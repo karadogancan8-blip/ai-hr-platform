@@ -5,7 +5,7 @@ import { IconUpload } from "@/components/icons";
 import { ClipboardList, FileDown, Loader2, Sparkles, Video } from "lucide-react";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 import { InterviewModal } from "@/components/recruiter/InterviewModal";
-import { downloadCandidatePdf } from "@/lib/download-candidate-pdf";
+import { PrintReportModal } from "@/components/reports/PrintReportModal";
 import type { InterviewGuide } from "@/lib/interview";
 import { fetchResumes, updateResumeInterview, type StoredResume } from "@/lib/resumes";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -57,7 +57,7 @@ export function RecruiterWorkspace() {
   const [guideLoading, setGuideLoading] = useState(false);
   const [guideError, setGuideError] = useState("");
   const [savingInterview, setSavingInterview] = useState(false);
-  const [pdfBusyId, setPdfBusyId] = useState<string | null>(null);
+  const [printResume, setPrintResume] = useState<StoredResume | null>(null);
   const branding = useCompanyBranding();
 
   const average = useMemo(() => {
@@ -170,22 +170,8 @@ export function RecruiterWorkspace() {
     }
   }
 
-  async function downloadExecutivePdf(resume: StoredResume) {
-    setPdfBusyId(resume.id);
-    setError("");
-    try {
-      await downloadCandidatePdf({
-        resume,
-        branding,
-        guide: guides[resume.id] ?? null,
-        fileName: `${resume.name}-executive-rapor`,
-      });
-      setNotice(`${resume.name} için executive PDF indirildi.`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "PDF indirilemedi.");
-    } finally {
-      setPdfBusyId(null);
-    }
+  function openPrintReport(resume: StoredResume) {
+    setPrintResume(resume);
   }
 
   return (
@@ -375,15 +361,10 @@ export function RecruiterWorkspace() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => void downloadExecutivePdf(resume)}
-                  disabled={pdfBusyId === resume.id}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 sm:col-span-2"
+                  onClick={() => openPrintReport(resume)}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 sm:col-span-2"
                 >
-                  {pdfBusyId === resume.id ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <FileDown className="h-3.5 w-3.5" />
-                  )}
+                  <FileDown className="h-3.5 w-3.5" />
                   Executive PDF Raporu İndir
                 </button>
               </div>
@@ -423,6 +404,15 @@ export function RecruiterWorkspace() {
           }
         }}
       />
+      {printResume ? (
+        <PrintReportModal
+          open
+          resume={printResume}
+          branding={branding}
+          guide={guides[printResume.id] ?? null}
+          onClose={() => setPrintResume(null)}
+        />
+      ) : null}
     </div>
   );
 }

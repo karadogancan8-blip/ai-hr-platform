@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { FileDown, Loader2, Star, X } from "lucide-react";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
-import { downloadCandidatePdf } from "@/lib/download-candidate-pdf";
+import { PrintReportModal } from "@/components/reports/PrintReportModal";
 import {
   allQuestions,
   interviewFinalScore,
@@ -37,9 +37,7 @@ export function InterviewModal({
 }: InterviewModalProps) {
   const questions = useMemo(() => (guide ? allQuestions(guide) : []), [guide]);
   const [ratings, setRatings] = useState<InterviewRating[]>([]);
-  const [exporting, setExporting] = useState(false);
-  const [exportError, setExportError] = useState("");
-  const [exportNotice, setExportNotice] = useState("");
+  const [printOpen, setPrintOpen] = useState(false);
   const branding = useCompanyBranding();
 
   useEffect(() => {
@@ -75,6 +73,7 @@ export function InterviewModal({
   }
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/45 p-3 backdrop-blur-[2px] sm:items-center sm:p-6">
       <button type="button" className="absolute inset-0" aria-label="Kapat" onClick={onClose} disabled={saving} />
       <div
@@ -117,14 +116,6 @@ export function InterviewModal({
           ) : null}
           {error ? (
             <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
-          ) : null}
-          {exportError ? (
-            <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{exportError}</p>
-          ) : null}
-          {exportNotice ? (
-            <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-              {exportNotice}
-            </p>
           ) : null}
 
           {guide && !loading ? (
@@ -206,28 +197,12 @@ export function InterviewModal({
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              disabled={exporting || saving}
-              onClick={() => {
-                setExporting(true);
-                setExportError("");
-                setExportNotice("");
-                void downloadCandidatePdf({
-                  resume: { ...resume, interviewScore: resume.interviewScore ?? score },
-                  branding,
-                  guide,
-                  ratings,
-                  fileName: `${resume.name}-executive-rapor`,
-                })
-                  .then(() => setExportNotice("Executive PDF indirildi."))
-                  .catch((err) => {
-                    setExportError(err instanceof Error ? err.message : "PDF indirilemedi.");
-                  })
-                  .finally(() => setExporting(false));
-              }}
+              disabled={saving}
+              onClick={() => setPrintOpen(true)}
               className="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-medium text-sky-900 hover:bg-sky-100 disabled:opacity-50"
             >
-              {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
-              {exporting ? "PDF hazırlanıyor…" : "Executive PDF Raporu İndir"}
+              <FileDown className="h-4 w-4" />
+              Executive PDF Raporu İndir
             </button>
             <button
               type="button"
@@ -252,6 +227,17 @@ export function InterviewModal({
         </footer>
       </div>
     </div>
+    {printOpen ? (
+      <PrintReportModal
+        open
+        resume={{ ...resume, interviewScore: resume.interviewScore ?? score }}
+        branding={branding}
+        guide={guide}
+        ratings={ratings}
+        onClose={() => setPrintOpen(false)}
+      />
+    ) : null}
+    </>
   );
 }
 

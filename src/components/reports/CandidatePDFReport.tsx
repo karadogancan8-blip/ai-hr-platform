@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { allQuestions, type InterviewGuide, type InterviewRating } from "@/lib/interview";
 import type { CompanyBranding } from "@/lib/branding";
 import type { StoredResume } from "@/lib/resumes";
@@ -10,8 +11,17 @@ export type CandidatePDFReportProps = {
   guide: InterviewGuide | null;
   ratings?: InterviewRating[];
   generatedAt?: Date;
-  useSafeLogo?: boolean;
 };
+
+const ink = "#1e293b";
+const muted = "#64748b";
+const line = "#e2e8f0";
+const paper = "#ffffff";
+const soft = "#f8fafc";
+const greenBg = "#ecfdf5";
+const greenInk = "#065f46";
+const amberBg = "#fffbeb";
+const amberInk = "#92400e";
 
 export function CandidatePDFReport({
   resume,
@@ -19,10 +29,10 @@ export function CandidatePDFReport({
   guide,
   ratings = [],
   generatedAt = new Date(),
-  useSafeLogo = true,
 }: CandidatePDFReportProps) {
   const questions = guide ? allQuestions(guide) : [];
-  const accent = branding.primaryColor;
+  const accent = branding.primaryColor || "#123056";
+  const [logoFailed, setLogoFailed] = useState(false);
   const dateLabel = generatedAt.toLocaleString("tr-TR", {
     day: "2-digit",
     month: "long",
@@ -30,48 +40,100 @@ export function CandidatePDFReport({
     hour: "2-digit",
     minute: "2-digit",
   });
+  const strengths = (guide?.strengths.length ? guide.strengths : resume.strengths).slice(0, 8);
+  const probes = (guide?.probeAreas.length ? guide.probeAreas : resume.weaknesses).slice(0, 8);
 
   return (
     <article
-      className="box-border w-[794px] bg-white text-slate-800"
-      style={{ fontFamily: "Segoe UI, Arial, sans-serif" }}
+      id="candidate-print-root"
+      style={{
+        boxSizing: "border-box",
+        width: "210mm",
+        maxWidth: "100%",
+        margin: "0 auto",
+        background: paper,
+        color: ink,
+        fontFamily: 'Segoe UI, Arial, Helvetica, sans-serif',
+        fontSize: "12px",
+        lineHeight: 1.5,
+        printColorAdjust: "exact",
+      }}
     >
-      <header className="flex items-center justify-between px-10 py-7 text-white" style={{ backgroundColor: accent }}>
-        <div className="flex items-center gap-4">
-          {branding.logoUrl && !useSafeLogo ? (
+      <header
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+          padding: "22px 28px",
+          background: accent,
+          color: paper,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {branding.logoUrl && !logoFailed ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={branding.logoUrl}
               alt={branding.companyName}
-              className="h-14 w-14 rounded-xl bg-white object-contain p-1"
+              onError={() => setLogoFailed(true)}
+              style={{
+                width: 56,
+                height: 56,
+                objectFit: "contain",
+                background: paper,
+                borderRadius: 12,
+                padding: 4,
+              }}
             />
           ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/15 text-lg font-bold">
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 12,
+                background: "rgba(255,255,255,0.16)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 700,
+                fontSize: 16,
+              }}
+            >
               {branding.companyName.slice(0, 2).toUpperCase()}
             </div>
           )}
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">Executive rapor</p>
-            <h1 className="text-xl font-semibold">{branding.companyName}</h1>
-            <p className="text-sm text-white/80">İşe alım değerlendirme özeti</p>
+            <p style={{ margin: 0, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", opacity: 0.75 }}>
+              Executive rapor
+            </p>
+            <h1 style={{ margin: "4px 0 0", fontSize: 20, fontWeight: 650 }}>{branding.companyName}</h1>
+            <p style={{ margin: "2px 0 0", fontSize: 12, opacity: 0.85 }}>İşe alım değerlendirme özeti</p>
           </div>
         </div>
-        <p className="text-right text-xs text-white/75">{dateLabel}</p>
+        <p style={{ margin: 0, fontSize: 11, opacity: 0.8, textAlign: "right" }}>{dateLabel}</p>
       </header>
 
-      <section className="grid grid-cols-3 gap-4 px-10 py-6">
-        <div className="col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Aday</p>
-          <p className="mt-1 text-2xl font-semibold" style={{ color: accent }}>
-            {resume.name}
+      <section style={{ display: "grid", gridTemplateColumns: "1.7fr 1fr", gap: 14, padding: "20px 28px 8px" }}>
+        <div style={{ border: `1px solid ${line}`, background: soft, borderRadius: 14, padding: 16 }}>
+          <p style={{ margin: 0, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: muted }}>
+            Aday
           </p>
-          <p className="mt-1 text-sm text-slate-600">{resume.role}</p>
+          <p style={{ margin: "6px 0 0", fontSize: 22, fontWeight: 650, color: accent }}>{resume.name}</p>
+          <p style={{ margin: "4px 0 0", color: muted }}>{resume.role}</p>
           {resume.skills.length ? (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {resume.skills.slice(0, 8).map((skill) => (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
+              {resume.skills.slice(0, 10).map((skill) => (
                 <span
                   key={skill}
-                  className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-medium text-slate-700 ring-1 ring-slate-200"
+                  style={{
+                    border: `1px solid ${line}`,
+                    background: paper,
+                    borderRadius: 999,
+                    padding: "2px 10px",
+                    fontSize: 11,
+                    color: ink,
+                  }}
                 >
                   {skill}
                 </span>
@@ -79,69 +141,63 @@ export function CandidatePDFReport({
             </div>
           ) : null}
         </div>
-        <div className="space-y-3">
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <ScoreTile label="Eşleşme skoru" value={resume.matchScore} accent={accent} />
-          <ScoreTile
-            label="Mülakat skoru"
-            value={resume.interviewScore}
-            accent={accent}
-          />
+          <ScoreTile label="Mülakat skoru" value={resume.interviewScore} accent={accent} />
         </div>
       </section>
 
-      <section className="px-10 pb-5">
-        <h2 className="text-sm font-semibold uppercase tracking-wide" style={{ color: accent }}>
+      <section style={{ padding: "12px 28px" }}>
+        <h2 style={{ margin: 0, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: accent }}>
           AI CV özeti
         </h2>
-        <p className="mt-2 text-sm leading-6 text-slate-700">{resume.summary || "Özet henüz üretilmedi."}</p>
+        <p style={{ margin: "8px 0 0", color: ink }}>{resume.summary || "Özet henüz üretilmedi."}</p>
       </section>
 
-      <section className="grid grid-cols-2 gap-4 px-10 pb-6">
-        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Güçlü yönler</h3>
-          <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-slate-700">
-            {(guide?.strengths.length ? guide.strengths : resume.strengths).slice(0, 6).map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-            {!resume.strengths.length && !guide?.strengths.length ? <li>Belirtilmedi</li> : null}
+      <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, padding: "4px 28px 16px" }}>
+        <div style={{ border: "1px solid #a7f3d0", background: greenBg, borderRadius: 14, padding: 14 }}>
+          <h3 style={{ margin: 0, fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: greenInk }}>
+            Güçlü yönler
+          </h3>
+          <ul style={{ margin: "8px 0 0", paddingLeft: 18, color: ink }}>
+            {strengths.length ? strengths.map((item) => <li key={item}>{item}</li>) : <li>Belirtilmedi</li>}
           </ul>
         </div>
-        <div className="rounded-2xl border border-amber-100 bg-amber-50/70 p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-amber-800">Gelişime açık yönler</h3>
-          <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-slate-700">
-            {(guide?.probeAreas.length ? guide.probeAreas : resume.weaknesses).slice(0, 6).map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-            {!resume.weaknesses.length && !guide?.probeAreas.length ? <li>Belirtilmedi</li> : null}
+        <div style={{ border: "1px solid #fde68a", background: amberBg, borderRadius: 14, padding: 14 }}>
+          <h3 style={{ margin: 0, fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: amberInk }}>
+            Gelişime açık yönler
+          </h3>
+          <ul style={{ margin: "8px 0 0", paddingLeft: 18, color: ink }}>
+            {probes.length ? probes.map((item) => <li key={item}>{item}</li>) : <li>Belirtilmedi</li>}
           </ul>
         </div>
       </section>
 
-      <section className="px-10 pb-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wide" style={{ color: accent }}>
+      <section style={{ padding: "0 28px 20px" }}>
+        <h2 style={{ margin: 0, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", color: accent }}>
           AI mülakat soruları ve değerlendirme notları
         </h2>
         {questions.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">
+          <p style={{ margin: "8px 0 0", color: muted }}>
             Bu rapor için henüz mülakat rehberi üretilmedi.
             {resume.interviewNotes ? ` Kayıtlı not: ${resume.interviewNotes}` : ""}
           </p>
         ) : (
-          <div className="mt-3 space-y-3">
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
             {questions.map((question, index) => {
               const rating = ratings.find((item) => item.questionId === question.id);
               return (
-                <div key={question.id} className="rounded-xl border border-slate-200 p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                <div key={question.id} style={{ border: `1px solid ${line}`, borderRadius: 12, padding: 12 }}>
+                  <p style={{ margin: 0, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: muted }}>
                     {question.kind === "technical" ? "Teknik" : "Kültürel uyum"} · Soru {index + 1}
                   </p>
-                  <p className="mt-1 text-sm font-medium text-slate-900">{question.question}</p>
-                  <p className="mt-2 text-xs leading-5 text-slate-600">
-                    <span className="font-semibold">Beklenen yanıt: </span>
+                  <p style={{ margin: "6px 0 0", fontWeight: 600, color: ink }}>{question.question}</p>
+                  <p style={{ margin: "6px 0 0", color: muted }}>
+                    <strong style={{ color: accent }}>Beklenen yanıt: </strong>
                     {question.expectedAnswer}
                   </p>
-                  <p className="mt-2 text-xs text-slate-700">
-                    <span className="font-semibold">Puan: </span>
+                  <p style={{ margin: "6px 0 0", color: ink }}>
+                    <strong>Puan: </strong>
                     {rating?.rating ? `${rating.rating}/5` : "Puanlanmadı"}
                     {rating?.note ? ` — ${rating.note}` : ""}
                   </p>
@@ -151,14 +207,23 @@ export function CandidatePDFReport({
           </div>
         )}
         {resume.interviewNotes && questions.length > 0 ? (
-          <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-600">
-            <span className="font-semibold">Kayıtlı mülakat notları: </span>
+          <p style={{ margin: "12px 0 0", background: soft, borderRadius: 12, padding: 12, color: muted }}>
+            <strong style={{ color: ink }}>Kayıtlı mülakat notları: </strong>
             {resume.interviewNotes}
           </p>
         ) : null}
       </section>
 
-      <footer className="flex items-center justify-between border-t border-slate-200 px-10 py-4 text-[11px] text-slate-500">
+      <footer
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          borderTop: `1px solid ${line}`,
+          padding: "12px 28px",
+          fontSize: 11,
+          color: muted,
+        }}
+      >
         <span>{branding.companyName} · Gizli / İç kullanım</span>
         <span>Nexus HR Executive Report</span>
       </footer>
@@ -176,11 +241,9 @@ function ScoreTile({
   accent: string;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-semibold" style={{ color: accent }}>
-        {value == null ? "—" : value}
-      </p>
+    <div style={{ border: `1px solid ${line}`, background: paper, borderRadius: 14, padding: 12, textAlign: "center" }}>
+      <p style={{ margin: 0, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: muted }}>{label}</p>
+      <p style={{ margin: "6px 0 0", fontSize: 24, fontWeight: 700, color: accent }}>{value == null ? "—" : value}</p>
     </div>
   );
 }
