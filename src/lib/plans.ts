@@ -15,22 +15,22 @@ export type Plan = {
 export const plans: Plan[] = [
   {
     id: "free",
-    name: "Başlangıç",
+    name: "KOBİ",
     seatLabel: "1–50 Çalışan",
-    monthlyPrice: 1490,
+    monthlyPrice: 2950,
     description: "Küçük ve orta ölçekli ekipler için çekirdek AI İK operasyonu.",
     features: [
       "AI destekli CV analizi ve işe alım",
       "Mevzuat asistanı (temel kota)",
       "Onboarding şablonları",
-      "KVKK uyumlu veri saklama",
+      "KVKK uyumlu belge ve izin kaydı",
     ],
   },
   {
     id: "pro",
-    name: "Kurumsal",
+    name: "Pro (Büyüyen)",
     seatLabel: "50–250 Çalışan",
-    monthlyPrice: 3990,
+    monthlyPrice: 7450,
     description: "Büyüyen organizasyonlar için tam platform ve öncelikli kapasite.",
     features: [
       "Sınırsız CV analizi ve mülakat rehberi",
@@ -47,7 +47,7 @@ export const plans: Plan[] = [
     monthlyPrice: null,
     description: "Holding ve büyük ölçek için özel sözleşme, SSO ve SLA.",
     features: [
-      "Özel fiyatlandırma ve hesap yöneticisi",
+      "Özel teklif ve hesap yöneticisi",
       "SSO, özel entegrasyonlar ve SLA",
       "Özel model / veri bölgesi seçenekleri",
       "Kurumsal onboarding ve eğitim",
@@ -56,9 +56,9 @@ export const plans: Plan[] = [
 ];
 
 export const planBadgeLabel: Record<PlanId, string> = {
-  free: "Başlangıç Plan",
-  pro: "Kurumsal Plan",
-  enterprise: "Enterprise Plan",
+  free: "KOBİ",
+  pro: "Pro",
+  enterprise: "Enterprise",
 };
 
 export function formatTry(amount: number) {
@@ -71,7 +71,7 @@ export function yearlyTotal(monthly: number) {
 }
 
 export function planChargeLabel(plan: Plan, cycle: BillingCycle) {
-  if (plan.monthlyPrice == null) return "Özel fiyatlandırma";
+  if (plan.monthlyPrice == null) return "Özel Teklif";
   if (cycle === "yearly") {
     return `${formatTry(yearlyTotal(plan.monthlyPrice))} / yıl`;
   }
@@ -79,7 +79,7 @@ export function planChargeLabel(plan: Plan, cycle: BillingCycle) {
 }
 
 export function planMonthlyEquivalent(plan: Plan, cycle: BillingCycle) {
-  if (plan.monthlyPrice == null) return "Satış ekibi ile belirlenir";
+  if (plan.monthlyPrice == null) return "Satış ekibi ile özel teklif";
   if (cycle === "yearly") {
     return `${formatTry(Math.round(yearlyTotal(plan.monthlyPrice) / 12))} / ay olarak faturalandırılır · 2 ay ücretsiz`;
   }
@@ -88,7 +88,7 @@ export function planMonthlyEquivalent(plan: Plan, cycle: BillingCycle) {
 
 export function asPlanId(value?: string | null): PlanId {
   if (value === "pro" || value === "enterprise" || value === "free") return value;
-  if (value === "baslangic" || value === "ucretsiz") return "free";
+  if (value === "baslangic" || value === "ucretsiz" || value === "kobi") return "free";
   if (value === "kurumsal") return "pro";
   return "free";
 }

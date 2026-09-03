@@ -11,6 +11,7 @@ import { mergeById, readSessionList, writeSessionList } from "@/lib/session-stor
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
+import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
 
 const SESSION_KEY = DEMO_PERFORMANCE_KEY;
 
@@ -159,6 +160,11 @@ export function PerformanceWorkspace() {
           <HelpTip text="Yönetici notlarından skor önerisi, güçlü yönler ve gelecek çeyrek hedefleri üretir." />
         </div>
       </form>
+
+      <HrDocsAndAppeal
+        storageKey="nexus-docs-performance"
+        subjectLabel={latest?.employeeName ?? "performans"}
+      />
 
       {latest ? (
         <section className="grid gap-4 lg:grid-cols-2">

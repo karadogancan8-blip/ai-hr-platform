@@ -13,6 +13,7 @@ import { mergeById, readSessionList, writeSessionList } from "@/lib/session-stor
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
+import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
 
 const SESSION_KEY = DEMO_ONBOARDING_KEY;
 
@@ -211,6 +212,8 @@ export function OnboardingWorkspace() {
           <HelpTip text="Çalışan, rol ve departmana göre 4 haftalık uyum checklist’i ve sohbet asistanı oluşturur." />
         </div>
       </form>
+
+      <HrDocsAndAppeal storageKey="nexus-docs-onboarding" subjectLabel="onboarding" />
 
       {loading ? <p className="text-sm text-slate-400">Planlar yükleniyor…</p> : null}
 

@@ -94,6 +94,7 @@ export function defaultAccessControl(): AccessControlMap {
 }
 
 export function asAppRole(value?: string | null): AppRole {
+  if (value === "admin") return "company_admin";
   if (value === "hr_manager" || value === "hr_specialist" || value === "employee" || value === "company_admin") {
     return value;
   }
@@ -105,12 +106,17 @@ export function asVisibility(value?: string | null): ModuleVisibility {
   return "hr_managers";
 }
 
+export function isSalaryPrivileged(role: AppRole) {
+  return role === "company_admin" || role === "hr_manager";
+}
+
 export function canManageAccess(role: AppRole) {
   return role === "company_admin";
 }
 
-export function canViewModule(role: AppRole, access: ModuleAccess) {
+export function canViewModule(role: AppRole, access: ModuleAccess, moduleId?: EnterpriseModuleId) {
   if (!access.enabled) return false;
+  if (moduleId === "salary_benchmark") return isSalaryPrivileged(role);
   if (access.visibility === "admin_only") return role === "company_admin";
   if (access.visibility === "hr_managers") return role === "company_admin" || role === "hr_manager";
   return true;

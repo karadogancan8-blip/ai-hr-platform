@@ -160,11 +160,11 @@ export function PricingWorkspace() {
               <p className="mt-2 text-sm leading-6 text-slate-500">{plan.description}</p>
               <p className="mt-6 flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
                 <span className="text-3xl font-semibold tracking-tight text-slate-900">
-                  {plan.monthlyPrice == null ? "Özel" : planChargeLabel(plan, cycle).split(" / ")[0]}
+                  {plan.monthlyPrice == null ? "Özel Teklif" : planChargeLabel(plan, cycle).split(" / ")[0]}
                 </span>
                 <span className="text-sm text-slate-400">
                   {plan.monthlyPrice == null
-                    ? "fiyatlandırma"
+                    ? ""
                     : cycle === "yearly"
                       ? "/ yıl"
                       : "/ ay"}

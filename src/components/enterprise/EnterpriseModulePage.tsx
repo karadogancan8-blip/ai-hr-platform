@@ -103,8 +103,9 @@ export function EnterpriseModulePage({ moduleId }: { moduleId: EnterpriseModuleI
   if (!canView(moduleId) || !meta) {
     return (
       <div className="rounded-2xl border border-rose-100 bg-rose-50 px-5 py-8 text-sm text-rose-900">
-        Bu Enterprise modülü şirket admini tarafından kapatılmış veya rolünüze açık değil. Flight Risk ve Salary
-        Benchmarking gibi hassas analitikler employee / hr_specialist rollerinde gizlenir.
+        {moduleId === "salary_benchmark"
+          ? "Ücret kıyaslaması yalnızca şirket admini ve İK yöneticilerine açıktır. Standart çalışanlar bu raporu göremez."
+          : "Bu Enterprise modülü şirket admini tarafından kapatılmış veya rolünüze açık değil. Flight Risk ve Salary Benchmarking gibi hassas analitikler employee / hr_specialist rollerinde gizlenir."}
       </div>
     );
   }

@@ -22,7 +22,9 @@ import { planBadgeLabel, type PlanId } from "@/lib/plans";
 import { fetchCompanySubscription } from "@/lib/subscription";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import { APP_ROLES, type EnterpriseModuleId } from "@/lib/access-control";
+import type { MessageKey } from "@/lib/i18n";
 
 const navItems: {
   href: string;
@@ -30,42 +32,51 @@ const navItems: {
   description: string;
   icon: ComponentType<{ className?: string }>;
   moduleId?: EnterpriseModuleId;
+  labelKey?: MessageKey;
+  descKey?: MessageKey;
 }[] = [
   {
     href: "/dashboard",
     label: "Dashboard",
     description: "Genel Özet",
     icon: IconDashboard,
+    labelKey: "nav.dashboard",
+    descKey: "nav.dashboardDesc",
   },
   {
     href: "/ise-alim",
     label: "İşe Alım & CV Analizi",
     description: "RecruiterAgent",
     icon: IconRecruit,
+    labelKey: "nav.recruit",
   },
   {
     href: "/mevzuat",
     label: "Şirket İçi Mevzuat",
     description: "PolicyAgent",
     icon: IconPolicy,
+    labelKey: "nav.policy",
   },
   {
     href: "/izin",
     label: "İzin & Özlük Yönetimi",
     description: "HRAdminAgent",
     icon: IconLeave,
+    labelKey: "nav.leave",
   },
   {
     href: "/onboarding",
     label: "Onboarding",
     description: "Uyum Companion",
     icon: IconOnboarding,
+    labelKey: "nav.onboarding",
   },
   {
     href: "/performans",
     label: "Performans",
     description: "Değerlendirme",
     icon: IconPerformance,
+    labelKey: "nav.performance",
   },
   {
     href: "/kultur-profili",
@@ -114,12 +125,14 @@ const navItems: {
     label: "Fiyatlandırma & Üyelik",
     description: "Paketler",
     icon: IconCreditCard,
+    labelKey: "nav.pricing",
   },
   {
     href: "/ayarlar",
     label: "Ayarlar",
     description: "White-Label & Yetki",
     icon: IconSettings,
+    labelKey: "nav.settings",
   },
 ];
 
@@ -136,6 +149,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const [signingOut, setSigningOut] = useState(false);
   const branding = useCompanyBranding();
   const { canView, role, loading: accessLoading } = useAccessControl();
+  const { t } = useI18n();
   const roleLabel = APP_ROLES.find((item) => item.id === role)?.label ?? "Şirket Admini";
 
   useEffect(() => {
@@ -223,7 +237,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
         <nav className="space-y-1 px-3 pb-2">
           <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-200/50">
-            Modüller
+            {t("nav.modules")}
           </p>
           {navItems
             .filter((item) => {
@@ -253,9 +267,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   <Icon className="h-[18px] w-[18px]" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-medium leading-5">{item.label}</span>
+                  <span className="block text-sm font-medium leading-5">
+                    {item.labelKey ? t(item.labelKey) : item.label}
+                  </span>
                   <span className={`mt-0.5 block text-xs ${active ? "text-sky-200" : "text-slate-400"}`}>
-                    {item.description}
+                    {item.descKey ? t(item.descKey) : item.description}
                   </span>
                   {item.href === "/fiyatlandirma" ? (
                     <span className="mt-1.5 inline-flex max-w-full rounded-full bg-sky-400/20 px-2 py-0.5 text-[10px] font-semibold leading-4 text-sky-100">

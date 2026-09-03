@@ -80,7 +80,7 @@ export function AccessControlProvider({ children }: { children: ReactNode }) {
       role,
       access,
       canManage: canManageAccess(role),
-      canView: (moduleId) => canViewModule(role, access[moduleId]),
+      canView: (moduleId) => canViewModule(role, access[moduleId], moduleId),
     }),
     [access, loading, role],
   );
