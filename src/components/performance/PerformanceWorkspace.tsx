@@ -164,6 +164,10 @@ export function PerformanceWorkspace() {
       <HrDocsAndAppeal
         storageKey="nexus-docs-performance"
         subjectLabel={latest?.employeeName ?? "performans"}
+        showDocs={false}
+        appealButtonKey="appeal.button.performance"
+        appealTitleKey="appeal.title.performance"
+        appealLeadKey="appeal.lead.performance"
       />
 
       {latest ? (

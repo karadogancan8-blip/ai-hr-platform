@@ -9,6 +9,7 @@ import {
 import { isSupabaseConfigured } from "@/lib/supabase";
 import type { LeaveRequest, LeaveStatus, LeaveType } from "@/lib/types";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
 
 const typeLabel: Record<LeaveType, string> = {
   yillik: "Yıllık izin",
@@ -313,6 +314,14 @@ export function LeaveWorkspace() {
           </div>
         </section>
       </div>
+
+      <HrDocsAndAppeal
+        storageKey="nexus-docs-leave"
+        subjectLabel="izin-ozluk"
+        appealButtonKey="appeal.button.leave"
+        appealTitleKey="appeal.title.leave"
+        appealLeadKey="appeal.lead.leave"
+      />
     </div>
   );
 }
