@@ -6,6 +6,7 @@ import { initialPolicyMessages } from "@/lib/mock-data";
 import { DEMO_POLICY_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { readSessionList } from "@/lib/session-store";
 import type { ChatMessage } from "@/lib/types";
+import { AiDisclaimer } from "@/components/ai-disclaimer";
 
 function nowLabel() {
   return new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
@@ -144,6 +145,7 @@ export function PolicyChat() {
           </button>
         </form>
       </div>
+      <AiDisclaimer className="mt-3" />
     </div>
   );
 }

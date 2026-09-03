@@ -9,6 +9,7 @@ import {
 import { DEMO_PERFORMANCE_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { mergeById, readSessionList, writeSessionList } from "@/lib/session-store";
 import { isSupabaseConfigured } from "@/lib/supabase";
+import { AiDisclaimer } from "@/components/ai-disclaimer";
 
 const SESSION_KEY = DEMO_PERFORMANCE_KEY;
 
@@ -164,6 +165,7 @@ export function PerformanceWorkspace() {
               </span>
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-600">{latest.summary}</p>
+            <AiDisclaimer className="mt-4" />
           </article>
           <article className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Güçlü yönler</h3>

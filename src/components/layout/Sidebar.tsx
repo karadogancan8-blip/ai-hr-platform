@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { LogOut } from "lucide-react";
+import { Brain, GraduationCap, LineChart, ShieldAlert, Video, Wallet } from "lucide-react";
 import {
   IconClose,
   IconCreditCard,
@@ -20,8 +21,16 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { planBadgeLabel, type PlanId } from "@/lib/plans";
 import { fetchCompanySubscription } from "@/lib/subscription";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
+import { useAccessControl } from "@/components/access/AccessControlProvider";
+import { APP_ROLES, type EnterpriseModuleId } from "@/lib/access-control";
 
-const navItems = [
+const navItems: {
+  href: string;
+  label: string;
+  description: string;
+  icon: ComponentType<{ className?: string }>;
+  moduleId?: EnterpriseModuleId;
+}[] = [
   {
     href: "/dashboard",
     label: "Dashboard",
@@ -59,6 +68,48 @@ const navItems = [
     icon: IconPerformance,
   },
   {
+    href: "/kultur-profili",
+    label: "Kültür & Profil",
+    description: "Culture Fit",
+    icon: Brain,
+    moduleId: "culture_fit",
+  },
+  {
+    href: "/ayrilma-riski",
+    label: "Ayrılma Riski",
+    description: "Flight Risk",
+    icon: LineChart,
+    moduleId: "flight_risk",
+  },
+  {
+    href: "/ucret-karsilastirma",
+    label: "Ücret Kıyaslama",
+    description: "Salary Benchmark",
+    icon: Wallet,
+    moduleId: "salary_benchmark",
+  },
+  {
+    href: "/video-mulakat",
+    label: "Video Duygu Analizi",
+    description: "Interview Sentiment",
+    icon: Video,
+    moduleId: "video_sentiment",
+  },
+  {
+    href: "/uyum-kalkani",
+    label: "Uyum Kalkanı",
+    description: "Compliance Shield",
+    icon: ShieldAlert,
+    moduleId: "compliance_shield",
+  },
+  {
+    href: "/beceri-acigi",
+    label: "Beceri & Öğrenme",
+    description: "Skill Gap",
+    icon: GraduationCap,
+    moduleId: "skill_gap",
+  },
+  {
     href: "/fiyatlandirma",
     label: "Fiyatlandırma & Üyelik",
     description: "Paketler",
@@ -67,7 +118,7 @@ const navItems = [
   {
     href: "/ayarlar",
     label: "Ayarlar",
-    description: "White-Label",
+    description: "White-Label & Yetki",
     icon: IconSettings,
   },
 ];
@@ -84,6 +135,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const [plan, setPlan] = useState<PlanId>("free");
   const [signingOut, setSigningOut] = useState(false);
   const branding = useCompanyBranding();
+  const { canView, role, loading: accessLoading } = useAccessControl();
+  const roleLabel = APP_ROLES.find((item) => item.id === role)?.label ?? "Şirket Admini";
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
@@ -172,7 +225,12 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-200/50">
             Modüller
           </p>
-          {navItems.map((item) => {
+          {navItems
+            .filter((item) => {
+              if (item.moduleId) return !accessLoading && canView(item.moduleId);
+              return true;
+            })
+            .map((item) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
             const Icon = item.icon;
 
@@ -217,6 +275,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </p>
           <span className="inline-flex rounded-full bg-sky-400/20 px-2.5 py-1 text-[11px] font-semibold text-sky-100">
             {planBadgeLabel[plan]}
+          </span>
+          <span className="inline-flex rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-sky-100">
+            {roleLabel}
           </span>
           <button
             type="button"

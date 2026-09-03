@@ -49,6 +49,8 @@ alter table public.companies add column if not exists plan_type text not null de
 alter table public.companies add column if not exists subscription_status text not null default 'free';
 alter table public.companies add column if not exists logo_url text;
 alter table public.companies add column if not exists primary_color text default '#123056';
+alter table public.companies add column if not exists access_control jsonb not null default '{}'::jsonb;
+alter table public.profiles add column if not exists role text not null default 'company_admin';
 
 alter table public.resumes add column if not exists interview_score integer;
 alter table public.resumes add column if not exists interview_notes text;
@@ -86,8 +88,8 @@ begin
   values (company_name, 'free', 'free')
   returning id into new_company_id;
 
-  insert into public.profiles (id, company_id, email)
-  values (new.id, new_company_id, new.email)
+  insert into public.profiles (id, company_id, email, role)
+  values (new.id, new_company_id, new.email, 'company_admin')
   on conflict (id) do update
     set company_id = excluded.company_id,
         email = excluded.email;

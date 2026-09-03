@@ -7,6 +7,7 @@ export type CompanyRow = {
   subscription_status?: string | null;
   logo_url?: string | null;
   primary_color?: string | null;
+  access_control?: Json | null;
   created_at?: string | null;
 };
 
@@ -14,6 +15,7 @@ export type ProfileRow = {
   id: string;
   company_id: string;
   email?: string | null;
+  role?: string | null;
   created_at?: string | null;
 };
 
@@ -88,6 +90,7 @@ export type Database = {
           subscription_status?: string;
           logo_url?: string | null;
           primary_color?: string | null;
+          access_control?: Json | null;
           created_at?: string;
         };
         Update: Partial<CompanyRow>;
@@ -95,7 +98,7 @@ export type Database = {
       };
       profiles: {
         Row: ProfileRow;
-        Insert: { id: string; company_id: string; email?: string | null; created_at?: string };
+        Insert: { id: string; company_id: string; email?: string | null; role?: string | null; created_at?: string };
         Update: Partial<ProfileRow>;
         Relationships: [];
       };

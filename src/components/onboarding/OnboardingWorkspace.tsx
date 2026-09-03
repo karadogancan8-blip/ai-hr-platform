@@ -11,6 +11,7 @@ import {
 import { DEMO_ONBOARDING_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { mergeById, readSessionList, writeSessionList } from "@/lib/session-store";
 import { isSupabaseConfigured } from "@/lib/supabase";
+import { AiDisclaimer } from "@/components/ai-disclaimer";
 
 const SESSION_KEY = DEMO_ONBOARDING_KEY;
 
@@ -254,6 +255,7 @@ export function OnboardingWorkspace() {
                 </span>
               </div>
               <p className="mt-2 text-sm leading-6 text-slate-600">{selected.summary}</p>
+              <AiDisclaimer className="mt-3" />
               <div className="mt-4 space-y-4">
                 {selected.weeks.map((week) => (
                   <div key={week.week} className="rounded-xl border border-slate-100 p-3">

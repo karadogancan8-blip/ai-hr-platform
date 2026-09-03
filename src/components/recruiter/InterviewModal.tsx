@@ -11,6 +11,7 @@ import {
   type InterviewRating,
 } from "@/lib/interview";
 import type { StoredResume } from "@/lib/resumes";
+import { AiDisclaimer } from "@/components/ai-disclaimer";
 
 type InterviewModalProps = {
   open: boolean;
@@ -184,6 +185,7 @@ export function InterviewModal({
                 })}
             </>
           ) : null}
+          {guide && !loading ? <AiDisclaimer className="mt-2" /> : null}
         </div>
 
         <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-sky-100 bg-white px-5 py-4">

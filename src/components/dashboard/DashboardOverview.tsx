@@ -1,13 +1,31 @@
-import { dashboardStats, recentActivity } from "@/lib/mock-data";
+"use client";
+
 import Link from "next/link";
+import { dashboardStats, recentActivity } from "@/lib/mock-data";
+import { useAccessControl } from "@/components/access/AccessControlProvider";
+import { ENTERPRISE_MODULES } from "@/lib/access-control";
+
+const coreLinks = [
+  { href: "/ise-alim", label: "CV analizi başlat" },
+  { href: "/onboarding", label: "Onboarding planı üret" },
+  { href: "/performans", label: "Performans incelemesi" },
+  { href: "/mevzuat", label: "Mevzuat sorusu sor" },
+  { href: "/izin", label: "İzin talebi oluştur" },
+];
 
 export function DashboardOverview() {
+  const { canView, loading } = useAccessControl();
+  const enterpriseLinks = ENTERPRISE_MODULES.filter((item) => !loading && canView(item.id)).map((item) => ({
+    href: item.href,
+    label: item.subtitle,
+  }));
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">Dashboard</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Recruiter, Policy ve HR Admin ajanlarının operasyon özeti.
+          Recruiter, Policy ve HR Admin ajanlarının operasyon özeti. Hassas Enterprise raporları rolünüze göre gizlenir.
         </p>
       </div>
 
@@ -51,15 +69,9 @@ export function DashboardOverview() {
 
         <article className="rounded-2xl border border-sky-100 bg-[linear-gradient(180deg,#123056_0%,#1b4f86_100%)] p-5 text-white shadow-[0_8px_30px_rgba(15,55,95,0.16)]">
           <h2 className="text-base font-semibold">Hızlı erişim</h2>
-          <p className="mt-1 text-sm text-sky-100/80">Modüllere doğrudan geçin.</p>
+          <p className="mt-1 text-sm text-sky-100/80">Yetkiniz olan modüllere geçin.</p>
           <div className="mt-5 space-y-2">
-            {[
-              { href: "/ise-alim", label: "CV analizi başlat" },
-              { href: "/onboarding", label: "Onboarding planı üret" },
-              { href: "/performans", label: "Performans incelemesi" },
-              { href: "/mevzuat", label: "Mevzuat sorusu sor" },
-              { href: "/izin", label: "İzin talebi oluştur" },
-            ].map((link) => (
+            {[...coreLinks, ...enterpriseLinks].map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

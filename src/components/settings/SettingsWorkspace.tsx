@@ -10,6 +10,7 @@ import {
 } from "@/lib/branding";
 import { seedDemoCorporateData } from "@/lib/seed-data";
 import { isSupabaseConfigured } from "@/lib/supabase";
+import { AccessControlCard } from "@/components/settings/AccessControlCard";
 
 export function SettingsWorkspace() {
   const [companyName, setCompanyName] = useState("");
@@ -190,6 +191,8 @@ export function SettingsWorkspace() {
           </div>
         </aside>
       </form>
+
+      <AccessControlCard />
 
       <section className="rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Demo / sunum modu</p>

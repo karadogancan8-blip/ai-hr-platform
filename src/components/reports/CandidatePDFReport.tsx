@@ -4,6 +4,7 @@ import { useState } from "react";
 import { allQuestions, type InterviewGuide, type InterviewRating } from "@/lib/interview";
 import type { CompanyBranding } from "@/lib/branding";
 import type { StoredResume } from "@/lib/resumes";
+import { AI_DISCLAIMER_TEXT } from "@/components/ai-disclaimer";
 
 export type CandidatePDFReportProps = {
   resume: StoredResume;
@@ -212,6 +213,23 @@ export function CandidatePDFReport({
             {resume.interviewNotes}
           </p>
         ) : null}
+      </section>
+
+      <section style={{ padding: "0 28px 16px" }}>
+        <p
+          style={{
+            margin: 0,
+            padding: 12,
+            borderRadius: 12,
+            border: "1px solid #fde68a",
+            background: "#fffbeb",
+            color: "#78350f",
+            fontSize: 11,
+            lineHeight: 1.5,
+          }}
+        >
+          {AI_DISCLAIMER_TEXT}
+        </p>
       </section>
 
       <footer

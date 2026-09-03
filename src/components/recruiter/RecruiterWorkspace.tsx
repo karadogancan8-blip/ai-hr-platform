@@ -10,6 +10,7 @@ import type { InterviewGuide } from "@/lib/interview";
 import { fetchResumes, updateResumeInterview, type StoredResume } from "@/lib/resumes";
 import { DEMO_GUIDES_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { isSupabaseConfigured } from "@/lib/supabase";
+import { AiDisclaimer } from "@/components/ai-disclaimer";
 
 function scoreTone(score: number) {
   if (score >= 90) return "from-sky-500 to-blue-700";
@@ -329,6 +330,7 @@ export function RecruiterWorkspace() {
                 </div>
               </div>
               <p className="mt-3 text-sm leading-6 text-slate-600">{resume.summary}</p>
+              <AiDisclaimer className="mt-3" />
               {resume.strengths.length ? (
                 <div className="mt-3">
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Güçlü yönler</p>
