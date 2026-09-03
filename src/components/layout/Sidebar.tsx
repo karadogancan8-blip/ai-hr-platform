@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
 import {
   IconClose,
+  IconCreditCard,
   IconDashboard,
   IconLeave,
   IconPolicy,
@@ -13,6 +14,8 @@ import {
 } from "../icons";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { planBadgeLabel, type PlanId } from "@/lib/plans";
+import { fetchCompanySubscription } from "@/lib/subscription";
 
 const navItems = [
   {
@@ -39,6 +42,12 @@ const navItems = [
     description: "HRAdminAgent",
     icon: IconLeave,
   },
+  {
+    href: "/fiyatlandirma",
+    label: "Fiyatlandırma & Üyelik",
+    description: "Paketler",
+    icon: IconCreditCard,
+  },
 ];
 
 type SidebarProps = {
@@ -50,6 +59,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [plan, setPlan] = useState<PlanId>("free");
   const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
@@ -61,7 +71,18 @@ export function Sidebar({ open, onClose }: SidebarProps) {
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       setEmail(session?.user?.email ?? "");
     });
-    return () => data.subscription.unsubscribe();
+    void fetchCompanySubscription()
+      .then((sub) => setPlan(sub.planType))
+      .catch(() => setPlan("free"));
+    function onPlan(event: Event) {
+      const detail = (event as CustomEvent<PlanId>).detail;
+      if (detail) setPlan(detail);
+    }
+    window.addEventListener("nexus-plan-updated", onPlan);
+    return () => {
+      data.subscription.unsubscribe();
+      window.removeEventListener("nexus-plan-updated", onPlan);
+    };
   }, []);
 
   async function logout() {
@@ -138,12 +159,17 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 >
                   <Icon className="h-[18px] w-[18px]" />
                 </span>
-                <span>
+                <span className="min-w-0 flex-1">
                   <span className="block text-sm font-medium leading-5">{item.label}</span>
                   <span className={`block text-xs ${active ? "text-sky-200" : "text-slate-400"}`}>
                     {item.description}
                   </span>
                 </span>
+                {item.href === "/fiyatlandirma" ? (
+                  <span className="mt-1 shrink-0 rounded-full bg-sky-400/20 px-2 py-0.5 text-[10px] font-semibold text-sky-100">
+                    {planBadgeLabel[plan]}
+                  </span>
+                ) : null}
               </Link>
             );
           })}
@@ -154,6 +180,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           <p className="truncate text-sm text-sky-50" title={email || "Oturum yok"}>
             {email || "Oturum yok"}
           </p>
+          <span className="inline-flex rounded-full bg-sky-400/20 px-2.5 py-1 text-[11px] font-semibold text-sky-100">
+            {planBadgeLabel[plan]}
+          </span>
           <button
             type="button"
             onClick={() => void logout()}

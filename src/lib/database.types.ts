@@ -3,6 +3,8 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type CompanyRow = {
   id: string;
   name: string;
+  plan_type?: string | null;
+  subscription_status?: string | null;
   created_at?: string | null;
 };
 
@@ -50,7 +52,13 @@ export type Database = {
     Tables: {
       companies: {
         Row: CompanyRow;
-        Insert: { id?: string; name: string; created_at?: string };
+        Insert: {
+          id?: string;
+          name: string;
+          plan_type?: string;
+          subscription_status?: string;
+          created_at?: string;
+        };
         Update: Partial<CompanyRow>;
         Relationships: [];
       };

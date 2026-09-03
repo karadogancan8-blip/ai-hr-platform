@@ -45,6 +45,9 @@ create table if not exists public.resumes (
 alter table public.leave_requests add column if not exists company_id uuid references public.companies (id) on delete cascade;
 alter table public.resumes add column if not exists company_id uuid references public.companies (id) on delete cascade;
 
+alter table public.companies add column if not exists plan_type text not null default 'free';
+alter table public.companies add column if not exists subscription_status text not null default 'free';
+
 create index if not exists leave_requests_company_id_idx on public.leave_requests (company_id);
 create index if not exists resumes_company_id_idx on public.resumes (company_id);
 create index if not exists profiles_company_id_idx on public.profiles (company_id);
@@ -74,8 +77,8 @@ begin
     company_name := 'Yeni Şirket';
   end if;
 
-  insert into public.companies (name)
-  values (company_name)
+  insert into public.companies (name, plan_type, subscription_status)
+  values (company_name, 'free', 'free')
   returning id into new_company_id;
 
   insert into public.profiles (id, company_id, email)
@@ -111,6 +114,7 @@ drop policy if exists "companies_insert_auth" on public.companies;
 drop policy if exists "profiles_select_own" on public.profiles;
 drop policy if exists "profiles_insert_own" on public.profiles;
 drop policy if exists "profiles_update_own" on public.profiles;
+drop policy if exists "companies_update_own" on public.companies;
 drop policy if exists "leave_requests_company" on public.leave_requests;
 drop policy if exists "resumes_company" on public.resumes;
 
@@ -123,6 +127,12 @@ create policy "companies_insert_auth"
   on public.companies for insert
   to authenticated
   with check (true);
+
+create policy "companies_update_own"
+  on public.companies for update
+  to authenticated
+  using (id = public.current_company_id())
+  with check (id = public.current_company_id());
 
 create policy "profiles_select_own"
   on public.profiles for select

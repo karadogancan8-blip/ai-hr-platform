@@ -39,11 +39,17 @@ export async function ensureCompanyForUser(
     String((user.user_metadata as { company_name?: string } | undefined)?.company_name || "").trim() ||
     "Yeni Şirket";
 
-  const { data: company, error: companyError } = await supabase
+  let { data: company, error: companyError } = await supabase
     .from("companies")
-    .insert({ name })
+    .insert({ name, plan_type: "free", subscription_status: "free" })
     .select("id")
     .single();
+
+  if (companyError && /plan_type|subscription_status/i.test(companyError.message)) {
+    const retry = await supabase.from("companies").insert({ name }).select("id").single();
+    company = retry.data;
+    companyError = retry.error;
+  }
 
   if (companyError) throw new Error(companyError.message);
 
