@@ -3,17 +3,34 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { useI18n } from "@/components/i18n/LocaleProvider";
-import { LOCALES, localeMeta } from "@/lib/i18n";
+import { LOCALES, localeMeta, type Locale } from "@/lib/i18n";
 
 type LanguageSwitcherProps = {
   className?: string;
 };
 
+function LanguageRow({ id }: { id: Locale }) {
+  const option = localeMeta[id];
+  return (
+    <span className="inline-flex min-w-0 items-center gap-2" dir="ltr">
+      <span className="text-[15px] leading-none" aria-hidden>
+        {option.flag}
+      </span>
+      <span className="text-[11px] font-semibold tracking-wide text-slate-500">{option.short}</span>
+      <span className="text-slate-300" aria-hidden>
+        –
+      </span>
+      <span dir={option.dir} className="truncate text-sm text-slate-800">
+        {option.nativeName}
+      </span>
+    </span>
+  );
+}
+
 export function LanguageSwitcher({ className = "" }: LanguageSwitcherProps) {
   const { locale, setLocale, t } = useI18n();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  const current = localeMeta[locale];
 
   useEffect(() => {
     if (!open) return;
@@ -36,21 +53,18 @@ export function LanguageSwitcher({ className = "" }: LanguageSwitcherProps) {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800 shadow-sm hover:bg-slate-50"
+        className="inline-flex max-w-[14rem] items-center gap-2 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-slate-800 shadow-sm transition hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 hover:shadow-md"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={t("lang.label")}
       >
-        <span className="text-sm leading-none" aria-hidden>
-          {current.flag}
-        </span>
-        <span className="tabular-nums tracking-wide">{current.short}</span>
-        <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition ${open ? "rotate-180" : ""}`} />
+        <LanguageRow id={locale} />
+        <ChevronDown className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
       {open ? (
         <ul
           role="listbox"
-          className="absolute end-0 z-50 mt-2 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+          className="absolute end-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 p-1 shadow-[0_18px_40px_-18px_rgba(15,23,42,0.45)] backdrop-blur-sm"
         >
           {LOCALES.map((id) => {
             const option = localeMeta[id];
@@ -66,16 +80,14 @@ export function LanguageSwitcher({ className = "" }: LanguageSwitcherProps) {
                     setLocale(id);
                     setOpen(false);
                   }}
-                  className={`flex w-full items-center gap-2.5 px-3 py-2 text-sm ${
-                    selected ? "bg-slate-50 font-medium text-slate-900" : "text-slate-600 hover:bg-slate-50"
+                  className={`inline-flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-start transition ${
+                    selected
+                      ? "bg-sky-50 text-slate-900 shadow-sm"
+                      : "text-slate-600 hover:translate-x-0.5 hover:bg-slate-50 hover:text-slate-900 rtl:hover:-translate-x-0.5"
                   }`}
                 >
-                  <span className="text-base leading-none" aria-hidden>
-                    {option.flag}
-                  </span>
-                  <span className="min-w-0 flex-1 text-start">{option.nativeName}</span>
-                  <span className="text-[10px] font-semibold tracking-wide text-slate-400">{option.short}</span>
-                  {selected ? <Check className="h-3.5 w-3.5 text-sky-700" /> : <span className="h-3.5 w-3.5" />}
+                  <LanguageRow id={id} />
+                  {selected ? <Check className="ms-auto h-3.5 w-3.5 shrink-0 text-sky-700" /> : null}
                 </button>
               </li>
             );
