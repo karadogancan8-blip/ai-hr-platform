@@ -7,6 +7,7 @@ export type StoredResume = {
   name: string;
   role: string;
   matchScore: number;
+  interviewScore: number | null;
   summary: string;
   skills: string[];
   strengths: string[];
@@ -36,6 +37,8 @@ export function mapResumeRow(row: ResumeRow): StoredResume {
     name,
     role: row.role ?? "Aday",
     matchScore: Math.round(Number(score) || 0),
+    interviewScore:
+      typeof row.interview_score === "number" ? Math.round(row.interview_score) : null,
     summary: row.summary ?? row.analysis_summary ?? "",
     skills: row.skills ?? [],
     strengths: row.strengths ?? [],
@@ -83,6 +86,7 @@ export async function insertResume(input: ResumeInsert, client?: AppSupabase) {
         name: input.name || mapped.name,
         role: input.role || mapped.role,
         matchScore: input.matchScore,
+        interviewScore: mapped.interviewScore,
         summary: input.summary || mapped.summary,
         skills: mapped.skills.length ? mapped.skills : (input.skills ?? []),
         strengths: mapped.strengths.length ? mapped.strengths : (input.strengths ?? []),
@@ -96,4 +100,40 @@ export async function insertResume(input: ResumeInsert, client?: AppSupabase) {
   }
 
   throw new Error("CV analizi resumes tablosuna kaydedilemedi.");
+}
+
+export async function updateResumeInterview(
+  id: string,
+  input: { interviewScore: number; interviewNotes?: string },
+  client?: AppSupabase,
+) {
+  const supabase = client ?? getSupabase();
+  const companyId = await getCompanyId(supabase);
+  const payload: Record<string, string | number> = {
+    interview_score: input.interviewScore,
+    interview_notes: input.interviewNotes ?? "",
+  };
+
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const { data, error } = await supabase
+      .from("resumes")
+      .update(payload)
+      .eq("id", id)
+      .eq("company_id", companyId)
+      .select()
+      .single();
+
+    if (!error) return mapResumeRow(data);
+
+    const column = missingColumn(error.message);
+    if (column === "interview_score") {
+      throw new Error(
+        "resumes tablosunda interview_score kolonu yok. supabase/schema.sql içindeki ALTER TABLE komutlarını çalıştırın.",
+      );
+    }
+    if (!column || !(column in payload) || column === "interview_score") throw new Error(error.message);
+    delete payload[column];
+  }
+
+  throw new Error("Mülakat skoru kaydedilemedi.");
 }

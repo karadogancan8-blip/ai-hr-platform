@@ -44,6 +44,8 @@ export type ResumeRow = {
   skills?: string[] | null;
   strengths?: string[] | null;
   weaknesses?: string[] | null;
+  interview_score?: number | null;
+  interview_notes?: string | null;
   created_at?: string | null;
 };
 

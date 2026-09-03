@@ -2,8 +2,10 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { IconUpload } from "@/components/icons";
-import { Loader2, Sparkles } from "lucide-react";
-import { fetchResumes, type StoredResume } from "@/lib/resumes";
+import { ClipboardList, Loader2, Sparkles, Video } from "lucide-react";
+import { InterviewModal } from "@/components/recruiter/InterviewModal";
+import type { InterviewGuide } from "@/lib/interview";
+import { fetchResumes, updateResumeInterview, type StoredResume } from "@/lib/resumes";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 function scoreTone(score: number) {
@@ -47,6 +49,12 @@ export function RecruiterWorkspace() {
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [guides, setGuides] = useState<Record<string, InterviewGuide>>({});
+  const [interviewResume, setInterviewResume] = useState<StoredResume | null>(null);
+  const [interviewMode, setInterviewMode] = useState<"guide" | "live">("guide");
+  const [guideLoading, setGuideLoading] = useState(false);
+  const [guideError, setGuideError] = useState("");
+  const [savingInterview, setSavingInterview] = useState(false);
 
   const average = useMemo(() => {
     if (!resumes.length) return 0;
@@ -116,6 +124,45 @@ export function RecruiterWorkspace() {
       setError(err instanceof Error ? err.message : "Analiz veya kayıt başarısız.");
     } finally {
       setAnalyzing(false);
+    }
+  }
+
+  async function loadInterviewGuide(resume: StoredResume) {
+    const cached = guides[resume.id];
+    if (cached) return cached;
+    const response = await fetch("/api/generate-interview", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        candidateName: resume.name,
+        role: resume.role,
+        jobTitle,
+        summary: resume.summary,
+        skills: resume.skills,
+        strengths: resume.strengths,
+        weaknesses: resume.weaknesses,
+      }),
+    });
+    const payload = (await response.json()) as { guide?: InterviewGuide; error?: string };
+    if (!response.ok || !payload.guide) {
+      throw new Error(payload.error || "Mülakat rehberi üretilemedi.");
+    }
+    setGuides((prev) => ({ ...prev, [resume.id]: payload.guide! }));
+    return payload.guide;
+  }
+
+  async function openInterview(resume: StoredResume, mode: "guide" | "live") {
+    setInterviewResume(resume);
+    setInterviewMode(mode);
+    setGuideError("");
+    if (guides[resume.id]) return;
+    setGuideLoading(true);
+    try {
+      await loadInterviewGuide(resume);
+    } catch (err) {
+      setGuideError(err instanceof Error ? err.message : "Rehber üretilemedi.");
+    } finally {
+      setGuideLoading(false);
     }
   }
 
@@ -237,6 +284,15 @@ export function RecruiterWorkspace() {
                 <div>
                   <h3 className="text-sm font-semibold text-[#0b1f3a]">{resume.name}</h3>
                   <p className="text-xs text-slate-500">{resume.role}</p>
+                  <span
+                    className={`mt-2 inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                      resume.interviewScore == null
+                        ? "bg-slate-100 text-slate-500"
+                        : "bg-indigo-50 text-indigo-800"
+                    }`}
+                  >
+                    Mülakat Skoru: {resume.interviewScore == null ? "—" : resume.interviewScore}
+                  </span>
                 </div>
                 <div
                   className={`flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br text-xs font-bold text-white ${scoreTone(
@@ -278,10 +334,60 @@ export function RecruiterWorkspace() {
                 ))}
               </div>
               <p className="mt-4 text-xs text-slate-400">{formatWhen(resume.createdAt)}</p>
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => void openInterview(resume, "guide")}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-medium text-sky-900 hover:bg-sky-100"
+                >
+                  <ClipboardList className="h-3.5 w-3.5" />
+                  AI Mülakat Rehberi Üret
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void openInterview(resume, "live")}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#123056] px-3 py-2 text-xs font-medium text-white hover:bg-[#0f2744]"
+                >
+                  <Video className="h-3.5 w-3.5" />
+                  Mülakat Başlat
+                </button>
+              </div>
             </article>
           ))}
         </div>
       </section>
+
+      <InterviewModal
+        open={Boolean(interviewResume)}
+        mode={interviewMode}
+        resume={interviewResume}
+        guide={interviewResume ? (guides[interviewResume.id] ?? null) : null}
+        loading={guideLoading}
+        error={guideError}
+        saving={savingInterview}
+        onClose={() => {
+          if (savingInterview) return;
+          setInterviewResume(null);
+          setGuideError("");
+        }}
+        onSave={async ({ score, notes }) => {
+          if (!interviewResume) return;
+          setSavingInterview(true);
+          try {
+            const updated = await updateResumeInterview(interviewResume.id, {
+              interviewScore: score,
+              interviewNotes: notes,
+            });
+            setResumes((prev) => prev.map((item) => (item.id === updated.id ? { ...item, ...updated } : item)));
+            setNotice(`${interviewResume.name} için mülakat skoru ${score} olarak kaydedildi.`);
+            setInterviewResume(null);
+          } catch (err) {
+            setGuideError(err instanceof Error ? err.message : "Skor kaydedilemedi.");
+          } finally {
+            setSavingInterview(false);
+          }
+        }}
+      />
     </div>
   );
 }

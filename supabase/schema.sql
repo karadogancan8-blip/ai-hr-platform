@@ -48,6 +48,9 @@ alter table public.resumes add column if not exists company_id uuid references p
 alter table public.companies add column if not exists plan_type text not null default 'free';
 alter table public.companies add column if not exists subscription_status text not null default 'free';
 
+alter table public.resumes add column if not exists interview_score integer;
+alter table public.resumes add column if not exists interview_notes text;
+
 create index if not exists leave_requests_company_id_idx on public.leave_requests (company_id);
 create index if not exists resumes_company_id_idx on public.resumes (company_id);
 create index if not exists profiles_company_id_idx on public.profiles (company_id);
