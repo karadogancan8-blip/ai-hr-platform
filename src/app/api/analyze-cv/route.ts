@@ -1,7 +1,7 @@
 import { generateObject, generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { isGeminiConfigured, withGeminiModel } from "@/lib/gemini";
+import { isGeminiConfigured, toClientError, withGeminiModel } from "@/lib/gemini";
 import { insertResume } from "@/lib/resumes";
 import { createServerSupabase } from "@/lib/supabase/server";
 
@@ -48,15 +48,19 @@ async function analyzeCv(jobTitle: string, jobDescription: string, cvText: strin
     );
     return object;
   } catch {
-    const { text } = await withGeminiModel((model) =>
-      generateText({
-        model,
-        system: `${systemPrompt} Yalnızca JSON nesnesi döndür. Anahtarlar: name, role, experience, location, matchScore, skills, strengths, weaknesses, summary.`,
-        prompt,
-        maxRetries: 2,
-      }),
-    );
-    return parseJsonObject(text);
+    try {
+      const { text } = await withGeminiModel((model) =>
+        generateText({
+          model,
+          system: `${systemPrompt} Yalnızca JSON nesnesi döndür. Anahtarlar: name, role, experience, location, matchScore, skills, strengths, weaknesses, summary.`,
+          prompt,
+          maxRetries: 2,
+        }),
+      );
+      return parseJsonObject(text);
+    } catch (error) {
+      throw new Error(toClientError(error, "CV analizi tamamlanamadı. Lütfen tekrar deneyin."));
+    }
   }
 }
 
@@ -118,7 +122,6 @@ export async function POST(request: Request) {
       saved,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "CV analizi tamamlanamadı.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: toClientError(error, "CV analizi tamamlanamadı.") }, { status: 502 });
   }
 }

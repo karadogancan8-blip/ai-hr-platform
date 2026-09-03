@@ -1,7 +1,7 @@
 import { generateObject, generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { isGeminiConfigured, withGeminiModel } from "@/lib/gemini";
+import { isGeminiConfigured, toClientError, withGeminiModel } from "@/lib/gemini";
 import type { InterviewGuide } from "@/lib/interview";
 import { createServerSupabase } from "@/lib/supabase/server";
 
@@ -116,15 +116,22 @@ probeAreas: mülakatta sıkıştırılacak gelişim alanları olsun.`;
       );
       parsed = object;
     } catch {
-      const { text } = await withGeminiModel((model) =>
-        generateText({
-          model,
-          system: `${system} Yalnızca JSON döndür: technicalQuestions, cultureQuestions, strengths, probeAreas.`,
-          prompt,
-          maxRetries: 2,
-        }),
-      );
-      parsed = parseJsonGuide(text);
+      try {
+        const { text } = await withGeminiModel((model) =>
+          generateText({
+            model,
+            system: `${system} Yalnızca JSON döndür: technicalQuestions, cultureQuestions, strengths, probeAreas.`,
+            prompt,
+            maxRetries: 2,
+          }),
+        );
+        parsed = parseJsonGuide(text);
+      } catch (error) {
+        return NextResponse.json(
+          { error: toClientError(error, "Mülakat rehberi üretilemedi. Lütfen tekrar deneyin.") },
+          { status: 502 },
+        );
+      }
     }
 
     const guide = toGuide(parsed);
@@ -134,7 +141,6 @@ probeAreas: mülakatta sıkıştırılacak gelişim alanları olsun.`;
 
     return NextResponse.json({ guide });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Mülakat rehberi üretilemedi.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: toClientError(error, "Mülakat rehberi üretilemedi.") }, { status: 502 });
   }
 }

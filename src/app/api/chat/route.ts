@@ -1,6 +1,6 @@
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
-import { isGeminiConfigured, withGeminiModel } from "@/lib/gemini";
+import { isGeminiConfigured, toClientError, withGeminiModel } from "@/lib/gemini";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 export const maxDuration = 60;
@@ -77,7 +77,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ reply: text.trim() });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Yanıt üretilemedi.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: toClientError(error, "Yanıt üretilemedi.") }, { status: 502 });
   }
 }
