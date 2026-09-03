@@ -9,88 +9,149 @@ import { createServerSupabase } from "@/lib/supabase/server";
 export const maxDuration = 60;
 
 const questionSchema = z.object({
-  question: z.string(),
-  expectedAnswer: z.string(),
+  question: z.string().min(1),
+  expectedAnswer: z.string().min(1),
 });
 
 const interviewSchema = z.object({
   technicalQuestions: z.array(questionSchema).min(5),
   cultureQuestions: z.array(questionSchema).min(3),
-  strengths: z.array(z.string()).min(2),
-  probeAreas: z.array(z.string()).min(2),
+  strengths: z.array(z.string()).min(1).optional(),
+  probeAreas: z.array(z.string()).min(1).optional(),
 });
 
-function fail(error: unknown, clientMessage: string, status = 502) {
-  console.error("[generate-interview]", error);
-  return NextResponse.json({ error: clientMessage }, { status });
-}
+function fallbackGuide(jobTitle: string, candidateName: string, summary: string): InterviewGuide {
+  const role = jobTitle || "açık pozisyon";
+  const name = candidateName || "Aday";
+  const context = summary ? ` CV özetinde belirtilen deneyimi` : " önceki deneyimini";
 
-function stripMarkdownFences(text: string) {
-  return text
-    .replace(/```json\s*/gi, "")
-    .replace(/```\s*/g, "")
-    .trim();
-}
-
-function extractJsonObject(text: string) {
-  const cleaned = stripMarkdownFences(text);
-  const start = cleaned.indexOf("{");
-  const end = cleaned.lastIndexOf("}");
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error("Yanıtta JSON nesnesi bulunamadı.");
-  }
-  return cleaned.slice(start, end + 1);
-}
-
-function parseInterviewJson(text: string) {
-  const payload = extractJsonObject(text);
-  let raw: unknown;
-  try {
-    raw = JSON.parse(payload);
-  } catch (error) {
-    console.error("[generate-interview] JSON.parse başarısız:", error, payload.slice(0, 500));
-    throw new Error("Gemini yanıtı geçerli JSON değil.");
-  }
-  return interviewSchema.parse(raw);
-}
-
-function toGuide(parsed: z.infer<typeof interviewSchema>): InterviewGuide {
   return {
-    technicalQuestions: parsed.technicalQuestions.slice(0, 5).map((item, index) => ({
-      id: `tech-${index + 1}`,
-      kind: "technical",
-      question: item.question,
-      expectedAnswer: item.expectedAnswer,
-    })),
-    cultureQuestions: parsed.cultureQuestions.slice(0, 3).map((item, index) => ({
-      id: `culture-${index + 1}`,
-      kind: "culture",
-      question: item.question,
-      expectedAnswer: item.expectedAnswer,
-    })),
-    strengths: parsed.strengths.slice(0, 5),
-    probeAreas: parsed.probeAreas.slice(0, 5),
+    technicalQuestions: [
+      {
+        id: "tech-1",
+        kind: "technical",
+        question: `${role} rolünde üstlendiğiniz en karmaşık işi anlatın. Hangi kısıtlar vardı ve sonucu nasıl ölçtünüz?`,
+        expectedAnswer: `Somut kapsam, kısıt, kendi katkısı ve ölçülebilir sonuç. ${name} için${context} bağlayın.`,
+      },
+      {
+        id: "tech-2",
+        kind: "technical",
+        question: `Bu pozisyonda kullandığınız temel araç / yöntem / süreç hangileri? Neden bunları tercih ediyorsunuz?`,
+        expectedAnswer: "Güncel araç bilgisi, tercih gerekçesi ve alternatiflerle kıyaslama.",
+      },
+      {
+        id: "tech-3",
+        kind: "technical",
+        question: `${role} işinde kaliteyi ve riski nasıl kontrol edersiniz? Bir hata veya regresyon örneği verin.`,
+        expectedAnswer: "Kalite kapısı, gözden geçirme, izleme ve öğrenilen ders.",
+      },
+      {
+        id: "tech-4",
+        kind: "technical",
+        question: "Belirsiz veya eksik gereksinimle nasıl ilerlersiniz? Paydaşları nasıl hizalarsınız?",
+        expectedAnswer: "Varsayımları yazma, erken prototip/örnek, paydaş teyidi ve kapsamı küçültme.",
+      },
+      {
+        id: "tech-5",
+        kind: "technical",
+        question: `${role} tarafında ölçek, performans veya süreç darboğazı yaşadığınız bir durumu adım adım anlatın.`,
+        expectedAnswer: "Kök neden, seçilen çözüm, trade-off ve sonrası metrik.",
+      },
+    ],
+    cultureQuestions: [
+      {
+        id: "culture-1",
+        kind: "culture",
+        question: "Zor bir geri bildirim aldığınız veya verdiğiniz bir örneği anlatın. Sonuç ne oldu?",
+        expectedAnswer: "Açık iletişim, empati ve davranış değişikliği.",
+      },
+      {
+        id: "culture-2",
+        kind: "culture",
+        question: "Ekip içinde görüş ayrılığı olduğunda nasıl hizalama sağlarsınız?",
+        expectedAnswer: "Veriye dayanma, dinleme, ortak hedef ve net karar.",
+      },
+      {
+        id: "culture-3",
+        kind: "culture",
+        question: "Yoğun dönemde öncelikleri nasıl belirler ve ekibe nasıl görünür kılarsınız?",
+        expectedAnswer: "Etki/acil matrisi, şeffaf iletişim ve teslim taahhüdü.",
+      },
+    ],
+    strengths: [
+      "Somut teslimat ve sonuç odaklı anlatım beklenir",
+      `${role} süreçlerine hâkimiyet bu turda doğrulanacak`,
+    ],
+    probeAreas: [
+      "Derinlemesine teknik gerekçe ve trade-off",
+      "Belirsizlik altında karar kalitesi",
+      "Ekip içi iletişim ve sahiplik",
+    ],
   };
 }
 
+function toGuide(
+  parsed: z.infer<typeof interviewSchema>,
+  fallback: InterviewGuide,
+): InterviewGuide {
+  const technical = parsed.technicalQuestions.slice(0, 5).map((item, index) => ({
+    id: `tech-${index + 1}` as const,
+    kind: "technical" as const,
+    question: item.question,
+    expectedAnswer: item.expectedAnswer,
+  }));
+  const culture = parsed.cultureQuestions.slice(0, 3).map((item, index) => ({
+    id: `culture-${index + 1}` as const,
+    kind: "culture" as const,
+    question: item.question,
+    expectedAnswer: item.expectedAnswer,
+  }));
+
+  return {
+    technicalQuestions: technical.length >= 5 ? technical : fallback.technicalQuestions,
+    cultureQuestions: culture.length >= 3 ? culture : fallback.cultureQuestions,
+    strengths: parsed.strengths?.length ? parsed.strengths.slice(0, 5) : fallback.strengths,
+    probeAreas: parsed.probeAreas?.length ? parsed.probeAreas.slice(0, 5) : fallback.probeAreas,
+  };
+}
+
+function parseGuideFromText(text: string, fallback: InterviewGuide): InterviewGuide {
+  const cleanedText = text.replace(/```json|```/g, "").trim();
+  const start = cleanedText.indexOf("{");
+  const end = cleanedText.lastIndexOf("}");
+  if (start === -1 || end <= start) {
+    throw new Error("Temizlenmiş yanıtta JSON nesnesi yok.");
+  }
+
+  let raw: unknown;
+  try {
+    raw = JSON.parse(cleanedText.slice(start, end + 1));
+  } catch (error) {
+    console.error("[generate-interview] JSON.parse hatası:", error);
+    console.error("[generate-interview] cleanedText:", cleanedText.slice(0, 800));
+    throw error;
+  }
+
+  const parsed = interviewSchema.parse(raw);
+  return toGuide(parsed, fallback);
+}
+
 export async function POST(request: Request) {
+  let jobTitle = "Açık pozisyon";
+  let candidateName = "Aday";
+  let summary = "";
+
   try {
     const supabase = await createServerSupabase();
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      return NextResponse.json({ error: "Oturum gerekli." }, { status: 401 });
-    }
-
-    if (!isGeminiConfigured()) {
-      return NextResponse.json(
-        {
-          error:
-            "GOOGLE_GENERATIVE_AI_API_KEY tanımlı değil. Ücretsiz Gemini anahtarını .env.local dosyasına ekleyin.",
-        },
-        { status: 500 },
-      );
+      console.error("[generate-interview] oturum yok");
+      return NextResponse.json({
+        guide: fallbackGuide(jobTitle, candidateName, summary),
+        fallback: true,
+      });
     }
 
     let body: {
@@ -101,15 +162,28 @@ export async function POST(request: Request) {
       skills?: string[];
       strengths?: string[];
       weaknesses?: string[];
-    };
+    } = {};
+
     try {
       body = (await request.json()) as typeof body;
     } catch (error) {
-      return fail(error, "İstek gövdesi okunamadı.", 400);
+      console.error("[generate-interview] istek gövdesi okunamadı:", error);
+      return NextResponse.json({
+        guide: fallbackGuide(jobTitle, candidateName, summary),
+        fallback: true,
+      });
     }
 
-    const summary = body.summary?.trim() ?? "";
-    const jobTitle = body.jobTitle?.trim() || body.role?.trim() || "Açık pozisyon";
+    candidateName = body.candidateName?.trim() || "Aday";
+    jobTitle = body.jobTitle?.trim() || body.role?.trim() || "Açık pozisyon";
+    summary = body.summary?.trim() ?? "";
+    const fallback = fallbackGuide(jobTitle, candidateName, summary);
+
+    if (!isGeminiConfigured()) {
+      console.error("[generate-interview] GOOGLE_GENERATIVE_AI_API_KEY tanımlı değil");
+      return NextResponse.json({ guide: fallback, fallback: true });
+    }
+
     const profileBits = [
       summary,
       (body.skills ?? []).join(", "),
@@ -118,32 +192,26 @@ export async function POST(request: Request) {
     ]
       .filter(Boolean)
       .join("\n");
-    if (profileBits.length < 20) {
-      return NextResponse.json(
-        { error: "Mülakat rehberi için adayın CV özeti veya beceri bilgisi gerekli." },
-        { status: 400 },
-      );
-    }
 
     const system =
-      "Sen RecruiterAgent adlı kıdemli bir mülakat koçusun. Türkçe, somut ve pozisyona özel sorular yaz. CV'de olmayan deneyimi uydurma. Yalnızca JSON döndür. Markdown kullanma.";
-    const prompt = `Aday: ${body.candidateName || "Aday"}
+      "Sen RecruiterAgent adlı kıdemli bir mülakat koçusun. Türkçe yaz. Yalnızca JSON döndür.";
+    const prompt = `Aday: ${candidateName}
 Pozisyon: ${jobTitle}
-CV özeti: ${summary || profileBits}
+CV özeti: ${summary || profileBits || "belirtilmedi"}
 Beceriler: ${(body.skills ?? []).join(", ") || "belirtilmedi"}
 Güçlü yönler: ${(body.strengths ?? []).join("; ") || "belirtilmedi"}
 Gelişim alanları: ${(body.weaknesses ?? []).join("; ") || "belirtilmedi"}
 
-Şu JSON şemasını doldur:
+JSON:
 {
   "technicalQuestions": [{ "question": "...", "expectedAnswer": "..." }],
   "cultureQuestions": [{ "question": "...", "expectedAnswer": "..." }],
   "strengths": ["..."],
   "probeAreas": ["..."]
 }
-technicalQuestions tam 5, cultureQuestions tam 3 öğe içermeli.`;
+technicalQuestions 5, cultureQuestions 3 öğe olsun.`;
 
-    let text: string;
+    let text = "";
     try {
       const result = await generateText({
         model: google("gemini-1.5-flash"),
@@ -151,26 +219,24 @@ technicalQuestions tam 5, cultureQuestions tam 3 öğe içermeli.`;
         prompt,
         maxRetries: 2,
       });
-      text = result.text;
+      text = result.text ?? "";
     } catch (error) {
-      return fail(error, "Gemini mülakat rehberi üretemedi. Lütfen tekrar deneyin.");
+      console.error("[generate-interview] Gemini API hatası:", error);
+      return NextResponse.json({ guide: fallback, fallback: true });
     }
 
-    let parsed: z.infer<typeof interviewSchema>;
     try {
-      parsed = parseInterviewJson(text);
+      const guide = parseGuideFromText(text, fallback);
+      return NextResponse.json({ guide, fallback: false });
     } catch (error) {
-      return fail(error, "Gemini yanıtı JSON olarak okunamadı. Lütfen tekrar deneyin.");
+      console.error("[generate-interview] JSON sanitization / parse hatası:", error);
+      return NextResponse.json({ guide: fallback, fallback: true });
     }
-
-    const guide = toGuide(parsed);
-    if (guide.technicalQuestions.length < 5 || guide.cultureQuestions.length < 3) {
-      console.error("[generate-interview] eksik rehber", guide);
-      return NextResponse.json({ error: "Rehber eksik üretildi, tekrar deneyin." }, { status: 502 });
-    }
-
-    return NextResponse.json({ guide });
   } catch (error) {
-    return fail(error, "Mülakat rehberi üretilemedi.");
+    console.error("[generate-interview] beklenmeyen hata:", error);
+    return NextResponse.json({
+      guide: fallbackGuide(jobTitle, candidateName, summary),
+      fallback: true,
+    });
   }
 }
