@@ -1,28 +1,57 @@
-import { generateObject, generateText } from "ai";
+import { google } from "@ai-sdk/google";
+import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { isGeminiConfigured, toClientError, withGeminiModel } from "@/lib/gemini";
+import { isGeminiConfigured } from "@/lib/gemini";
 import type { InterviewGuide } from "@/lib/interview";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 export const maxDuration = 60;
 
 const questionSchema = z.object({
-  question: z.string().describe("Mülakat sorusu, Türkçe ve net"),
-  expectedAnswer: z.string().describe("Adaydan beklenen kilit yanıt / değerlendirme ipucu"),
+  question: z.string(),
+  expectedAnswer: z.string(),
 });
 
 const interviewSchema = z.object({
-  technicalQuestions: z.array(questionSchema).min(5).max(8),
-  cultureQuestions: z.array(questionSchema).min(3).max(6),
-  strengths: z.array(z.string()).min(2).max(6),
-  probeAreas: z.array(z.string()).min(2).max(6).describe("Mülakatta sıkıştırılacak gelişim alanları"),
+  technicalQuestions: z.array(questionSchema).min(5),
+  cultureQuestions: z.array(questionSchema).min(3),
+  strengths: z.array(z.string()).min(2),
+  probeAreas: z.array(z.string()).min(2),
 });
 
-function parseJsonGuide(text: string) {
-  const fenced = text.match(/\{[\s\S]*\}/);
-  if (!fenced) throw new Error("Gemini geçerli bir mülakat JSON'u döndürmedi.");
-  return interviewSchema.parse(JSON.parse(fenced[0]));
+function fail(error: unknown, clientMessage: string, status = 502) {
+  console.error("[generate-interview]", error);
+  return NextResponse.json({ error: clientMessage }, { status });
+}
+
+function stripMarkdownFences(text: string) {
+  return text
+    .replace(/```json\s*/gi, "")
+    .replace(/```\s*/g, "")
+    .trim();
+}
+
+function extractJsonObject(text: string) {
+  const cleaned = stripMarkdownFences(text);
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) {
+    throw new Error("Yanıtta JSON nesnesi bulunamadı.");
+  }
+  return cleaned.slice(start, end + 1);
+}
+
+function parseInterviewJson(text: string) {
+  const payload = extractJsonObject(text);
+  let raw: unknown;
+  try {
+    raw = JSON.parse(payload);
+  } catch (error) {
+    console.error("[generate-interview] JSON.parse başarısız:", error, payload.slice(0, 500));
+    throw new Error("Gemini yanıtı geçerli JSON değil.");
+  }
+  return interviewSchema.parse(raw);
 }
 
 function toGuide(parsed: z.infer<typeof interviewSchema>): InterviewGuide {
@@ -64,7 +93,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as {
+    let body: {
       candidateName?: string;
       role?: string;
       jobTitle?: string;
@@ -73,6 +102,11 @@ export async function POST(request: Request) {
       strengths?: string[];
       weaknesses?: string[];
     };
+    try {
+      body = (await request.json()) as typeof body;
+    } catch (error) {
+      return fail(error, "İstek gövdesi okunamadı.", 400);
+    }
 
     const summary = body.summary?.trim() ?? "";
     const jobTitle = body.jobTitle?.trim() || body.role?.trim() || "Açık pozisyon";
@@ -92,7 +126,7 @@ export async function POST(request: Request) {
     }
 
     const system =
-      "Sen RecruiterAgent adlı kıdemli bir mülakat koçusun. Türkçe, somut ve pozisyona özel sorular yaz. CV'de olmayan deneyimi uydurma.";
+      "Sen RecruiterAgent adlı kıdemli bir mülakat koçusun. Türkçe, somut ve pozisyona özel sorular yaz. CV'de olmayan deneyimi uydurma. Yalnızca JSON döndür. Markdown kullanma.";
     const prompt = `Aday: ${body.candidateName || "Aday"}
 Pozisyon: ${jobTitle}
 CV özeti: ${summary || profileBits}
@@ -100,47 +134,43 @@ Beceriler: ${(body.skills ?? []).join(", ") || "belirtilmedi"}
 Güçlü yönler: ${(body.strengths ?? []).join("; ") || "belirtilmedi"}
 Gelişim alanları: ${(body.weaknesses ?? []).join("; ") || "belirtilmedi"}
 
-5 teknik soru (beklenen kilit yanıtlarla) ve 3 kültürel uyum / yetkinlik sorusu üret.
-probeAreas: mülakatta sıkıştırılacak gelişim alanları olsun.`;
+Şu JSON şemasını doldur:
+{
+  "technicalQuestions": [{ "question": "...", "expectedAnswer": "..." }],
+  "cultureQuestions": [{ "question": "...", "expectedAnswer": "..." }],
+  "strengths": ["..."],
+  "probeAreas": ["..."]
+}
+technicalQuestions tam 5, cultureQuestions tam 3 öğe içermeli.`;
+
+    let text: string;
+    try {
+      const result = await generateText({
+        model: google("gemini-1.5-flash"),
+        system,
+        prompt,
+        maxRetries: 2,
+      });
+      text = result.text;
+    } catch (error) {
+      return fail(error, "Gemini mülakat rehberi üretemedi. Lütfen tekrar deneyin.");
+    }
 
     let parsed: z.infer<typeof interviewSchema>;
     try {
-      const { object } = await withGeminiModel((model) =>
-        generateObject({
-          model,
-          schema: interviewSchema,
-          system,
-          prompt,
-          maxRetries: 2,
-        }),
-      );
-      parsed = object;
-    } catch {
-      try {
-        const { text } = await withGeminiModel((model) =>
-          generateText({
-            model,
-            system: `${system} Yalnızca JSON döndür: technicalQuestions, cultureQuestions, strengths, probeAreas.`,
-            prompt,
-            maxRetries: 2,
-          }),
-        );
-        parsed = parseJsonGuide(text);
-      } catch (error) {
-        return NextResponse.json(
-          { error: toClientError(error, "Mülakat rehberi üretilemedi. Lütfen tekrar deneyin.") },
-          { status: 502 },
-        );
-      }
+      parsed = parseInterviewJson(text);
+    } catch (error) {
+      return fail(error, "Gemini yanıtı JSON olarak okunamadı. Lütfen tekrar deneyin.");
     }
 
     const guide = toGuide(parsed);
     if (guide.technicalQuestions.length < 5 || guide.cultureQuestions.length < 3) {
+      console.error("[generate-interview] eksik rehber", guide);
       return NextResponse.json({ error: "Rehber eksik üretildi, tekrar deneyin." }, { status: 502 });
     }
 
     return NextResponse.json({ guide });
   } catch (error) {
-    return NextResponse.json({ error: toClientError(error, "Mülakat rehberi üretilemedi.") }, { status: 502 });
+    return fail(error, "Mülakat rehberi üretilemedi.");
   }
 }
