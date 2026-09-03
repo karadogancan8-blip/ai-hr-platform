@@ -43,7 +43,7 @@ export default function PricingPage() {
                   href="/login"
                   className="rounded-xl bg-[#123056] px-3.5 py-2 font-medium text-white hover:bg-[#0f2744]"
                 >
-                  14 gün ücretsiz
+                  14 gün ücretsiz deneyin
                 </Link>
               </>
             )}

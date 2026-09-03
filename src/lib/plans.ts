@@ -9,6 +9,7 @@ export type Plan = {
   monthlyPrice: number | null;
   description: string;
   features: string[];
+  highlights?: string[];
   popular?: boolean;
 };
 
@@ -16,41 +17,53 @@ export const plans: Plan[] = [
   {
     id: "free",
     name: "KOBİ",
-    seatLabel: "1–50 Çalışan",
+    seatLabel: "1–50 çalışan",
     monthlyPrice: 2950,
-    description: "Küçük ve orta ölçekli ekipler için çekirdek AI İK operasyonu.",
+    description: "Küçük ve orta ölçekli ekipler için yapay zeka destekli çekirdek İK operasyonu.",
     features: [
-      "AI destekli CV analizi ve işe alım",
-      "Mevzuat asistanı (temel kota)",
-      "Onboarding şablonları",
+      "Yapay zeka destekli özgeçmiş analizi ve işe alım",
+      "Mevzuat asistanı (temel kullanım kotası)",
+      "Oryantasyon şablonları",
       "KVKK uyumlu belge ve izin kaydı",
     ],
   },
   {
     id: "pro",
-    name: "Pro (Büyüyen)",
-    seatLabel: "50–250 Çalışan",
+    name: "Pro",
+    seatLabel: "50–250 çalışan",
     monthlyPrice: 7450,
-    description: "Büyüyen organizasyonlar için tam platform ve öncelikli kapasite.",
+    description: "Büyüyen organizasyonlar için tam platform, öncelikli kapasite ve sektörel zeka.",
+    highlights: [
+      "Sektörel Akıllı Bilgi Üssü",
+      "Canlı AI Mülakat Simülatörü",
+      "Şeffaf İtiraz ve Geri Bildirim Modülü",
+      "Gizli Ücret Kıyaslama",
+    ],
     features: [
-      "Sınırsız CV analizi ve mülakat rehberi",
-      "Mevzuat botu + performans yönetimi",
-      "White-label marka kimliği",
-      "Çoklu yönetici ve denetim izi",
+      "Sınırsız özgeçmiş analizi ve mülakat rehberi",
+      "Mevzuat asistanı ve performans yönetimi",
+      "Kurumsal marka kimliği (white-label)",
+      "Çoklu yönetici yetkisi ve denetim izi",
     ],
     popular: true,
   },
   {
     id: "enterprise",
     name: "Enterprise",
-    seatLabel: "250+ Çalışan",
+    seatLabel: "250 ve üzeri çalışan",
     monthlyPrice: null,
-    description: "Holding ve büyük ölçek için özel sözleşme, SSO ve SLA.",
+    description: "Holding ve büyük ölçekli yapılar için özel sözleşme, SSO ve hizmet seviyesi taahhüdü.",
+    highlights: [
+      "Sektörel Akıllı Bilgi Üssü",
+      "Canlı AI Mülakat Simülatörü",
+      "Şeffaf İtiraz ve Geri Bildirim Modülü",
+      "Gizli Ücret Kıyaslama",
+    ],
     features: [
-      "Özel teklif ve hesap yöneticisi",
+      "Özel teklif ve atanmış hesap yöneticisi",
       "SSO, özel entegrasyonlar ve SLA",
-      "Özel model / veri bölgesi seçenekleri",
-      "Kurumsal onboarding ve eğitim",
+      "Özel model ve veri bölgesi seçenekleri",
+      "Kurumsal oryantasyon ve eğitim",
     ],
   },
 ];
@@ -71,7 +84,7 @@ export function yearlyTotal(monthly: number) {
 }
 
 export function planChargeLabel(plan: Plan, cycle: BillingCycle) {
-  if (plan.monthlyPrice == null) return "Özel Teklif";
+  if (plan.monthlyPrice == null) return "Özel teklif";
   if (cycle === "yearly") {
     return `${formatTry(yearlyTotal(plan.monthlyPrice))} / yıl`;
   }
@@ -79,11 +92,11 @@ export function planChargeLabel(plan: Plan, cycle: BillingCycle) {
 }
 
 export function planMonthlyEquivalent(plan: Plan, cycle: BillingCycle) {
-  if (plan.monthlyPrice == null) return "Satış ekibi ile özel teklif";
+  if (plan.monthlyPrice == null) return "Satış ekibiyle özel teklif.";
   if (cycle === "yearly") {
-    return `${formatTry(Math.round(yearlyTotal(plan.monthlyPrice) / 12))} / ay olarak faturalandırılır · 2 ay ücretsiz`;
+    return `${formatTry(Math.round(yearlyTotal(plan.monthlyPrice) / 12))} / ay olarak faturalandırılır. 2 ay ücretsiz.`;
   }
-  return "Aylık fatura · dilediğiniz zaman iptal";
+  return "Aylık faturalandırma. İstediğiniz zaman iptal edebilirsiniz.";
 }
 
 export function asPlanId(value?: string | null): PlanId {
