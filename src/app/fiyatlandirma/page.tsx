@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PricingWorkspace } from "@/components/billing/PricingWorkspace";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 export default function PricingPage() {
+  const { t } = useI18n();
   const [authed, setAuthed] = useState(false);
 
   useEffect(() => {
@@ -27,23 +30,24 @@ export default function PricingPage() {
             <span className="text-sm font-semibold tracking-tight text-[#0b1f3a]">Nexus HR</span>
           </Link>
           <nav className="flex items-center gap-2 text-sm">
+            <LanguageSwitcher />
             {authed ? (
               <Link
                 href="/dashboard"
                 className="rounded-xl bg-[#123056] px-3.5 py-2 font-medium text-white hover:bg-[#0f2744]"
               >
-                Panele dön
+                {t("pricing.back")}
               </Link>
             ) : (
               <>
                 <Link href="/login" className="rounded-lg px-3 py-2 text-slate-600 hover:bg-sky-50">
-                  Giriş
+                  {t("pricing.login")}
                 </Link>
                 <Link
                   href="/login"
                   className="rounded-xl bg-[#123056] px-3.5 py-2 font-medium text-white hover:bg-[#0f2744]"
                 >
-                  14 gün ücretsiz deneyin
+                  {t("pricing.trial")}
                 </Link>
               </>
             )}

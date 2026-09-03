@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import { CheckoutModal } from "@/components/checkout/CheckoutModal";
 import { DemoRequestModal } from "@/components/marketing/DemoRequestModal";
 import {
+  PLAN_MULTILINGUAL_FEATURE,
   planChargeLabel,
   planMonthlyEquivalent,
   plans,
@@ -14,6 +15,7 @@ import {
   type PlanId,
 } from "@/lib/plans";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import { fetchCompanySubscription, updateCompanySubscription } from "@/lib/subscription";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -28,12 +30,13 @@ function FeatureRow({ text, emphasis }: { text: string; emphasis?: boolean }) {
       >
         <Check className="h-3 w-3" strokeWidth={2.5} />
       </span>
-      <span>{text}</span>
+      <span className="text-start">{text}</span>
     </li>
   );
 }
 
 export function PricingWorkspace() {
+  const { t } = useI18n();
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
   const [currentPlan, setCurrentPlan] = useState<PlanId>("free");
   const [authed, setAuthed] = useState(false);
@@ -100,15 +103,11 @@ export function PricingWorkspace() {
     <div className="space-y-10">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-800">Üyelik</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-800">{t("pricing.kicker")}</p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-            <HelpTitle hint="Aylık veya yıllık faturalandırmayı seçin. Kartlar, çalışan ölçeğinize uygun paketi gösterir.">
-              Fiyatlandırma ve paketler
-            </HelpTitle>
+            <HelpTitle hint={t("pricing.hint")}>{t("pricing.title")}</HelpTitle>
           </h1>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
-            Çalışan ölçeğinize uygun paketi seçin. Yıllık ödemede iki ay ücretsiz uygulanır.
-          </p>
+          <p className="mt-2 text-sm leading-6 text-slate-500">{t("pricing.lead")}</p>
         </div>
 
         <div className="inline-flex items-center self-start rounded-xl border border-slate-200 bg-white p-0.5">
@@ -119,7 +118,7 @@ export function PricingWorkspace() {
               cycle === "monthly" ? "bg-[#123056] text-white" : "text-slate-600 hover:bg-slate-50"
             }`}
           >
-            Aylık
+            {t("pricing.monthly")}
           </button>
           <button
             type="button"
@@ -128,13 +127,13 @@ export function PricingWorkspace() {
               cycle === "yearly" ? "bg-[#123056] text-white" : "text-slate-600 hover:bg-slate-50"
             }`}
           >
-            Yıllık
+            {t("pricing.yearly")}
             <span
               className={`rounded-md px-1.5 py-px text-[10px] font-medium ${
                 cycle === "yearly" ? "bg-white/15 text-sky-100" : "bg-slate-100 text-slate-600"
               }`}
             >
-              2 ay ücretsiz
+              {t("pricing.yearlyBadge")}
             </span>
           </button>
         </div>
@@ -164,11 +163,11 @@ export function PricingWorkspace() {
               <div className="min-h-[1.5rem]">
                 {plan.popular ? (
                   <span className="inline-flex rounded-md bg-[#123056] px-2 py-0.5 text-[11px] font-medium text-white">
-                    En Çok Tercih Edilen
+                    {t("pricing.popular")}
                   </span>
                 ) : current ? (
                   <span className="inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-                    Mevcut paket
+                    {t("pricing.current")}
                   </span>
                 ) : (
                   <span className="invisible text-[11px]">.</span>
@@ -190,15 +189,22 @@ export function PricingWorkspace() {
               <p className="mt-1 text-xs leading-5 text-slate-400">{planMonthlyEquivalent(plan, cycle)}</p>
 
               {current && plan.popular ? (
-                <p className="mt-2 text-[11px] font-medium text-slate-500">Mevcut paket</p>
+                <p className="mt-2 text-[11px] font-medium text-slate-500">{t("pricing.current")}</p>
               ) : null}
 
               <ul className="mt-6 flex-1 space-y-2.5">
                 {highlights.map((feature) => (
-                  <FeatureRow key={feature} text={feature} emphasis />
+                  <FeatureRow
+                    key={feature}
+                    text={feature === PLAN_MULTILINGUAL_FEATURE ? t("plan.multilang") : feature}
+                    emphasis
+                  />
                 ))}
                 {plan.features.map((feature) => (
-                  <FeatureRow key={feature} text={feature} />
+                  <FeatureRow
+                    key={feature}
+                    text={feature === PLAN_MULTILINGUAL_FEATURE ? t("plan.multilang") : feature}
+                  />
                 ))}
               </ul>
 
@@ -217,10 +223,10 @@ export function PricingWorkspace() {
                     }`}
                   >
                     {current && plan.monthlyPrice != null
-                      ? "Bu paket aktif"
+                      ? t("pricing.active")
                       : plan.monthlyPrice == null
-                        ? "Teklif alın"
-                        : "Hemen başla"}
+                        ? t("pricing.offer")
+                        : t("pricing.start")}
                   </button>
                 ) : (
                   <Link
@@ -231,7 +237,7 @@ export function PricingWorkspace() {
                         : "bg-slate-50 text-slate-800 hover:bg-slate-100"
                     }`}
                   >
-                    Hemen başla
+                    {t("pricing.start")}
                   </Link>
                 )}
                 <button
@@ -239,7 +245,7 @@ export function PricingWorkspace() {
                   onClick={() => requestDemo(plan)}
                   className="w-full rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
-                  Demo talep et
+                  {t("pricing.demo")}
                 </button>
               </div>
             </article>

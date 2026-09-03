@@ -14,6 +14,8 @@ import {
   Zap,
 } from "lucide-react";
 import { DemoRequestModal } from "@/components/marketing/DemoRequestModal";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 
 const modules = [
   {
@@ -55,6 +57,7 @@ const stats = [
 ];
 
 export function LandingPage() {
+  const { t } = useI18n();
   const [demoOpen, setDemoOpen] = useState(false);
 
   return (
@@ -68,17 +71,18 @@ export function LandingPage() {
             <span className="text-sm font-semibold tracking-tight text-[#0b1f3a]">Nexus HR</span>
           </Link>
           <nav className="flex items-center gap-2 text-sm">
+            <LanguageSwitcher />
             <Link href="/fiyatlandirma" className="hidden rounded-lg px-3 py-2 text-slate-600 hover:bg-sky-50 sm:inline">
-              Fiyatlandırma
+              {t("pricing.nav")}
             </Link>
             <Link href="/login" className="rounded-lg px-3 py-2 text-slate-600 hover:bg-sky-50">
-              Giriş
+              {t("pricing.login")}
             </Link>
             <Link
               href="/login"
               className="rounded-xl bg-[#123056] px-3.5 py-2 text-sm font-medium text-white hover:bg-[#0f2744]"
             >
-              14 gün ücretsiz
+              {t("pricing.trial")}
             </Link>
           </nav>
         </div>

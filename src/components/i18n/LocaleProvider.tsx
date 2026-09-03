@@ -1,18 +1,27 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { dictionaries, type Locale, type MessageKey } from "@/lib/i18n";
-
-const STORAGE_KEY = "nexus-locale";
+import {
+  LOCALE_STORAGE_KEY,
+  dictionaries,
+  dirForLocale,
+  isLocale,
+  localeMeta,
+  type Locale,
+  type LocaleDir,
+  type MessageKey,
+} from "@/lib/i18n";
 
 type LocaleContextValue = {
   locale: Locale;
+  dir: LocaleDir;
   setLocale: (locale: Locale) => void;
   t: (key: MessageKey) => string;
 };
 
 const LocaleContext = createContext<LocaleContextValue>({
   locale: "tr",
+  dir: "ltr",
   setLocale: () => undefined,
   t: (key) => dictionaries.tr[key],
 });
@@ -21,29 +30,48 @@ export function useI18n() {
   return useContext(LocaleContext);
 }
 
+function applyDocumentLocale(locale: Locale) {
+  const meta = localeMeta[locale];
+  const root = document.documentElement;
+  root.lang = meta.htmlLang;
+  root.dir = meta.dir;
+  root.dataset.locale = locale;
+}
+
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("tr");
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (saved === "en" || saved === "tr") setLocaleState(saved);
+    const saved = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+    if (isLocale(saved)) {
+      setLocaleState(saved);
+      applyDocumentLocale(saved);
+    }
   }, []);
 
   useEffect(() => {
-    document.documentElement.lang = locale;
+    applyDocumentLocale(locale);
   }, [locale]);
 
   const value = useMemo<LocaleContextValue>(
     () => ({
       locale,
+      dir: dirForLocale(locale),
       setLocale: (next) => {
         setLocaleState(next);
-        window.localStorage.setItem(STORAGE_KEY, next);
+        window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
+        applyDocumentLocale(next);
       },
       t: (key) => dictionaries[locale][key] ?? dictionaries.tr[key],
     }),
     [locale],
   );
 
-  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
+  return (
+    <LocaleContext.Provider value={value}>
+      <div dir={dirForLocale(locale)} lang={localeMeta[locale].htmlLang} className="min-h-full">
+        {children}
+      </div>
+    </LocaleContext.Provider>
+  );
 }

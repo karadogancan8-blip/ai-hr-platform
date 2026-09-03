@@ -1,3 +1,6 @@
+export const PLAN_MULTILINGUAL_FEATURE =
+  "8 Farklı Global Dil Desteği (TR, EN, DE, FR, ES, AR, RU, ZH)";
+
 export type PlanId = "free" | "pro" | "enterprise";
 export type SubscriptionStatus = "free" | "active";
 export type BillingCycle = "monthly" | "yearly";
@@ -38,6 +41,7 @@ export const plans: Plan[] = [
       "Canlı AI Mülakat Simülatörü",
       "Şeffaf İtiraz ve Geri Bildirim Modülü",
       "Gizli Ücret Kıyaslama",
+      PLAN_MULTILINGUAL_FEATURE,
     ],
     features: [
       "Sınırsız özgeçmiş analizi ve mülakat rehberi",
@@ -58,6 +62,7 @@ export const plans: Plan[] = [
       "Canlı AI Mülakat Simülatörü",
       "Şeffaf İtiraz ve Geri Bildirim Modülü",
       "Gizli Ücret Kıyaslama",
+      PLAN_MULTILINGUAL_FEATURE,
     ],
     features: [
       "Özel teklif ve atanmış hesap yöneticisi",
