@@ -2,10 +2,9 @@ import { createGoogleGenerativeAI, google as googleProvider } from "@ai-sdk/goog
 
 const DEFAULT_MODELS = [
   "gemini-2.5-flash",
-  "gemini-2.0-flash",
-  "gemini-2.5-flash-lite",
   "gemini-flash-latest",
-  "gemini-1.5-flash",
+  "gemini-1.5-flash-latest",
+  "gemini-2.5-flash-lite",
 ] as const;
 
 const RETRYABLE =
@@ -24,7 +23,9 @@ export function isGeminiConfigured() {
 }
 
 export function geminiModelId() {
-  return process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
+  const configured = process.env.GEMINI_MODEL?.trim();
+  if (configured === "gemini-1.5-flash") return "gemini-2.5-flash";
+  return configured || "gemini-2.5-flash";
 }
 
 function googleClient() {
@@ -37,7 +38,7 @@ function googleClient() {
   return createGoogleGenerativeAI({ apiKey });
 }
 
-/** `google('gemini-2.0-flash')` eşdeğeri; yoksa ücretsiz Flash yedeklerine düşer. */
+/** `google('gemini-2.5-flash')` eşdeğeri; model yoksa veya kota dolarsa Flash yedeklerine düşer. */
 export function gemini(modelId = geminiModelId()) {
   return googleClient()(modelId);
 }
