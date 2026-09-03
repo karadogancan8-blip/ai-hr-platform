@@ -110,8 +110,15 @@ export function KnowledgeWorkspace() {
           department,
         }),
       });
-      const payload = (await response.json()) as { reply?: string };
-      setAnswer(payload.reply || t("kb.noReply"));
+      const raw = await response.text();
+      let reply = "";
+      try {
+        const payload = JSON.parse(raw) as { reply?: string };
+        reply = payload.reply?.trim() || "";
+      } catch {
+        reply = "";
+      }
+      setAnswer(reply || t("kb.noReply"));
     } catch {
       setAnswer(t("kb.offline"));
     } finally {

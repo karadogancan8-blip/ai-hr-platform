@@ -197,17 +197,17 @@ export function InterviewModal({
               <span className="ml-2 text-xs text-amber-700">{unanswered} soru puanlanmadı</span>
             ) : null}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2 overflow-visible">
+            <HelpTip text="Aday özeti ve mülakat puanlarını yazdırılabilir yönetici PDF’ine aktarır." side="top" align="start" sideOffset={8} />
             <button
               type="button"
               disabled={saving}
               onClick={() => setPrintOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-medium text-sky-900 hover:bg-sky-100 disabled:opacity-50"
+              className="inline-flex min-w-0 items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-center text-sm font-medium leading-tight text-sky-900 hover:bg-sky-100 disabled:opacity-50"
             >
-              <FileDown className="h-4 w-4" />
+              <FileDown className="h-4 w-4 shrink-0" />
               Executive PDF Raporu İndir
             </button>
-            <HelpTip text="Aday özeti ve mülakat puanlarını yazdırılabilir yönetici PDF’ine aktarır." />
             <button
               type="button"
               disabled={saving || loading || !guide || unanswered > 0}

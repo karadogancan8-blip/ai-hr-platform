@@ -207,7 +207,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
       <aside
         className={`fixed start-0 top-0 z-40 flex h-screen w-[272px] flex-col overflow-y-auto border-e border-white/10 bg-[linear-gradient(180deg,#0b1f3a_0%,#123056_55%,#0e2744_100%)] text-slate-100 shadow-xl transition-transform duration-200 overscroll-contain lg:!translate-x-0 ${
-          open ? "translate-x-0" : "-translate-x-full rtl:translate-x-full"
+          open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between gap-3 px-5 py-6">

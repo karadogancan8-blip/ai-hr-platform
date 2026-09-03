@@ -47,7 +47,7 @@ export function LanguageSwitcher({ className = "" }: LanguageSwitcherProps) {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2 py-1.5 text-slate-800 shadow-sm transition hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 hover:shadow-md"
+        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2 py-1.5 text-slate-800 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={t("lang.label")}
@@ -76,7 +76,7 @@ export function LanguageSwitcher({ className = "" }: LanguageSwitcherProps) {
                   className={`inline-flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-start transition ${
                     selected
                       ? "bg-sky-50 text-slate-900 shadow-sm"
-                      : "text-slate-600 hover:translate-x-0.5 hover:bg-slate-50 hover:text-slate-900"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
                   <LanguageRow id={id} />

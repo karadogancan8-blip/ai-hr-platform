@@ -1,8 +1,7 @@
-import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
-import { isGeminiConfigured } from "@/lib/gemini";
+import { isGeminiConfigured, withGeminiModel } from "@/lib/gemini";
 import type { Locale } from "@/lib/i18n";
 
 export const maxDuration = 30;
@@ -20,10 +19,20 @@ function fallbackAnswer(question: string, title: string, body: string, locale: L
     tr: `“${title}” belgesine göre: ${excerpt}${body.length > 280 ? "…" : ""}\n\nSorunuz: ${question.slice(0, 180)}\nBu yanıt belge özetine dayanır; bağlayıcı yorum için İK ile teyit edin.`,
     en: `Based on “${title}”: ${excerpt}${body.length > 280 ? "…" : ""}\n\nQuestion: ${question.slice(0, 180)}\nThis is a document summary; confirm with HR before acting.`,
   };
-  return tails[locale];
+  return tails[locale] ?? tails.tr;
+}
+
+function jsonReply(reply: string, fallback = false) {
+  return NextResponse.json({ reply, fallback });
 }
 
 export async function POST(request: Request) {
+  let locale: Locale = "tr";
+  let question = "";
+  let title = "Document";
+  let document = "";
+  let department = "General";
+
   try {
     const body = (await request.json()) as {
       question?: string;
@@ -32,32 +41,39 @@ export async function POST(request: Request) {
       locale?: string;
       department?: string;
     };
-    const locale = parseRequestLocale(body.locale);
-    const question = body.question?.trim() || "";
-    const title = body.title?.trim() || "Document";
-    const document = body.document?.trim() || "";
-    const department = DEPT_LABEL[body.department || ""] || body.department || "General";
+    locale = parseRequestLocale(body.locale);
+    question = body.question?.trim() || "";
+    title = body.title?.trim() || (locale === "en" ? "Document" : "Belge");
+    document = body.document?.trim() || "";
+    department = DEPT_LABEL[body.department || ""] || body.department || "General";
+  } catch {
+    return jsonReply(
+      locale === "en"
+        ? "The question could not be read. Please try again."
+        : "Soru okunamadı. Lütfen tekrar deneyin.",
+      true,
+    );
+  }
 
-    if (!question) {
-      return NextResponse.json({ reply: fallbackAnswer("—", title, document, locale), fallback: true });
-    }
+  if (!question) {
+    return jsonReply(fallbackAnswer("—", title, document, locale), true);
+  }
 
-    if (!isGeminiConfigured() || !document) {
-      return NextResponse.json({ reply: fallbackAnswer(question, title, document, locale), fallback: true });
-    }
+  if (!isGeminiConfigured() || !document) {
+    return jsonReply(fallbackAnswer(question, title, document, locale), true);
+  }
 
-    try {
-      const { text } = await generateText({
-        model: google("gemini-1.5-flash"),
+  try {
+    const { text } = await withGeminiModel((model) =>
+      generateText({
+        model,
         system: `You are the Nexus HR knowledge-base assistant. Answer only from the provided document. If the document does not contain the answer, say so and recommend HR confirmation. Be concise and professional. Audience department: ${department}. ${replyInLocaleInstruction(locale)}`,
         prompt: `Document title: ${title}\n\n${document.slice(0, 8000)}\n\nQuestion: ${question}`,
         maxRetries: 1,
-      });
-      return NextResponse.json({ reply: text.trim() || fallbackAnswer(question, title, document, locale) });
-    } catch {
-      return NextResponse.json({ reply: fallbackAnswer(question, title, document, locale), fallback: true });
-    }
+      }),
+    );
+    return jsonReply(text.trim() || fallbackAnswer(question, title, document, locale));
   } catch {
-    return NextResponse.json({ reply: "Could not process the question.", fallback: true });
+    return jsonReply(fallbackAnswer(question, title, document, locale), true);
   }
 }

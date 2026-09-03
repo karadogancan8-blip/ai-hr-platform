@@ -146,16 +146,16 @@ export function PerformanceWorkspace() {
             className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
           />
         </label>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 overflow-visible">
+          <HelpTip text={t("perf.generateHint")} side="top" align="start" sideOffset={8} />
           <button
             type="submit"
             disabled={generating}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+            className="inline-flex min-w-0 items-center justify-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-center text-sm font-medium leading-tight text-white hover:bg-[#0f2744] disabled:opacity-50"
           >
-            {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            {t("perf.generate")}
+            {generating ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Sparkles className="h-4 w-4 shrink-0" />}
+            <span className="min-w-0">{t("perf.generate")}</span>
           </button>
-          <HelpTip text={t("perf.generateHint")} />
         </div>
       </form>
 

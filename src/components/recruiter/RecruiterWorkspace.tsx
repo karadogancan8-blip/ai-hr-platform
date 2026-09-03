@@ -294,16 +294,16 @@ export function RecruiterWorkspace() {
               className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
             />
           </label>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+          <div className="mt-4 flex min-w-0 flex-wrap items-center gap-2 overflow-visible">
+            <HelpTip text={t("recruit.analyzeHint")} side="top" align="start" sideOffset={8} />
             <button
               type="submit"
               disabled={analyzing}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+              className="inline-flex min-w-0 items-center justify-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-center text-sm font-medium leading-tight text-white hover:bg-[#0f2744] disabled:opacity-50"
             >
-              {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {analyzing ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Sparkles className="h-4 w-4 shrink-0" />}
               {analyzing ? t("recruit.analyzing") : t("recruit.analyze")}
             </button>
-            <HelpTip text={t("recruit.analyzeHint")} />
           </div>
           {notice ? <p className="mt-3 text-xs text-sky-800">{notice}</p> : null}
         </section>
@@ -389,38 +389,38 @@ export function RecruiterWorkspace() {
               </div>
               <p className="mt-4 text-xs text-slate-400">{formatWhen(resume.createdAt, localeMeta[locale].htmlLang)}</p>
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <div className="flex items-center gap-1">
+                <div className="flex min-w-0 items-center gap-1 overflow-visible">
+                  <HelpTip text={t("recruit.guideHint")} side="top" align="start" sideOffset={8} />
                   <button
                     type="button"
                     onClick={() => void openInterview(resume, "guide")}
-                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-medium text-sky-900 hover:bg-sky-100"
+                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-center text-xs font-medium leading-tight text-sky-900 hover:bg-sky-100"
                   >
-                    <ClipboardList className="h-3.5 w-3.5" />
-                    {t("recruit.guide")}
+                    <ClipboardList className="h-3.5 w-3.5 shrink-0" />
+                    <span className="min-w-0">{t("recruit.guide")}</span>
                   </button>
-                  <HelpTip text={t("recruit.guideHint")} />
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex min-w-0 items-center gap-1 overflow-visible">
+                  <HelpTip text={t("recruit.liveHint")} side="top" align="start" sideOffset={8} />
                   <button
                     type="button"
                     onClick={() => void openLiveInterview(resume)}
-                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#123056] px-3 py-2 text-xs font-medium text-white hover:bg-[#0f2744]"
+                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#123056] px-3 py-2 text-center text-xs font-medium leading-tight text-white hover:bg-[#0f2744]"
                   >
-                    <Video className="h-3.5 w-3.5" />
-                    {t("recruit.live")}
+                    <Video className="h-3.5 w-3.5 shrink-0" />
+                    <span className="min-w-0">{t("recruit.live")}</span>
                   </button>
-                  <HelpTip text={t("recruit.liveHint")} />
                 </div>
-                <div className="flex items-center gap-1 sm:col-span-2">
+                <div className="flex min-w-0 items-center gap-1 overflow-visible sm:col-span-2">
+                  <HelpTip text={t("recruit.pdfHint")} side="top" align="start" sideOffset={8} />
                   <button
                     type="button"
                     onClick={() => openPrintReport(resume)}
-                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-center text-xs font-medium leading-tight text-slate-700 hover:bg-slate-50"
                   >
-                    <FileDown className="h-3.5 w-3.5" />
-                    {t("recruit.pdf")}
+                    <FileDown className="h-3.5 w-3.5 shrink-0" />
+                    <span className="min-w-0">{t("recruit.pdf")}</span>
                   </button>
-                  <HelpTip text={t("recruit.pdfHint")} />
                 </div>
               </div>
             </article>
