@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { IconMenu } from "../icons";
 import { Sidebar } from "./Sidebar";
+import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const branding = useCompanyBranding();
 
   return (
     <div className="min-h-screen bg-[#eef4fb] text-slate-800">
@@ -33,8 +35,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="hidden rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-800 sm:block">
               Şirket izolasyonu aktif
             </div>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#123056] text-xs font-semibold text-white">
-              İK
+            <div
+              className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full text-xs font-semibold text-white"
+              style={{ backgroundColor: branding.primaryColor }}
+            >
+              {branding.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={branding.logoUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                branding.companyName.slice(0, 2).toUpperCase() || "İK"
+              )}
             </div>
           </div>
         </header>

@@ -5,6 +5,8 @@ export type CompanyRow = {
   name: string;
   plan_type?: string | null;
   subscription_status?: string | null;
+  logo_url?: string | null;
+  primary_color?: string | null;
   created_at?: string | null;
 };
 
@@ -59,6 +61,8 @@ export type Database = {
           name: string;
           plan_type?: string;
           subscription_status?: string;
+          logo_url?: string | null;
+          primary_color?: string | null;
           created_at?: string;
         };
         Update: Partial<CompanyRow>;

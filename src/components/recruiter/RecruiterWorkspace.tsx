@@ -1,10 +1,13 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { IconUpload } from "@/components/icons";
-import { ClipboardList, Loader2, Sparkles, Video } from "lucide-react";
+import { ClipboardList, FileDown, Loader2, Sparkles, Video } from "lucide-react";
+import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 import { InterviewModal } from "@/components/recruiter/InterviewModal";
+import { CandidatePDFReport } from "@/components/reports/CandidatePDFReport";
 import type { InterviewGuide } from "@/lib/interview";
+import { exportElementToPdf } from "@/lib/pdf-report";
 import { fetchResumes, updateResumeInterview, type StoredResume } from "@/lib/resumes";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
@@ -55,6 +58,10 @@ export function RecruiterWorkspace() {
   const [guideLoading, setGuideLoading] = useState(false);
   const [guideError, setGuideError] = useState("");
   const [savingInterview, setSavingInterview] = useState(false);
+  const [pdfBusyId, setPdfBusyId] = useState<string | null>(null);
+  const [pdfBundle, setPdfBundle] = useState<{ resume: StoredResume; guide: InterviewGuide | null } | null>(null);
+  const pdfRef = useRef<HTMLDivElement>(null);
+  const branding = useCompanyBranding();
 
   const average = useMemo(() => {
     if (!resumes.length) return 0;
@@ -165,6 +172,43 @@ export function RecruiterWorkspace() {
       setGuideLoading(false);
     }
   }
+
+  async function downloadExecutivePdf(resume: StoredResume) {
+    setPdfBusyId(resume.id);
+    setError("");
+    try {
+      const guide = guides[resume.id] ?? (await loadInterviewGuide(resume));
+      setPdfBundle({ resume, guide });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "PDF için mülakat rehberi alınamadı.");
+      setPdfBusyId(null);
+    }
+  }
+
+  useLayoutEffect(() => {
+    if (!pdfBundle) return;
+    const node = pdfRef.current;
+    if (!node) {
+      setError("PDF şablonu hazır değil.");
+      setPdfBusyId(null);
+      setPdfBundle(null);
+      return;
+    }
+    const name = pdfBundle.resume.name;
+    let cancelled = false;
+    void exportElementToPdf(node, `${name}-executive-rapor`)
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "PDF oluşturulamadı.");
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setPdfBusyId(null);
+        setPdfBundle(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [pdfBundle]);
 
   return (
     <div className="space-y-6">
@@ -351,6 +395,19 @@ export function RecruiterWorkspace() {
                   <Video className="h-3.5 w-3.5" />
                   Mülakat Başlat
                 </button>
+                <button
+                  type="button"
+                  onClick={() => void downloadExecutivePdf(resume)}
+                  disabled={pdfBusyId === resume.id}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 sm:col-span-2"
+                >
+                  {pdfBusyId === resume.id ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <FileDown className="h-3.5 w-3.5" />
+                  )}
+                  Executive PDF Raporu İndir
+                </button>
               </div>
             </article>
           ))}
@@ -388,6 +445,13 @@ export function RecruiterWorkspace() {
           }
         }}
       />
+      {pdfBundle ? (
+        <div className="pointer-events-none fixed top-0 -left-[12000px] z-[-1]">
+          <div ref={pdfRef}>
+            <CandidatePDFReport resume={pdfBundle.resume} branding={branding} guide={pdfBundle.guide} />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

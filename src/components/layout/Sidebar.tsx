@@ -11,11 +11,13 @@ import {
   IconLeave,
   IconPolicy,
   IconRecruit,
+  IconSettings,
 } from "../icons";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { planBadgeLabel, type PlanId } from "@/lib/plans";
 import { fetchCompanySubscription } from "@/lib/subscription";
+import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 
 const navItems = [
   {
@@ -48,6 +50,12 @@ const navItems = [
     description: "Paketler",
     icon: IconCreditCard,
   },
+  {
+    href: "/ayarlar",
+    label: "Ayarlar",
+    description: "White-Label",
+    icon: IconSettings,
+  },
 ];
 
 type SidebarProps = {
@@ -61,6 +69,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const [email, setEmail] = useState("");
   const [plan, setPlan] = useState<PlanId>("free");
   const [signingOut, setSigningOut] = useState(false);
+  const branding = useCompanyBranding();
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
@@ -115,11 +124,23 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       >
         <div className="flex items-center justify-between gap-3 px-5 py-6">
           <Link href="/dashboard" className="flex items-center gap-3" onClick={onClose}>
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-400/15 text-sm font-bold tracking-tight text-sky-300 ring-1 ring-sky-400/30">
-              AI
-            </span>
+            {branding.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={branding.logoUrl}
+                alt={branding.companyName}
+                className="h-10 w-10 rounded-xl bg-white object-contain p-0.5 ring-1 ring-white/20"
+              />
+            ) : (
+              <span
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold tracking-tight text-white ring-1 ring-white/20"
+                style={{ backgroundColor: branding.primaryColor }}
+              >
+                {branding.companyName.slice(0, 2).toUpperCase() || "AI"}
+              </span>
+            )}
             <span>
-              <span className="block text-sm font-semibold tracking-wide">Nexus HR</span>
+              <span className="block text-sm font-semibold tracking-wide">{branding.companyName}</span>
               <span className="block text-xs text-sky-200/70">Yapay Zeka İK Platformu</span>
             </span>
           </Link>

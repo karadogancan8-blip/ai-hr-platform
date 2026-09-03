@@ -8,6 +8,7 @@ export type StoredResume = {
   role: string;
   matchScore: number;
   interviewScore: number | null;
+  interviewNotes: string;
   summary: string;
   skills: string[];
   strengths: string[];
@@ -39,6 +40,7 @@ export function mapResumeRow(row: ResumeRow): StoredResume {
     matchScore: Math.round(Number(score) || 0),
     interviewScore:
       typeof row.interview_score === "number" ? Math.round(row.interview_score) : null,
+    interviewNotes: row.interview_notes ?? "",
     summary: row.summary ?? row.analysis_summary ?? "",
     skills: row.skills ?? [],
     strengths: row.strengths ?? [],

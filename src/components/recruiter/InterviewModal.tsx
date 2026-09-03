@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Loader2, Star, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { FileDown, Loader2, Star, X } from "lucide-react";
+import { useCompanyBranding } from "@/components/branding/BrandingProvider";
+import { CandidatePDFReport } from "@/components/reports/CandidatePDFReport";
 import {
   allQuestions,
   interviewFinalScore,
   type InterviewGuide,
   type InterviewRating,
 } from "@/lib/interview";
+import { exportElementToPdf } from "@/lib/pdf-report";
 import type { StoredResume } from "@/lib/resumes";
 
 type InterviewModalProps = {
@@ -35,6 +38,10 @@ export function InterviewModal({
 }: InterviewModalProps) {
   const questions = useMemo(() => (guide ? allQuestions(guide) : []), [guide]);
   const [ratings, setRatings] = useState<InterviewRating[]>([]);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
+  const reportRef = useRef<HTMLDivElement>(null);
+  const branding = useCompanyBranding();
 
   useEffect(() => {
     if (!open || !guide) return;
@@ -111,6 +118,9 @@ export function InterviewModal({
           ) : null}
           {error ? (
             <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
+          ) : null}
+          {exportError ? (
+            <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{exportError}</p>
           ) : null}
 
           {guide && !loading ? (
@@ -189,26 +199,57 @@ export function InterviewModal({
               <span className="ml-2 text-xs text-amber-700">{unanswered} soru puanlanmadı</span>
             ) : null}
           </div>
-          <button
-            type="button"
-            disabled={saving || loading || !guide || unanswered > 0}
-            onClick={() =>
-              void onSave({
-                score,
-                ratings,
-                notes: ratings
-                  .map((item) => {
-                    const q = questions.find((question) => question.id === item.questionId);
-                    return `${q?.question ?? item.questionId}: ${item.rating}/5 — ${item.note}`;
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              disabled={exporting || loading || !guide}
+              onClick={() => {
+                const node = reportRef.current;
+                if (!node) return;
+                setExporting(true);
+                setExportError("");
+                void exportElementToPdf(node, `${resume.name}-executive-rapor`)
+                  .catch((err) => {
+                    setExportError(err instanceof Error ? err.message : "PDF oluşturulamadı.");
                   })
-                  .join("\n"),
-              })
-            }
-            className="rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
-          >
-            {saving ? "Kaydediliyor…" : "Mülakat Değerlendirmesini Kaydet"}
-          </button>
+                  .finally(() => setExporting(false));
+              }}
+              className="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-medium text-sky-900 hover:bg-sky-100 disabled:opacity-50"
+            >
+              {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
+              {exporting ? "PDF hazırlanıyor…" : "Executive PDF Raporu İndir"}
+            </button>
+            <button
+              type="button"
+              disabled={saving || loading || !guide || unanswered > 0}
+              onClick={() =>
+                void onSave({
+                  score,
+                  ratings,
+                  notes: ratings
+                    .map((item) => {
+                      const q = questions.find((question) => question.id === item.questionId);
+                      return `${q?.question ?? item.questionId}: ${item.rating}/5 — ${item.note}`;
+                    })
+                    .join("\n"),
+                })
+              }
+              className="rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+            >
+              {saving ? "Kaydediliyor…" : "Mülakat Değerlendirmesini Kaydet"}
+            </button>
+          </div>
         </footer>
+        <div className="pointer-events-none fixed top-0 -left-[12000px] z-[-1]">
+          <div ref={reportRef}>
+            <CandidatePDFReport
+              resume={{ ...resume, interviewScore: resume.interviewScore ?? score }}
+              branding={branding}
+              guide={guide}
+              ratings={ratings}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
