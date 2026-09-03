@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { FileUp, X } from "lucide-react";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
+import { submitAppeal, type AppealModule } from "@/lib/appeals";
 
 export type PersonnelFile = {
   id: string;
@@ -79,18 +80,28 @@ export function HrDocsAndAppeal({
     setNotice(t("docs.uploaded"));
   }
 
-  function submitAppeal(event: FormEvent) {
+  function submitAppealForm(event: FormEvent) {
     event.preventDefault();
     if (!reason.trim()) return;
-    window.sessionStorage.setItem(
-      `${storageKey}:appeal`,
-      JSON.stringify({
-        reason,
-        detail,
-        subjectLabel,
-        createdAt: new Date().toISOString(),
-      }),
-    );
+    const module: AppealModule = storageKey.includes("performance")
+      ? "performance"
+      : storageKey.includes("leave") || storageKey.includes("izin")
+        ? "leave"
+        : "general";
+    submitAppeal({
+      module,
+      subjectLabel: subjectLabel || module,
+      reason: t(
+        reason === "score"
+          ? "appeal.reasonScore"
+          : reason === "facts"
+            ? "appeal.reasonFacts"
+            : reason === "docs"
+              ? "appeal.reasonDocs"
+              : "appeal.reasonOther",
+      ),
+      detail,
+    });
     setAppealOpen(false);
     setReason("");
     setDetail("");
@@ -125,7 +136,7 @@ export function HrDocsAndAppeal({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <form onSubmit={submitAppeal} className="mt-4 space-y-3">
+        <form onSubmit={submitAppealForm} className="mt-4 space-y-3">
           <label className="block text-sm">
             <span className="mb-1 block text-slate-600">{t("appeal.reason")}</span>
             <select

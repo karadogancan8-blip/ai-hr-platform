@@ -3,13 +3,13 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { isGeminiConfigured, toClientError, withGeminiModel } from "@/lib/gemini";
+import { sanitizeCvText } from "@/lib/cv-text";
 import { insertResume, type StoredResume } from "@/lib/resumes";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 export const maxDuration = 60;
 
 const GEMINI_TIMEOUT_MS = 22_000;
-const CV_TEXT_LIMIT = 8_000;
 
 const cvAnalysisSchema = z.object({
   name: z.string().describe("Adayın adı soyadı; yoksa CV'den makul bir etiket"),
@@ -56,18 +56,6 @@ const SKILL_LEXICON = [
   "Excel",
   "Salesforce",
 ];
-
-function sanitizeCvText(raw: string) {
-  return raw
-    .replace(/\u0000/g, "")
-    .replace(/[\u0001-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
-    .replace(/\r\n?/g, "\n")
-    .replace(/[ \t]+\n/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .replace(/[^\S\n]{2,}/g, " ")
-    .trim()
-    .slice(0, CV_TEXT_LIMIT);
-}
 
 function analysisPrompt(jobTitle: string, jobDescription: string, cvText: string) {
   return `Açık pozisyon: ${jobTitle}\nPozisyon açıklaması: ${jobDescription}\n\nAday CV / metin:\n${cvText}`;

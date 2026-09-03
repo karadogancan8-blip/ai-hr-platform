@@ -12,6 +12,8 @@ import { isSupabaseConfigured } from "@/lib/supabase";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
 import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
+import { AppealsInbox } from "@/components/hr-admin/AppealsInbox";
+import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 
 const SESSION_KEY = DEMO_PERFORMANCE_KEY;
@@ -24,6 +26,8 @@ function scoreBadge(score: number) {
 
 export function PerformanceWorkspace() {
   const { t, locale } = useI18n();
+  const { role } = useAccessControl();
+  const hrDesk = role === "company_admin" || role === "hr_manager";
   const [reviews, setReviews] = useState<StoredPerformanceReview[]>([]);
   const [employeeName, setEmployeeName] = useState("");
   const [period, setPeriod] = useState("2026 Q3");
@@ -167,6 +171,7 @@ export function PerformanceWorkspace() {
         appealTitleKey="appeal.title.performance"
         appealLeadKey="appeal.lead.performance"
       />
+      {hrDesk ? <AppealsInbox /> : null}
 
       {latest ? (
         <section className="grid gap-4 lg:grid-cols-2">

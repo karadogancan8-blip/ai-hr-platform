@@ -24,10 +24,10 @@ type AccessContextValue = {
 
 const AccessContext = createContext<AccessContextValue>({
   loading: true,
-  role: "company_admin",
+  role: "employee",
   access: defaultAccessControl(),
-  canManage: true,
-  canView: () => true,
+  canManage: false,
+  canView: () => false,
 });
 
 export function useAccessControl() {
@@ -36,11 +36,13 @@ export function useAccessControl() {
 
 export function AccessControlProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState<AppRole>("company_admin");
+  const [role, setRole] = useState<AppRole>("employee");
   const [access, setAccess] = useState<AccessControlMap>(defaultAccessControl);
 
   const load = useCallback(async () => {
     if (!isSupabaseConfigured()) {
+      setRole("employee");
+      setAccess(defaultAccessControl());
       setLoading(false);
       return;
     }
@@ -49,7 +51,7 @@ export function AccessControlProvider({ children }: { children: ReactNode }) {
       setRole(bundle.role);
       setAccess(bundle.access);
     } catch {
-      setRole("company_admin");
+      setRole("employee");
       setAccess(defaultAccessControl());
     } finally {
       setLoading(false);

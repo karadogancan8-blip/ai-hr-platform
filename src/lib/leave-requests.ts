@@ -95,3 +95,10 @@ export async function updateLeaveStatus(id: string, status: LeaveStatus, client?
   if (error) throw new Error(error.message);
   return mapLeaveRow(data);
 }
+
+export async function deleteLeaveRequest(id: string, client?: AppSupabase) {
+  const supabase = client ?? getSupabase();
+  const companyId = await getCompanyId(supabase);
+  const { error } = await supabase.from("leave_requests").delete().eq("id", id).eq("company_id", companyId);
+  if (error) throw new Error(error.message);
+}

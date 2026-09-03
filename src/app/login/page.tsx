@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, Suspense, useMemo, useState } from "react";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { ensureCompanyForUser } from "@/lib/tenant";
+import { LegalLinks } from "@/components/legal/LegalLinks";
 
 type Mode = "login" | "register";
 
@@ -12,7 +13,8 @@ function LoginScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/dashboard";
-  const [mode, setMode] = useState<Mode>("login");
+  const initialMode = searchParams.get("mode") === "register" ? "register" : "login";
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -21,6 +23,10 @@ function LoginScreen() {
   const [error, setError] = useState("");
 
   const configured = useMemo(() => isSupabaseConfigured(), []);
+
+  useEffect(() => {
+    setMode(searchParams.get("mode") === "register" ? "register" : "login");
+  }, [searchParams]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -176,6 +182,9 @@ function LoginScreen() {
             </form>
             {error ? <p className="mt-4 text-sm text-rose-700">{error}</p> : null}
             {notice ? <p className="mt-4 text-sm text-sky-800">{notice}</p> : null}
+            <div className="mt-6">
+              <LegalLinks />
+            </div>
           </section>
         </div>
       </div>

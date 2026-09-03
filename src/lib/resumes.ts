@@ -152,3 +152,10 @@ export async function updateResumeInterview(
 
   throw new Error("Mülakat skoru kaydedilemedi.");
 }
+
+export async function deleteResume(id: string, client?: AppSupabase) {
+  const supabase = client ?? getSupabase();
+  const companyId = await getCompanyId(supabase);
+  const { error } = await supabase.from("resumes").delete().eq("id", id).eq("company_id", companyId);
+  if (error) throw new Error(error.message);
+}

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { DemoRequestModal } from "@/components/marketing/DemoRequestModal";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { LegalLinks } from "@/components/legal/LegalLinks";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
 
@@ -78,7 +79,7 @@ export function LandingPage() {
             <p className="mt-4 max-w-xl text-base leading-7 text-sky-100/90">{t("landing.heroLead")}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/login"
+                href="/login?mode=register"
                 className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#123056] shadow-lg shadow-slate-900/20 hover:bg-sky-50"
               >
                 {t("pricing.trial")}
@@ -148,9 +149,12 @@ export function LandingPage() {
 
       <footer className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-10 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p>© {new Date().getFullYear()} Nexus HR · {t("landing.footer")}</p>
-        <Link href="/fiyatlandirma" className="font-medium text-sky-800 hover:underline">
-          {t("landing.plans")}
-        </Link>
+        <div className="flex flex-wrap items-center gap-4">
+          <LegalLinks />
+          <Link href="/fiyatlandirma" className="font-medium text-sky-800 hover:underline">
+            {t("landing.plans")}
+          </Link>
+        </div>
       </footer>
 
       <DemoRequestModal open={demoOpen} onClose={() => setDemoOpen(false)} />

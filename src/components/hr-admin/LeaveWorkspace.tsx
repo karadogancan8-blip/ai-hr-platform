@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
+  deleteLeaveRequest,
   fetchLeaveRequests,
   insertLeaveRequest,
   updateLeaveStatus,
@@ -9,7 +10,10 @@ import {
 import { isSupabaseConfigured } from "@/lib/supabase";
 import type { LeaveRequest, LeaveStatus, LeaveType } from "@/lib/types";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
+import { AppealsInbox } from "@/components/hr-admin/AppealsInbox";
+import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
 
@@ -32,11 +36,14 @@ function shortId(id: string) {
 
 export function LeaveWorkspace() {
   const { t } = useI18n();
+  const { role } = useAccessControl();
+  const hrDesk = role === "company_admin" || role === "hr_manager";
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
     employee: "",
     department: "İnsan Kaynakları",
@@ -109,6 +116,18 @@ export function LeaveWorkspace() {
       setRequests((prev) => prev.map((item) => (item.id === id ? updated : item)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Durum güncellenemedi.");
+    }
+  }
+
+  async function removeRequest(id: string) {
+    try {
+      await deleteLeaveRequest(id);
+      setRequests((prev) => prev.filter((item) => item.id !== id));
+      setNotice(t("leave.deleted"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("leave.deleted"));
+    } finally {
+      setDeleteId(null);
     }
   }
 
@@ -272,26 +291,33 @@ export function LeaveWorkspace() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      {row.status === "beklemede" ? (
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => void setStatus(row.id, "onaylandi")}
-                            className="rounded-lg bg-emerald-600 px-2 py-1 text-xs font-medium text-white"
-                          >
-                            {t("leave.approve")}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => void setStatus(row.id, "reddedildi")}
-                            className="rounded-lg bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700"
-                          >
-                            {t("leave.reject")}
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-slate-400">—</span>
-                      )}
+                      <div className="flex flex-wrap gap-2">
+                        {row.status === "beklemede" ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => void setStatus(row.id, "onaylandi")}
+                              className="rounded-lg bg-emerald-600 px-2 py-1 text-xs font-medium text-white"
+                            >
+                              {t("leave.approve")}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void setStatus(row.id, "reddedildi")}
+                              className="rounded-lg bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700"
+                            >
+                              {t("leave.reject")}
+                            </button>
+                          </>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => setDeleteId(row.id)}
+                          className="rounded-lg bg-rose-600 px-2 py-1 text-xs font-medium text-white hover:bg-rose-700"
+                        >
+                          {t("common.delete")}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -307,6 +333,16 @@ export function LeaveWorkspace() {
         appealButtonKey="appeal.button.leave"
         appealTitleKey="appeal.title.leave"
         appealLeadKey="appeal.lead.leave"
+      />
+      {hrDesk ? <AppealsInbox /> : null}
+      <ConfirmDialog
+        open={Boolean(deleteId)}
+        title={t("common.delete")}
+        body={t("leave.deleteConfirm")}
+        onClose={() => setDeleteId(null)}
+        onConfirm={() => {
+          if (deleteId) void removeRequest(deleteId);
+        }}
       />
     </div>
   );

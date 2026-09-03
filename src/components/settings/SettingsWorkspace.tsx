@@ -12,6 +12,7 @@ import { seedDemoCorporateData } from "@/lib/seed-data";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { AccessControlCard } from "@/components/settings/AccessControlCard";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { LegalLinks } from "@/components/legal/LegalLinks";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 
 export function SettingsWorkspace() {
@@ -194,6 +195,15 @@ export function SettingsWorkspace() {
       </form>
 
       <AccessControlCard />
+
+      <section className="rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("legal.kicker")}</p>
+        <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">{t("settings.legalTitle")}</h2>
+        <p className="mt-1 text-sm text-slate-500">{t("settings.legalLead")}</p>
+        <div className="mt-4">
+          <LegalLinks className="text-sm" />
+        </div>
+      </section>
 
       <section className="rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("settings.demoKicker")}</p>

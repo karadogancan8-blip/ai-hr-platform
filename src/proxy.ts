@@ -2,17 +2,28 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "@/lib/supabase/config";
 
-const PUBLIC_PREFIXES = ["/login", "/auth"];
+const PUBLIC_PREFIXES = ["/login", "/auth", "/apply", "/gizlilik", "/kvkk", "/kullanim-sartlari"];
+const PUBLIC_API = ["/api/parse-pdf"];
 
 function isPublicPath(pathname: string) {
   if (pathname === "/" || pathname === "/fiyatlandirma") return true;
   return PUBLIC_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
+function isPublicApi(pathname: string) {
+  return PUBLIC_API.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!isSupabaseConfigured()) {
+    if (isPublicApi(pathname)) return NextResponse.next();
+    if (!isPublicPath(pathname)) {
+      const login = new URL("/login", request.url);
+      if (!pathname.startsWith("/login")) login.searchParams.set("next", pathname);
+      return NextResponse.redirect(login);
+    }
     return NextResponse.next();
   }
 
@@ -39,11 +50,11 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user && pathname.startsWith("/api")) {
+  if (!user && pathname.startsWith("/api") && !isPublicApi(pathname)) {
     return NextResponse.json({ error: "Oturum gerekli." }, { status: 401 });
   }
 
-  if (!user && !isPublicPath(pathname)) {
+  if (!user && !isPublicPath(pathname) && !isPublicApi(pathname)) {
     const login = new URL("/login", request.url);
     login.searchParams.set("next", pathname);
     return NextResponse.redirect(login);

@@ -1,20 +1,28 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ClipboardList, Copy, FileDown, Loader2, Sparkles, Video } from "lucide-react";
 import { IconUpload } from "@/components/icons";
-import { ClipboardList, FileDown, Loader2, Sparkles, Video } from "lucide-react";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 import { InterviewModal } from "@/components/recruiter/InterviewModal";
 import { LiveInterviewModal } from "@/components/recruiter/LiveInterviewModal";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { PrintReportModal } from "@/components/reports/PrintReportModal";
 import type { InterviewGuide } from "@/lib/interview";
-import { fetchResumes, updateResumeInterview, type StoredResume } from "@/lib/resumes";
+import { deleteResume, fetchResumes, updateResumeInterview, type StoredResume } from "@/lib/resumes";
 import { DEMO_GUIDES_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { localeMeta } from "@/lib/i18n";
+import { sanitizeCvText } from "@/lib/cv-text";
+import { companyApplyPath } from "@/lib/slug";
+import {
+  applicationsForSlug,
+  takePublicApplication,
+  type PublicApplication,
+} from "@/lib/public-applications";
 
 function scoreTone(score: number) {
   if (score >= 90) return "from-sky-500 to-blue-700";
@@ -68,7 +76,18 @@ export function RecruiterWorkspace() {
   const [savingInterview, setSavingInterview] = useState(false);
   const [printResume, setPrintResume] = useState<StoredResume | null>(null);
   const [liveResume, setLiveResume] = useState<StoredResume | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [origin, setOrigin] = useState("");
+  const [pendingApps, setPendingApps] = useState<PublicApplication[]>([]);
   const branding = useCompanyBranding();
+
+  const applyPath = useMemo(
+    () => companyApplyPath(branding.companyName, branding.companyId),
+    [branding.companyName, branding.companyId],
+  );
+  const applyHref = origin ? `${origin}${applyPath}` : applyPath;
+  const applySlug = applyPath.replace(/^\/apply\//, "");
 
   const average = useMemo(() => {
     if (!resumes.length) return 0;
@@ -96,6 +115,7 @@ export function RecruiterWorkspace() {
 
   useEffect(() => {
     void loadResumes();
+    setOrigin(window.location.origin);
     try {
       const raw = window.sessionStorage.getItem(DEMO_GUIDES_KEY);
       if (raw) setGuides(JSON.parse(raw) as Record<string, InterviewGuide>);
@@ -115,13 +135,68 @@ export function RecruiterWorkspace() {
     return () => window.removeEventListener(DEMO_SEEDED_EVENT, onSeed);
   }, []);
 
+  useEffect(() => {
+    setPendingApps(applicationsForSlug(applySlug));
+  }, [applySlug]);
+
   async function ingestFiles(list: FileList | null) {
     const file = list?.[0];
     if (!file) return;
     setFileName(file.name);
-    const text = await file.text();
-    setCvText(text);
-    setNotice(`${file.name} metin olarak okundu. Analiz için butona basın.`);
+    try {
+      const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+      if (isPdf) {
+        const form = new FormData();
+        form.append("file", file);
+        const response = await fetch("/api/parse-pdf", { method: "POST", body: form });
+        const payload = (await response.json()) as { text?: string };
+        const text = sanitizeCvText(payload.text ?? "");
+        if (text.length < 20) {
+          setNotice(t("recruit.pdfFail"));
+          return;
+        }
+        setCvText(text);
+        setNotice(t("recruit.fileRead", { name: file.name }));
+        return;
+      }
+      setCvText(sanitizeCvText(await file.text()));
+      setNotice(t("recruit.fileRead", { name: file.name }));
+    } catch {
+      setNotice(t("recruit.pdfFail"));
+    }
+  }
+
+  async function copyApplyLink() {
+    try {
+      await navigator.clipboard.writeText(applyHref);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setNotice(applyHref);
+    }
+  }
+
+  function importPendingApp() {
+    const first = pendingApps[0];
+    if (!first) return;
+    setCvText(sanitizeCvText(first.cvText));
+    if (first.role) setJobTitle(first.role);
+    setFileName(`${first.name}.txt`);
+    takePublicApplication(first.id);
+    setPendingApps(applicationsForSlug(applySlug));
+    setNotice(t("recruit.fileRead", { name: first.name }));
+  }
+
+  async function removeResume(id: string) {
+    try {
+      await deleteResume(id);
+      setResumes((prev) => prev.filter((item) => item.id !== id));
+      setNotice(t("recruit.deleted"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("recruit.deleted"));
+    } finally {
+      setDeleteId(null);
+    }
   }
 
   async function analyze(event: FormEvent) {
@@ -222,6 +297,23 @@ export function RecruiterWorkspace() {
 
   return (
     <div className="space-y-6">
+      <div className="rounded-2xl border border-sky-100 bg-white px-4 py-3 text-sm shadow-sm">
+        <p className="text-xs font-semibold text-[#0b1f3a]">{t("recruit.applyLink")}</p>
+        <p className="mt-0.5 text-[11px] text-slate-500">{t("recruit.applyHint")}</p>
+        <div className="mt-2 flex items-center gap-2">
+          <code className="min-w-0 flex-1 truncate rounded-lg bg-slate-50 px-2 py-1.5 text-[11px] text-slate-700">
+            {applyHref}
+          </code>
+          <button
+            type="button"
+            onClick={() => void copyApplyLink()}
+            className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#123056] px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-white hover:bg-[#0f2744]"
+          >
+            <Copy className="h-3.5 w-3.5" />
+            {copied ? t("common.copied") : t("common.copy")}
+          </button>
+        </div>
+      </div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("recruit.kicker")}</p>
@@ -238,6 +330,19 @@ export function RecruiterWorkspace() {
 
       {error ? (
         <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
+      ) : null}
+
+      {pendingApps.length ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+          <p>{t("recruit.pendingApps", { count: pendingApps.length })}</p>
+          <button
+            type="button"
+            onClick={importPendingApp}
+            className="rounded-lg bg-white px-3 py-1.5 text-xs font-medium text-sky-900 ring-1 ring-sky-200"
+          >
+            {t("recruit.importApp")}
+          </button>
+        </div>
       ) : null}
 
       <form onSubmit={analyze} className="space-y-4">
@@ -331,8 +436,15 @@ export function RecruiterWorkspace() {
           {resumes.map((resume) => (
             <article
               key={resume.id}
-              className="flex flex-col rounded-2xl border border-sky-100 bg-white p-4 shadow-[0_8px_30px_rgba(15,55,95,0.06)]"
+              className="relative flex flex-col rounded-2xl border border-sky-100 bg-white p-4 pt-11 shadow-[0_8px_30px_rgba(15,55,95,0.06)]"
             >
+              <button
+                type="button"
+                onClick={() => setDeleteId(resume.id)}
+                className="absolute top-3 right-3 rounded-lg bg-rose-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-rose-700"
+              >
+                {t("common.delete")}
+              </button>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="text-sm font-semibold text-[#0b1f3a]">{resume.name}</h3>
@@ -394,10 +506,10 @@ export function RecruiterWorkspace() {
                   <button
                     type="button"
                     onClick={() => void openInterview(resume, "guide")}
-                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-center text-xs font-medium leading-tight text-sky-900 hover:bg-sky-100"
+                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-center text-xs font-medium leading-tight text-sky-900 hover:bg-sky-100"
                   >
                     <ClipboardList className="h-3.5 w-3.5 shrink-0" />
-                    <span className="min-w-0">{t("recruit.guide")}</span>
+                    <span className="whitespace-nowrap">{t("recruit.guide")}</span>
                   </button>
                 </div>
                 <div className="flex min-w-0 items-center gap-1 overflow-visible">
@@ -499,6 +611,15 @@ export function RecruiterWorkspace() {
           onClose={() => setPrintResume(null)}
         />
       ) : null}
+      <ConfirmDialog
+        open={Boolean(deleteId)}
+        title={t("common.delete")}
+        body={t("recruit.deleteConfirm")}
+        onClose={() => setDeleteId(null)}
+        onConfirm={() => {
+          if (deleteId) void removeResume(deleteId);
+        }}
+      />
     </div>
   );
 }

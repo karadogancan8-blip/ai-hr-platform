@@ -139,7 +139,11 @@ export function PricingWorkspace() {
         </div>
       </div>
 
-      {loading ? <p className="text-sm text-slate-400">Paket durumu yükleniyor…</p> : null}
+      {loading ? (
+        <p className="min-h-[1.5rem] text-sm text-slate-400">Paket durumu yükleniyor…</p>
+      ) : (
+        <p className="min-h-[1.5rem]" aria-hidden />
+      )}
       {error ? (
         <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
       ) : null}
@@ -147,14 +151,14 @@ export function PricingWorkspace() {
         <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p>
       ) : null}
 
-      <div className="grid items-stretch gap-5 lg:grid-cols-3">
+      <div className="grid min-h-[640px] items-stretch gap-5 lg:grid-cols-3">
         {plans.map((plan) => {
           const current = authed && currentPlan === plan.id;
           const highlights = plan.highlights ?? [];
           return (
             <article
               key={plan.id}
-              className={`flex flex-col rounded-2xl border bg-white px-7 py-7 ${
+              className={`flex h-full min-h-[36rem] flex-col rounded-2xl border bg-white px-7 py-7 ${
                 plan.popular
                   ? "border-[#123056] shadow-[0_18px_40px_-24px_rgba(18,48,86,0.55)] ring-1 ring-[#123056]/10"
                   : "border-slate-200"

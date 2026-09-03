@@ -188,6 +188,9 @@ export async function fetchAccessBundle(client?: AppSupabase) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) {
+    return { companyId: "", userId: "", access: defaultAccessControl(), role: "employee" as AppRole };
+  }
   const companyId = await getCompanyId(supabase);
   const localAccess = readLocalAccess(companyId);
   const localRole = user?.id ? readLocalRole(user.id) : null;
