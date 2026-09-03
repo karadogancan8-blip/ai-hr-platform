@@ -42,13 +42,13 @@ export function AccessControlCard() {
       }
       setNotice(
         localOnly
-          ? "Ayarlar kaydedildi (yerel önbellek). Supabase’de access_control / profiles.role kolonları yoksa schema.sql komutlarını çalıştırın."
+          ? t("access.savedLocal")
           : canManage
-            ? "Modül ve yetki ayarları kaydedildi."
-            : "Rolünüz güncellendi. Hassas modüller bu role göre gizlenir.",
+            ? t("access.saved")
+            : t("access.roleUpdated"),
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Yetkiler kaydedilemedi.");
+      setError(err instanceof Error ? err.message : t("access.fail"));
     } finally {
       setSaving(false);
     }
@@ -67,7 +67,7 @@ export function AccessControlCard() {
         </div>
       </div>
 
-      {loading ? <p className="mt-4 text-sm text-slate-400">Yetki ayarları yükleniyor…</p> : null}
+      {loading ? <p className="mt-4 text-sm text-slate-400">{t("access.loading")}</p> : null}
       {error ? (
         <p className="mt-4 rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
       ) : null}
@@ -78,7 +78,7 @@ export function AccessControlCard() {
       ) : null}
 
       <label className="mt-5 block text-sm">
-        <span className="mb-1 block font-medium text-slate-700">Bu oturumdaki rol</span>
+        <span className="mb-1 block font-medium text-slate-700">{t("access.roleSession")}</span>
         <select
           value={draftRole}
           onChange={(event) => setDraftRole(event.target.value as AppRole)}
@@ -106,7 +106,7 @@ export function AccessControlCard() {
                     <h3 className="text-sm font-semibold text-[#0b1f3a]">{module.title}</h3>
                     {module.sensitive ? (
                       <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-700">
-                        Hassas
+                        {t("access.sensitive")}
                       </span>
                     ) : null}
                     <span
@@ -114,14 +114,14 @@ export function AccessControlCard() {
                         item.enabled ? "bg-emerald-50 text-emerald-800" : "bg-slate-200 text-slate-600"
                       }`}
                     >
-                      {item.enabled ? "Aktif" : "Pasif"}
+                      {item.enabled ? t("access.active") : t("access.inactive")}
                     </span>
                   </div>
                   <p className="mt-0.5 text-xs text-slate-500">{module.subtitle}</p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[420px]">
                   <label className="flex items-center justify-between gap-3 rounded-xl border border-sky-100 bg-white px-3 py-2">
-                    <span className="text-xs font-medium text-slate-600">Modül durumu</span>
+                    <span className="text-xs font-medium text-slate-600">{t("access.moduleStatus")}</span>
                     <button
                       type="button"
                       role="switch"
@@ -145,7 +145,7 @@ export function AccessControlCard() {
                     </button>
                   </label>
                   <label className="block">
-                    <span className="mb-1 block text-[11px] font-medium text-slate-500">Görünürlük yetkisi</span>
+                    <span className="mb-1 block text-[11px] font-medium text-slate-500">{t("access.visibility")}</span>
                     <select
                       value={item.visibility}
                       disabled={!canManage || !item.enabled}
@@ -181,12 +181,10 @@ export function AccessControlCard() {
         className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
       >
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-        {canManage ? "Yetkileri kaydet" : "Rolü kaydet"}
+        {canManage ? t("access.save") : t("access.saveRole")}
       </button>
       {!canManage ? (
-        <p className="mt-2 text-xs text-slate-500">
-          Modül aç/kapa ve görünürlük yalnızca şirket admini tarafından değiştirilir.
-        </p>
+        <p className="mt-2 text-xs text-slate-500">{t("access.adminOnly")}</p>
       ) : null}
     </section>
   );

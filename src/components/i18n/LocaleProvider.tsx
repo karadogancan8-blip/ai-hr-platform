@@ -28,6 +28,9 @@ const LocaleContext = createContext<LocaleContextValue>({
   t: (key, vars) => translate("tr", key, vars),
 });
 
+/** Alias used by language switcher and workspaces to apply locale immediately. */
+export const i18nContext = LocaleContext;
+
 export function useI18n() {
   return useContext(LocaleContext);
 }
@@ -48,6 +51,10 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     if (isLocale(saved)) {
       setLocaleState(saved);
       applyDocumentLocale(saved);
+      return;
+    }
+    if (saved) {
+      window.localStorage.setItem(LOCALE_STORAGE_KEY, "tr");
     }
   }, []);
 

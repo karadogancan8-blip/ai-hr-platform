@@ -25,8 +25,10 @@ const cvAnalysisSchema = z.object({
 
 export type CvAnalysis = z.infer<typeof cvAnalysisSchema>;
 
-const systemPrompt =
+const systemPromptTr =
   "Sen RecruiterAgent adlı kıdemli bir işe alım uzmanısın. CV'leri Türkçe, objektif ve profesyonel değerlendir. Uydurma sertifika veya deneyim ekleme; metinde yoksa belirt.";
+const systemPromptEn =
+  "You are RecruiterAgent, a senior talent-acquisition specialist. Evaluate CVs objectively and professionally. Do not invent certificates or experience; if they are missing from the text, say so.";
 
 const SKILL_LEXICON = [
   "React",
@@ -163,7 +165,8 @@ async function analyzeCv(
   locale = parseRequestLocale("tr"),
 ): Promise<{ object: CvAnalysis; fallback: boolean; warning?: string }> {
   const prompt = analysisPrompt(jobTitle, jobDescription, cvText);
-  const system = `${systemPrompt} ${replyInLocaleInstruction(locale)} Put JSON string values in that language.`;
+  const base = locale === "en" ? systemPromptEn : systemPromptTr;
+  const system = `${base} ${replyInLocaleInstruction(locale)} Put JSON string values in that language.`;
 
   try {
     const { object } = await withTimeout(

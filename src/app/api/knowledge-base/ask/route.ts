@@ -19,12 +19,6 @@ function fallbackAnswer(question: string, title: string, body: string, locale: L
   const tails: Record<Locale, string> = {
     tr: `“${title}” belgesine göre: ${excerpt}${body.length > 280 ? "…" : ""}\n\nSorunuz: ${question.slice(0, 180)}\nBu yanıt belge özetine dayanır; bağlayıcı yorum için İK ile teyit edin.`,
     en: `Based on “${title}”: ${excerpt}${body.length > 280 ? "…" : ""}\n\nQuestion: ${question.slice(0, 180)}\nThis is a document summary; confirm with HR before acting.`,
-    de: `Laut „${title}“: ${excerpt}${body.length > 280 ? "…" : ""}\n\nFrage: ${question.slice(0, 180)}\nBitte mit HR bestätigen.`,
-    fr: `D’après « ${title} » : ${excerpt}${body.length > 280 ? "…" : ""}\n\nQuestion : ${question.slice(0, 180)}\nConfirmez auprès des RH.`,
-    es: `Según “${title}”: ${excerpt}${body.length > 280 ? "…" : ""}\n\nPregunta: ${question.slice(0, 180)}\nConfirme con RR. HH.`,
-    ar: `وفقًا لـ «${title}»: ${excerpt}${body.length > 280 ? "…" : ""}\n\nالسؤال: ${question.slice(0, 180)}\nيرجى التأكد مع الموارد البشرية.`,
-    ru: `Согласно «${title}»: ${excerpt}${body.length > 280 ? "…" : ""}\n\nВопрос: ${question.slice(0, 180)}\nПодтвердите в HR.`,
-    zh: `根据「${title}」：${excerpt}${body.length > 280 ? "…" : ""}\n\n问题：${question.slice(0, 180)}\n请与人力资源确认。`,
   };
   return tails[locale];
 }

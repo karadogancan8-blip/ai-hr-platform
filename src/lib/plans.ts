@@ -1,5 +1,4 @@
-export const PLAN_MULTILINGUAL_FEATURE =
-  "8 Farklı Global Dil Desteği (TR, EN, DE, FR, ES, AR, RU, ZH)";
+export const PLAN_MULTILINGUAL_FEATURE = "Türkçe ve İngilizce dil desteği (TR, EN)";
 
 export type PlanId = "free" | "pro" | "enterprise";
 export type SubscriptionStatus = "free" | "active";

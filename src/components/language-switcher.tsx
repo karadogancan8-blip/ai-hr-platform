@@ -12,17 +12,11 @@ type LanguageSwitcherProps = {
 function LanguageRow({ id }: { id: Locale }) {
   const option = localeMeta[id];
   return (
-    <span className="inline-flex min-w-0 items-center gap-2" dir="ltr">
+    <span className="inline-flex items-center gap-1.5">
       <span className="text-[15px] leading-none" aria-hidden>
         {option.flag}
       </span>
-      <span className="text-[11px] font-semibold tracking-wide text-slate-500">{option.short}</span>
-      <span className="text-slate-300" aria-hidden>
-        –
-      </span>
-      <span dir={option.dir} className="truncate text-sm text-slate-800">
-        {option.nativeName}
-      </span>
+      <span className="text-[11px] font-semibold tracking-wide text-slate-600">{option.short}</span>
     </span>
   );
 }
@@ -53,10 +47,11 @@ export function LanguageSwitcher({ className = "" }: LanguageSwitcherProps) {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex max-w-[14rem] items-center gap-2 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-slate-800 shadow-sm transition hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 hover:shadow-md"
+        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2 py-1.5 text-slate-800 shadow-sm transition hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 hover:shadow-md"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={t("lang.label")}
+        title={`${localeMeta[locale].flag} ${localeMeta[locale].short} – ${localeMeta[locale].nativeName}`}
       >
         <LanguageRow id={locale} />
         <ChevronDown className={`h-3.5 w-3.5 shrink-0 text-slate-400 transition duration-200 ${open ? "rotate-180" : ""}`} />
@@ -64,10 +59,9 @@ export function LanguageSwitcher({ className = "" }: LanguageSwitcherProps) {
       {open ? (
         <ul
           role="listbox"
-          className="absolute end-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 p-1 shadow-[0_18px_40px_-18px_rgba(15,23,42,0.45)] backdrop-blur-sm"
+          className="absolute end-0 z-50 mt-2 w-36 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 p-1 shadow-[0_18px_40px_-18px_rgba(15,23,42,0.45)] backdrop-blur-sm"
         >
           {LOCALES.map((id) => {
-            const option = localeMeta[id];
             const selected = locale === id;
             return (
               <li key={id}>
@@ -75,7 +69,6 @@ export function LanguageSwitcher({ className = "" }: LanguageSwitcherProps) {
                   type="button"
                   role="option"
                   aria-selected={selected}
-                  dir={option.dir}
                   onClick={() => {
                     setLocale(id);
                     setOpen(false);
@@ -83,7 +76,7 @@ export function LanguageSwitcher({ className = "" }: LanguageSwitcherProps) {
                   className={`inline-flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-start transition ${
                     selected
                       ? "bg-sky-50 text-slate-900 shadow-sm"
-                      : "text-slate-600 hover:translate-x-0.5 hover:bg-slate-50 hover:text-slate-900 rtl:hover:-translate-x-0.5"
+                      : "text-slate-600 hover:translate-x-0.5 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
                   <LanguageRow id={id} />

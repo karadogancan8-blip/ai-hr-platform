@@ -13,23 +13,10 @@ import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
 
-const typeLabel: Record<LeaveType, string> = {
-  yillik: "Yıllık izin",
-  mazeret: "Mazeret",
-  hastalik: "Hastalık",
-  ucretsiz: "Ücretsiz",
-};
-
 const statusStyle: Record<LeaveStatus, string> = {
   beklemede: "bg-amber-50 text-amber-800",
   onaylandi: "bg-emerald-50 text-emerald-800",
   reddedildi: "bg-rose-50 text-rose-800",
-};
-
-const statusLabel: Record<LeaveStatus, string> = {
-  beklemede: "Onay bekliyor",
-  onaylandi: "Onaylandı",
-  reddedildi: "Reddedildi",
 };
 
 function daysBetween(start: string, end: string) {
@@ -173,7 +160,7 @@ export function LeaveWorkspace() {
               onChange={(event) => setForm({ ...form, type: event.target.value as LeaveType })}
               className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
             >
-              {(Object.keys(typeLabel) as LeaveType[]).map((key) => (
+              {(["yillik", "mazeret", "hastalik", "ucretsiz"] as LeaveType[]).map((key) => (
                 <option key={key} value={key}>
               {t(`leave.type.${key}` as MessageKey)}
                 </option>
@@ -207,7 +194,7 @@ export function LeaveWorkspace() {
               onChange={(event) => setForm({ ...form, reason: event.target.value })}
               rows={3}
               className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
-              placeholder="Kısa açıklama"
+              placeholder={t("leave.reasonPlaceholder")}
             />
           </label>
           <button

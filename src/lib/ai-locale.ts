@@ -1,21 +1,16 @@
 import { isLocale, type Locale } from "@/lib/i18n";
 
-export const AI_LANGUAGE_NAME: Record<Locale, string> = {
-  tr: "Turkish",
-  en: "English",
-  de: "German",
-  fr: "French",
-  es: "Spanish",
-  ar: "Arabic",
-  ru: "Russian",
-  zh: "Simplified Chinese",
-};
+export const GEMINI_ENGLISH_RULE = "Respond strictly in professional English";
 
 export function parseRequestLocale(value: unknown): Locale {
-  return isLocale(typeof value === "string" ? value : "") ? value : "tr";
+  if (typeof value === "string" && isLocale(value)) return value;
+  return "tr";
 }
 
+/** Gemini system-prompt fragment. English uses the product’s strict professional-English rule. */
 export function replyInLocaleInstruction(locale: Locale) {
-  const name = AI_LANGUAGE_NAME[locale];
-  return `Write the entire response in ${name} (locale code: ${locale}). Keep a professional HR tone. Do not mix languages.`;
+  if (locale === "en") {
+    return GEMINI_ENGLISH_RULE;
+  }
+  return "Respond strictly in professional Turkish (kurumsal İK Türkçesi). Do not mix English or any other language.";
 }
