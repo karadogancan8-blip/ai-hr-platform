@@ -71,6 +71,16 @@ export async function ensureCompanyForUser(
   return company.id;
 }
 
+export async function resolveOptionalCompanyId(supabase: AppSupabase) {
+  try {
+    const id = await getCompanyId(supabase);
+    return typeof id === "string" && id.trim() ? id.trim() : null;
+  } catch (error) {
+    console.error("[company_id]", error);
+    return null;
+  }
+}
+
 export async function getCompanyId(supabase: AppSupabase) {
   const {
     data: { user },

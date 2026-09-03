@@ -6,7 +6,10 @@ import {
   fetchPerformanceReviews,
   type StoredPerformanceReview,
 } from "@/lib/performance";
+import { mergeById, readSessionList, writeSessionList } from "@/lib/session-store";
 import { isSupabaseConfigured } from "@/lib/supabase";
+
+const SESSION_KEY = "nexus-performance-reviews";
 
 function scoreBadge(score: number) {
   if (score >= 4) return "bg-emerald-50 text-emerald-800";
@@ -25,23 +28,28 @@ export function PerformanceWorkspace() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
+  function remember(next: StoredPerformanceReview[], current?: StoredPerformanceReview | null) {
+    setReviews(next);
+    writeSessionList(SESSION_KEY, next);
+    if (current) setLatest(current);
+  }
+
   async function load() {
+    const session = readSessionList<StoredPerformanceReview>(SESSION_KEY);
+    if (session.length) {
+      setReviews(session);
+      setLatest(session[0]);
+    }
     if (!isSupabaseConfigured()) {
-      setError("Supabase yapılandırılmamış.");
       setLoading(false);
       return;
     }
     try {
       const rows = await fetchPerformanceReviews();
-      setReviews(rows);
-      setLatest(rows[0] ?? null);
-      setError("");
+      const merged = mergeById(session, rows);
+      remember(merged, merged[0] ?? null);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? `${err.message} Gerekirse supabase/schema.sql içindeki performance_reviews tablosunu çalıştırın.`
-          : "İncelemeler yüklenemedi.",
-      );
+      console.error("[performans] liste:", err);
     } finally {
       setLoading(false);
     }
@@ -71,13 +79,8 @@ export function PerformanceWorkspace() {
       };
       const row = payload.saved ?? payload.review;
       if (!row) throw new Error("Rapor üretilemedi.");
-      setLatest(row);
-      if (payload.saved) {
-        setReviews((prev) => [payload.saved!, ...prev.filter((item) => item.id !== payload.saved!.id)]);
-        setNotice(`${row.employeeName} için performans incelemesi kaydedildi.`);
-      } else {
-        setNotice("Rapor üretildi ancak kaydedilemedi. SQL şemasını kontrol edin.");
-      }
+      remember([row, ...reviews.filter((item) => item.id !== row.id)], row);
+      setNotice(`${row.employeeName} için performans incelemesi hazır.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Rapor üretilemedi.");
     } finally {

@@ -3,7 +3,7 @@ import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { isGeminiConfigured } from "@/lib/gemini";
-import { fallbackPerformanceReview, insertPerformanceReview } from "@/lib/performance";
+import { fallbackPerformanceReview, insertPerformanceReview, toLocalPerformanceReview } from "@/lib/performance";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 export const maxDuration = 60;
@@ -28,8 +28,8 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
     if (!user) {
       console.error("[generate-performance] oturum yok");
-      const review = fallbackPerformanceReview({ employeeName, period, notes });
-      return NextResponse.json({ review, fallback: true });
+      const local = toLocalPerformanceReview(fallbackPerformanceReview({ employeeName, period, notes }));
+      return NextResponse.json({ review: local, saved: local, fallback: true });
     }
 
     try {
@@ -48,12 +48,13 @@ export async function POST(request: Request) {
     const fallback = fallbackPerformanceReview({ employeeName, period, notes });
 
     async function persist(review: typeof fallback, fallbackFlag: boolean) {
+      const local = toLocalPerformanceReview(review);
       try {
         const saved = await insertPerformanceReview(review, supabase);
         return NextResponse.json({ review: saved, fallback: fallbackFlag, saved });
       } catch (error) {
         console.error("[generate-performance] kayıt hatası:", error);
-        return NextResponse.json({ review, fallback: fallbackFlag });
+        return NextResponse.json({ review: local, fallback: fallbackFlag, saved: local });
       }
     }
 
@@ -113,9 +114,7 @@ score 1-5 tam sayı. goals gelecek çeyrek için 3 madde olsun.`,
     }
   } catch (error) {
     console.error("[generate-performance] beklenmeyen hata:", error);
-    return NextResponse.json({
-      review: fallbackPerformanceReview({ employeeName, period, notes }),
-      fallback: true,
-    });
+    const local = toLocalPerformanceReview(fallbackPerformanceReview({ employeeName, period, notes }));
+    return NextResponse.json({ review: local, saved: local, fallback: true });
   }
 }

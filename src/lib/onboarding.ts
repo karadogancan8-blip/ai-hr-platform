@@ -1,5 +1,5 @@
 import { getSupabase } from "./supabase";
-import { getCompanyId, type AppSupabase } from "./tenant";
+import { resolveOptionalCompanyId, type AppSupabase } from "./tenant";
 import type { OnboardingPlanRow } from "./database.types";
 
 export type OnboardingTask = {
@@ -26,6 +26,7 @@ export type StoredOnboardingPlan = {
   weeks: OnboardingWeek[];
   tasks: OnboardingTask[];
   createdAt: string;
+  persisted?: boolean;
 };
 
 export type OnboardingPlanPayload = {
@@ -100,19 +101,42 @@ export function mapOnboardingRow(row: OnboardingPlanRow): StoredOnboardingPlan {
     weeks,
     tasks,
     createdAt: row.created_at ?? new Date().toISOString(),
+    persisted: true,
+  };
+}
+
+export function toLocalOnboardingPlan(input: {
+  employeeName: string;
+  role: string;
+  department: string;
+  payload: OnboardingPlanPayload;
+}): StoredOnboardingPlan {
+  return {
+    id: crypto.randomUUID(),
+    employeeName: input.employeeName,
+    role: input.role,
+    department: input.department,
+    status: "aktif",
+    summary: input.payload.summary,
+    weeks: input.payload.weeks,
+    tasks: input.payload.tasks,
+    createdAt: new Date().toISOString(),
+    persisted: false,
   };
 }
 
 export async function fetchOnboardingPlans(client?: AppSupabase) {
   const supabase = client ?? getSupabase();
-  const companyId = await getCompanyId(supabase);
-  const { data, error } = await supabase
-    .from("onboarding_plans")
-    .select("*")
-    .eq("company_id", companyId)
-    .order("created_at", { ascending: false });
+  const companyId = await resolveOptionalCompanyId(supabase);
+  let query = supabase.from("onboarding_plans").select("*").order("created_at", { ascending: false });
+  if (companyId) query = query.eq("company_id", companyId);
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
   return (data ?? []).map(mapOnboardingRow);
+}
+
+function shouldDropCompanyId(message: string) {
+  return /company_id|null value in column|invalid input syntax for type uuid|foreign key/i.test(message);
 }
 
 export async function insertOnboardingPlan(
@@ -125,7 +149,7 @@ export async function insertOnboardingPlan(
   client?: AppSupabase,
 ) {
   const supabase = client ?? getSupabase();
-  const companyId = await getCompanyId(supabase);
+  const companyId = await resolveOptionalCompanyId(supabase);
   const record: Record<string, unknown> = {
     company_id: companyId,
     employee_name: input.employeeName,
@@ -138,33 +162,34 @@ export async function insertOnboardingPlan(
   for (let attempt = 0; attempt < 8; attempt += 1) {
     const { data, error } = await supabase.from("onboarding_plans").insert(record).select().single();
     if (!error) return mapOnboardingRow(data);
+
     const column = missingColumn(error.message);
-    if (!column || column === "company_id" || !(column in record)) throw new Error(error.message);
-    delete record[column];
+    if (column && column in record && column !== "company_id") {
+      delete record[column];
+      continue;
+    }
+    if (shouldDropCompanyId(error.message) && "company_id" in record) {
+      delete record.company_id;
+      continue;
+    }
+    throw new Error(error.message);
   }
   throw new Error("Onboarding planı kaydedilemedi.");
 }
 
 export async function updateOnboardingTasks(id: string, tasks: OnboardingTask[], client?: AppSupabase) {
   const supabase = client ?? getSupabase();
-  const companyId = await getCompanyId(supabase);
-  const { data: existing, error: readError } = await supabase
-    .from("onboarding_plans")
-    .select("*")
-    .eq("id", id)
-    .eq("company_id", companyId)
-    .maybeSingle();
+  const companyId = await resolveOptionalCompanyId(supabase);
+  let read = supabase.from("onboarding_plans").select("*").eq("id", id);
+  if (companyId) read = read.eq("company_id", companyId);
+  const { data: existing, error: readError } = await read.maybeSingle();
   if (readError) throw new Error(readError.message);
   if (!existing) throw new Error("Plan bulunamadı.");
   const mapped = mapOnboardingRow(existing);
   const plan = { summary: mapped.summary, weeks: mapped.weeks, tasks };
-  const { data, error } = await supabase
-    .from("onboarding_plans")
-    .update({ plan })
-    .eq("id", id)
-    .eq("company_id", companyId)
-    .select()
-    .single();
+  let write = supabase.from("onboarding_plans").update({ plan }).eq("id", id);
+  if (companyId) write = write.eq("company_id", companyId);
+  const { data, error } = await write.select().single();
   if (error) throw new Error(error.message);
   return mapOnboardingRow(data);
 }

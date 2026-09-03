@@ -6,6 +6,7 @@ import { isGeminiConfigured } from "@/lib/gemini";
 import {
   fallbackOnboardingPlan,
   insertOnboardingPlan,
+  toLocalOnboardingPlan,
   type OnboardingPlanPayload,
   type OnboardingTask,
   type OnboardingWeek,
@@ -36,10 +37,6 @@ const schema = z.object({
     .min(8),
 });
 
-function ok(payload: OnboardingPlanPayload, fallback = false, saved?: unknown) {
-  return NextResponse.json({ plan: payload, fallback, saved });
-}
-
 export async function POST(request: Request) {
   let employeeName = "Yeni çalışan";
   let role = "Pozisyon";
@@ -52,7 +49,12 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
     if (!user) {
       console.error("[generate-onboarding] oturum yok");
-      return ok(fallbackOnboardingPlan({ employeeName, role, department }), true);
+      const payload = fallbackOnboardingPlan({ employeeName, role, department });
+      return NextResponse.json({
+        plan: payload,
+        fallback: true,
+        saved: toLocalOnboardingPlan({ employeeName, role, department, payload }),
+      });
     }
 
     try {
@@ -71,12 +73,13 @@ export async function POST(request: Request) {
     const fallback = fallbackOnboardingPlan({ employeeName, role, department });
 
     async function persist(payload: OnboardingPlanPayload, fallbackFlag: boolean) {
+      const local = toLocalOnboardingPlan({ employeeName, role, department, payload });
       try {
         const saved = await insertOnboardingPlan({ employeeName, role, department, payload }, supabase);
         return NextResponse.json({ plan: payload, fallback: fallbackFlag, saved });
       } catch (error) {
         console.error("[generate-onboarding] kayıt hatası:", error);
-        return ok(payload, fallbackFlag);
+        return NextResponse.json({ plan: payload, fallback: fallbackFlag, saved: local });
       }
     }
 
@@ -134,6 +137,11 @@ Departman: ${department}
     }
   } catch (error) {
     console.error("[generate-onboarding] beklenmeyen hata:", error);
-    return ok(fallbackOnboardingPlan({ employeeName, role, department }), true);
+    const payload = fallbackOnboardingPlan({ employeeName, role, department });
+    return NextResponse.json({
+      plan: payload,
+      fallback: true,
+      saved: toLocalOnboardingPlan({ employeeName, role, department, payload }),
+    });
   }
 }

@@ -1,5 +1,5 @@
 import { getSupabase } from "./supabase";
-import { getCompanyId, type AppSupabase } from "./tenant";
+import { resolveOptionalCompanyId, type AppSupabase } from "./tenant";
 import type { PerformanceReviewRow } from "./database.types";
 
 export type StoredPerformanceReview = {
@@ -13,6 +13,7 @@ export type StoredPerformanceReview = {
   goals: string[];
   score: number;
   createdAt: string;
+  persisted?: boolean;
 };
 
 function missingColumn(message: string) {
@@ -62,27 +63,41 @@ export function mapPerformanceRow(row: PerformanceReviewRow): StoredPerformanceR
     goals: row.goals ?? [],
     score: Math.min(5, Math.max(1, Math.round(Number(row.score) || 3))),
     createdAt: row.created_at ?? new Date().toISOString(),
+    persisted: true,
+  };
+}
+
+export function toLocalPerformanceReview(
+  input: Omit<StoredPerformanceReview, "id" | "createdAt" | "persisted">,
+): StoredPerformanceReview {
+  return {
+    ...input,
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    persisted: false,
   };
 }
 
 export async function fetchPerformanceReviews(client?: AppSupabase) {
   const supabase = client ?? getSupabase();
-  const companyId = await getCompanyId(supabase);
-  const { data, error } = await supabase
-    .from("performance_reviews")
-    .select("*")
-    .eq("company_id", companyId)
-    .order("created_at", { ascending: false });
+  const companyId = await resolveOptionalCompanyId(supabase);
+  let query = supabase.from("performance_reviews").select("*").order("created_at", { ascending: false });
+  if (companyId) query = query.eq("company_id", companyId);
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
   return (data ?? []).map(mapPerformanceRow);
 }
 
+function shouldDropCompanyId(message: string) {
+  return /company_id|null value in column|invalid input syntax for type uuid|foreign key/i.test(message);
+}
+
 export async function insertPerformanceReview(
-  input: Omit<StoredPerformanceReview, "id" | "createdAt">,
+  input: Omit<StoredPerformanceReview, "id" | "createdAt" | "persisted">,
   client?: AppSupabase,
 ) {
   const supabase = client ?? getSupabase();
-  const companyId = await getCompanyId(supabase);
+  const companyId = await resolveOptionalCompanyId(supabase);
   const payload: Record<string, unknown> = {
     company_id: companyId,
     employee_name: input.employeeName,
@@ -99,8 +114,15 @@ export async function insertPerformanceReview(
     const { data, error } = await supabase.from("performance_reviews").insert(payload).select().single();
     if (!error) return mapPerformanceRow(data);
     const column = missingColumn(error.message);
-    if (!column || column === "company_id" || !(column in payload)) throw new Error(error.message);
-    delete payload[column];
+    if (column && column in payload && column !== "company_id") {
+      delete payload[column];
+      continue;
+    }
+    if (shouldDropCompanyId(error.message) && "company_id" in payload) {
+      delete payload.company_id;
+      continue;
+    }
+    throw new Error(error.message);
   }
   throw new Error("Performans incelemesi kaydedilemedi.");
 }

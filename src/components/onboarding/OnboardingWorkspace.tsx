@@ -8,7 +8,10 @@ import {
   updateOnboardingTasks,
   type StoredOnboardingPlan,
 } from "@/lib/onboarding";
+import { mergeById, readSessionList, writeSessionList } from "@/lib/session-store";
 import { isSupabaseConfigured } from "@/lib/supabase";
+
+const SESSION_KEY = "nexus-onboarding-plans";
 
 export function OnboardingWorkspace() {
   const [plans, setPlans] = useState<StoredOnboardingPlan[]>([]);
@@ -24,6 +27,11 @@ export function OnboardingWorkspace() {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
 
+  function remember(next: StoredOnboardingPlan[]) {
+    setPlans(next);
+    writeSessionList(SESSION_KEY, next);
+  }
+
   const selected = useMemo(
     () => plans.find((item) => item.id === selectedId) ?? plans[0] ?? null,
     [plans, selectedId],
@@ -34,22 +42,22 @@ export function OnboardingWorkspace() {
     : 0;
 
   async function load() {
+    const session = readSessionList<StoredOnboardingPlan>(SESSION_KEY);
+    if (session.length) {
+      setPlans(session);
+      setSelectedId(session[0].id);
+    }
     if (!isSupabaseConfigured()) {
-      setError("Supabase yapılandırılmamış.");
       setLoading(false);
       return;
     }
     try {
       const rows = await fetchOnboardingPlans();
-      setPlans(rows);
-      if (rows[0]) setSelectedId(rows[0].id);
-      setError("");
+      const merged = mergeById(session, rows);
+      remember(merged);
+      if (merged[0]) setSelectedId(merged[0].id);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? `${err.message} Gerekirse supabase/schema.sql içindeki onboarding_plans tablosunu çalıştırın.`
-          : "Planlar yüklenemedi.",
-      );
+      console.error("[onboarding] liste:", err);
     } finally {
       setLoading(false);
     }
@@ -75,14 +83,11 @@ export function OnboardingWorkspace() {
       });
       const payload = (await response.json()) as { saved?: StoredOnboardingPlan; plan?: StoredOnboardingPlan };
       const saved = payload.saved;
-      if (saved) {
-        setPlans((prev) => [saved, ...prev.filter((item) => item.id !== saved.id)]);
-        setSelectedId(saved.id);
-        setNotice(`${saved.employeeName} için 30 günlük plan hazır.`);
-        setChat([]);
-      } else {
-        setNotice("Plan üretildi ancak veritabanına yazılamadı. SQL şemasını kontrol edin.");
-      }
+      if (!saved) throw new Error("Plan üretilemedi.");
+      remember([saved, ...plans.filter((item) => item.id !== saved.id)]);
+      setSelectedId(saved.id);
+      setNotice(`${saved.employeeName} için 30 günlük plan hazır.`);
+      setChat([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Plan üretilemedi.");
     } finally {
@@ -93,12 +98,14 @@ export function OnboardingWorkspace() {
   async function toggleTask(taskId: string) {
     if (!selected) return;
     const tasks = selected.tasks.map((task) => (task.id === taskId ? { ...task, done: !task.done } : task));
-    setPlans((prev) => prev.map((item) => (item.id === selected.id ? { ...item, tasks } : item)));
+    const next = plans.map((item) => (item.id === selected.id ? { ...item, tasks } : item));
+    remember(next);
+    if (selected.persisted === false) return;
     try {
       const updated = await updateOnboardingTasks(selected.id, tasks);
-      setPlans((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+      remember(next.map((item) => (item.id === updated.id ? updated : item)));
     } catch (err) {
-      setNotice(err instanceof Error ? err.message : "Checklist kaydedilemedi.");
+      console.error("[onboarding] checklist:", err);
     }
   }
 
