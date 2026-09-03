@@ -1,3 +1,5 @@
+import { extraDictionaries, type ExtraMessageKey } from "./i18n/translations";
+
 export const LOCALES = ["tr", "en", "de", "fr", "es", "ar", "ru", "zh"] as const;
 
 export type Locale = (typeof LOCALES)[number];
@@ -97,9 +99,9 @@ const tr = {
   "pricing.nav": "Fiyatlandırma",
 } as const;
 
-export type MessageKey = keyof typeof tr;
+export type MessageKey = keyof typeof tr | ExtraMessageKey;
 
-export const dictionaries: Record<Locale, Record<MessageKey, string>> = {
+const coreDictionaries = {
   tr,
   en: {
     "common.close": "Close",
@@ -537,6 +539,24 @@ export const dictionaries: Record<Locale, Record<MessageKey, string>> = {
   },
 };
 
-export function translate(locale: Locale, key: MessageKey) {
-  return dictionaries[locale][key] ?? dictionaries.tr[key];
+export const dictionaries: Record<Locale, Record<MessageKey, string>> = {
+  tr: { ...coreDictionaries.tr, ...extraDictionaries.tr },
+  en: { ...coreDictionaries.en, ...extraDictionaries.en },
+  de: { ...coreDictionaries.de, ...extraDictionaries.de },
+  fr: { ...coreDictionaries.fr, ...extraDictionaries.fr },
+  es: { ...coreDictionaries.es, ...extraDictionaries.es },
+  ar: { ...coreDictionaries.ar, ...extraDictionaries.ar },
+  ru: { ...coreDictionaries.ru, ...extraDictionaries.ru },
+  zh: { ...coreDictionaries.zh, ...extraDictionaries.zh },
+};
+
+export function interpolate(template: string, vars?: Record<string, string | number>) {
+  if (!vars) return template;
+  return template.replace(/\{(\w+)\}/g, (_, key: string) =>
+    vars[key] === undefined ? `{${key}}` : String(vars[key]),
+  );
+}
+
+export function translate(locale: Locale, key: MessageKey, vars?: Record<string, string | number>) {
+  return interpolate(dictionaries[locale][key] ?? dictionaries.tr[key] ?? key, vars);
 }

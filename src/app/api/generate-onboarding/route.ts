@@ -2,6 +2,7 @@ import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { isGeminiConfigured } from "@/lib/gemini";
 import {
   fallbackOnboardingPlan,
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
   let employeeName = "Yeni çalışan";
   let role = "Pozisyon";
   let department = "Departman";
+  let outputLocale = parseRequestLocale("tr");
 
   try {
     const supabase = await createServerSupabase();
@@ -62,10 +64,12 @@ export async function POST(request: Request) {
         employeeName?: string;
         role?: string;
         department?: string;
+        locale?: string;
       };
       employeeName = body.employeeName?.trim() || employeeName;
       role = body.role?.trim() || role;
       department = body.department?.trim() || department;
+      outputLocale = parseRequestLocale(body.locale);
     } catch (error) {
       console.error("[generate-onboarding] gövde hatası:", error);
     }
@@ -92,8 +96,7 @@ export async function POST(request: Request) {
     try {
       const result = await generateText({
         model: google("gemini-1.5-flash"),
-        system:
-          "Sen OnboardingAgent adlı İK oryantasyon koçusun. Türkçe yaz. Yalnızca JSON döndür. Markdown kullanma.",
+        system: `Sen OnboardingAgent adlı İK oryantasyon koçusun. Yalnızca JSON döndür. Markdown kullanma. JSON string değerlerini seçilen dilde yaz. ${replyInLocaleInstruction(outputLocale)}`,
         prompt: `Çalışan: ${employeeName}
 Pozisyon: ${role}
 Departman: ${department}

@@ -1,5 +1,6 @@
 export type KbTab = "all" | "hr" | "guides" | "templates";
 export type KbAudience = "employee" | "hr_only";
+export type KbDepartment = "hr" | "engineering" | "sales" | "general";
 
 export type KnowledgeDoc = {
   id: string;
@@ -8,11 +9,14 @@ export type KnowledgeDoc = {
   body: string;
   tab: Exclude<KbTab, "all">;
   audience: KbAudience;
+  department: KbDepartment;
   tags: string[];
   sector?: string;
   generated?: boolean;
   custom?: boolean;
 };
+
+export const KB_DEPARTMENTS: KbDepartment[] = ["hr", "engineering", "sales", "general"];
 
 export const KB_STORAGE_KEY = "nexus-knowledge-docs";
 
@@ -29,6 +33,7 @@ export const seedKnowledgeDocs: KnowledgeDoc[] = [
     title: "Çalışan Rehberi",
     summary: "İşe giriş, iletişim kanalları, ofis günleri ve sık sorulan süreçler.",
     audience: "employee",
+    department: "general",
     tab: "guides",
     tags: ["çalışan rehberi"],
     body: `Çalışan Rehberi
@@ -52,6 +57,7 @@ Salı ve Perşembe ofis günüdür. 5 iş gününden uzun uzaktan çalışma yö
     title: "Görev Tanımları",
     summary: "Rol bazlı sorumluluk, yetki sınırı ve teslim beklentisi şablonu.",
     audience: "employee",
+    department: "general",
     tab: "guides",
     tags: ["görev tanımı"],
     body: `Görev Tanımları
@@ -73,6 +79,7 @@ Organizasyon değişince İK, ilgili yönetici ile görev tanımını revize ede
     title: "Şirket Politikaları",
     summary: "İzin, etik, gizlilik ve işyeri davranış kurallarının özeti.",
     audience: "employee",
+    department: "general",
     tab: "guides",
     tags: ["şirket politikası"],
     body: `Şirket Politikaları
@@ -94,6 +101,7 @@ Saygılı iletişim, ayrımcılık yasağı ve güvenli işyeri taahhüdü geçe
     title: "İş Kanunu — İK özet notu",
     summary: "İzin, mesai, kıdem ve fesih için yönetici hatırlatması.",
     audience: "hr_only",
+    department: "hr",
     tab: "hr",
     tags: ["mevzuat"],
     body: `İş Kanunu — İK özet notu (iç kullanım)
@@ -112,6 +120,7 @@ Anlaşmazlıkta avukat / kıdemli İK onayı alınır.`,
     title: "KVKK aydınlatma metni şablonu",
     summary: "İş başvurusu ve özlük süreçleri için yasal şablon.",
     audience: "hr_only",
+    department: "hr",
     tab: "templates",
     tags: ["yasal şablon", "KVKK"],
     body: `KVKK Aydınlatma Metni (şablon)
@@ -129,6 +138,7 @@ Haklar: KVKK md. 11 başvurusu ik@[sirket].com
     title: "Fazla mesai onay formu",
     summary: "Yönetici onayı ve saat kaydı için doldurulabilir form taslağı.",
     audience: "hr_only",
+    department: "hr",
     tab: "templates",
     tags: ["form"],
     body: `Fazla Mesai Onay Formu
@@ -145,6 +155,7 @@ Onaysız mesai ücret/izin karşılığı doğurmaz. Haftalık üst sınıra dik
     title: "Disiplin ve uyarı süreci",
     summary: "Sözlü/yazılı uyarı basamakları — yalnızca İK ve yöneticiler.",
     audience: "hr_only",
+    department: "hr",
     tab: "hr",
     tags: ["yönetim", "mevzuat"],
     body: `Disiplin süreci (İK)
@@ -168,6 +179,7 @@ export function sectorKnowledgePack(sector: string, companyName: string): Knowle
         title: `${name} · Uzaktan çalışma ve IP politikası`,
         summary: "Kaynak kodu, cihaz ve esnek çalışma kuralları.",
         audience: "employee",
+        department: "engineering",
         tab: "guides",
         tags: ["şirket politikası"],
         sector: "Teknoloji",
@@ -184,6 +196,7 @@ export function sectorKnowledgePack(sector: string, companyName: string): Knowle
         title: "Nöbet / on-call İK notu",
         summary: "Teknoloji ekipleri için nöbet ücreti ve dinlenme.",
         audience: "hr_only",
+        department: "hr",
         tab: "hr",
         tags: ["mevzuat"],
         sector: "Teknoloji",
@@ -197,6 +210,7 @@ export function sectorKnowledgePack(sector: string, companyName: string): Knowle
         title: `${name} · İSG ve vardiya rehberi`,
         summary: "Kişisel koruyucu, vardiya devri ve kaza bildirimi.",
         audience: "employee",
+        department: "general",
         tab: "guides",
         tags: ["çalışan rehberi"],
         sector: "Üretim",
@@ -210,6 +224,7 @@ export function sectorKnowledgePack(sector: string, companyName: string): Knowle
         title: `${name} · Mağaza vardiya ve müşteri politikası`,
         summary: "Kasa, vardiya değişimi ve müşteri şikayet yolu.",
         audience: "employee",
+        department: "sales",
         tab: "guides",
         tags: ["şirket politikası"],
         sector: "Perakende",
@@ -223,6 +238,7 @@ export function sectorKnowledgePack(sector: string, companyName: string): Knowle
         title: `${name} · Gizlilik ve bilgi duvarı`,
         summary: "Müşteri hesabı, içeriden bilgi ve ekran kilidi.",
         audience: "employee",
+        department: "general",
         tab: "guides",
         tags: ["şirket politikası"],
         sector: "Finans",
@@ -236,6 +252,7 @@ export function sectorKnowledgePack(sector: string, companyName: string): Knowle
         title: `${name} · Hasta gizliliği ve vardiya`,
         summary: "Kişisel sağlık verisi ve nöbet teslimi.",
         audience: "employee",
+        department: "general",
         tab: "guides",
         tags: ["şirket politikası"],
         sector: "Sağlık",
@@ -265,7 +282,12 @@ export function loadKnowledgeDocs(): KnowledgeDoc[] {
   const stored = readStoredDocs();
   const map = new Map<string, KnowledgeDoc>();
   seedKnowledgeDocs.forEach((doc) => map.set(doc.id, doc));
-  stored.forEach((doc) => map.set(doc.id, doc));
+  stored.forEach((doc) =>
+    map.set(doc.id, {
+      ...doc,
+      department: doc.department ?? (doc.audience === "hr_only" ? "hr" : "general"),
+    }),
+  );
   return [...map.values()];
 }
 

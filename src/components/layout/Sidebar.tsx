@@ -229,7 +229,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             )}
             <span>
               <span className="block text-sm font-semibold tracking-wide">{branding.companyName}</span>
-              <span className="block text-xs text-sky-200/70">Yapay Zeka İK Platformu</span>
+              <span className="block text-xs text-sky-200/70">{t("nav.platform")}</span>
             </span>
           </Link>
           <button
@@ -292,9 +292,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         </nav>
 
         <div className="m-4 space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200/70">Hesap</p>
-          <p className="truncate text-sm text-sky-50" title={email || "Oturum yok"}>
-            {email || "Oturum yok"}
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200/70">{t("nav.account")}</p>
+          <p className="truncate text-sm text-sky-50" title={email || t("nav.noSession")}>
+            {email || t("nav.noSession")}
           </p>
           <span className="inline-flex rounded-full bg-sky-400/20 px-2.5 py-1 text-[11px] font-semibold text-sky-100">
             {planBadgeLabel[plan]}
@@ -309,7 +309,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-sm font-medium text-white hover:bg-white/20 disabled:opacity-50"
           >
             <LogOut className="h-4 w-4" />
-            {signingOut ? "Çıkış yapılıyor…" : "Çıkış Yap"}
+            {signingOut ? t("nav.signingOut") : t("nav.signOut")}
           </button>
         </div>
       </aside>

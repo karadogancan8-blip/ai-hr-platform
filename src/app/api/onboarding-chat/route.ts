@@ -1,6 +1,7 @@
 import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
+import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { isGeminiConfigured } from "@/lib/gemini";
 import { createServerSupabase } from "@/lib/supabase/server";
 
@@ -23,6 +24,7 @@ export async function POST(request: Request) {
   let employeeName = "yeni çalışan";
   let role = "pozisyon";
   let department = "departman";
+  let outputLocale = parseRequestLocale("tr");
 
   try {
     try {
@@ -44,11 +46,13 @@ export async function POST(request: Request) {
         role?: string;
         department?: string;
         summary?: string;
+        locale?: string;
       };
       question = body.message?.trim() || "";
       employeeName = body.employeeName?.trim() || employeeName;
       role = body.role?.trim() || role;
       department = body.department?.trim() || department;
+      outputLocale = parseRequestLocale(body.locale);
     } catch (error) {
       console.error("[onboarding-chat] gövde hatası:", error);
     }
@@ -68,8 +72,7 @@ export async function POST(request: Request) {
     try {
       const { text } = await generateText({
         model: google("gemini-1.5-flash"),
-        system:
-          "Sen OnboardingAgent adlı oryantasyon asistanısın. Türkçe, kısa ve uygulanabilir cevap ver. Uydurma iç politika numarası yazma.",
+        system: `Sen OnboardingAgent adlı oryantasyon asistanısın. Kısa ve uygulanabilir cevap ver. Uydurma iç politika numarası yazma. ${replyInLocaleInstruction(outputLocale)}`,
         prompt: `Çalışan: ${employeeName}\nPozisyon: ${role}\nDepartman: ${department}\nSoru: ${question}`,
         maxRetries: 2,
       });

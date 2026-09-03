@@ -10,6 +10,8 @@ import { isSupabaseConfigured } from "@/lib/supabase";
 import type { LeaveRequest, LeaveStatus, LeaveType } from "@/lib/types";
 import { HelpTitle } from "@/components/ui/HelpTip";
 import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
+import { useI18n } from "@/components/i18n/LocaleProvider";
+import type { MessageKey } from "@/lib/i18n";
 
 const typeLabel: Record<LeaveType, string> = {
   yillik: "Yıllık izin",
@@ -42,6 +44,7 @@ function shortId(id: string) {
 }
 
 export function LeaveWorkspace() {
+  const { t } = useI18n();
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -87,7 +90,7 @@ export function LeaveWorkspace() {
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (!form.employee.trim() || !form.reason.trim()) {
-      setNotice("Çalışan adı ve gerekçe zorunludur.");
+      setNotice(t("leave.required"));
       return;
     }
     setSaving(true);
@@ -105,7 +108,7 @@ export function LeaveWorkspace() {
       });
       setRequests((prev) => [created, ...prev]);
       setForm((prev) => ({ ...prev, employee: "", reason: "" }));
-      setNotice("Talep leave_requests tablosuna kaydedildi.");
+      setNotice(t("leave.saved"));
     } catch (err) {
       setNotice(err instanceof Error ? err.message : "Kayıt başarısız.");
     } finally {
@@ -125,15 +128,11 @@ export function LeaveWorkspace() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">HRAdminAgent</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("leave.kicker")}</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-          <HelpTitle hint="Çalışan izin talebini kaydedin; onay veya red durumunu aynı listeden güncelleyin.">
-            İzin & Özlük Yönetimi
-          </HelpTitle>
+          <HelpTitle hint={t("leave.hint")}>{t("leave.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Talepler doğrudan Supabase <code className="text-sky-800">leave_requests</code> tablosuna yazılır.
-        </p>
+        <p className="mt-1 text-sm text-slate-500">{t("leave.lead")}</p>
       </div>
 
       {error ? (
@@ -145,9 +144,9 @@ export function LeaveWorkspace() {
           onSubmit={submit}
           className="space-y-4 rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]"
         >
-          <h2 className="text-base font-semibold text-[#0b1f3a]">İzin talep formu</h2>
+          <h2 className="text-base font-semibold text-[#0b1f3a]">{t("leave.form")}</h2>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-600">Çalışan</span>
+            <span className="mb-1 block text-slate-600">{t("leave.employee")}</span>
             <input
               value={form.employee}
               onChange={(event) => setForm({ ...form, employee: event.target.value })}
@@ -156,7 +155,7 @@ export function LeaveWorkspace() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-600">Departman</span>
+            <span className="mb-1 block text-slate-600">{t("leave.dept")}</span>
             <select
               value={form.department}
               onChange={(event) => setForm({ ...form, department: event.target.value })}
@@ -168,7 +167,7 @@ export function LeaveWorkspace() {
             </select>
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-600">İzin türü</span>
+            <span className="mb-1 block text-slate-600">{t("leave.type")}</span>
             <select
               value={form.type}
               onChange={(event) => setForm({ ...form, type: event.target.value as LeaveType })}
@@ -176,14 +175,14 @@ export function LeaveWorkspace() {
             >
               {(Object.keys(typeLabel) as LeaveType[]).map((key) => (
                 <option key={key} value={key}>
-                  {typeLabel[key]}
+              {t(`leave.type.${key}` as MessageKey)}
                 </option>
               ))}
             </select>
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-sm">
-              <span className="mb-1 block text-slate-600">Başlangıç</span>
+              <span className="mb-1 block text-slate-600">{t("leave.start")}</span>
               <input
                 type="date"
                 value={form.startDate}
@@ -192,7 +191,7 @@ export function LeaveWorkspace() {
               />
             </label>
             <label className="block text-sm">
-              <span className="mb-1 block text-slate-600">Bitiş</span>
+              <span className="mb-1 block text-slate-600">{t("leave.end")}</span>
               <input
                 type="date"
                 value={form.endDate}
@@ -202,7 +201,7 @@ export function LeaveWorkspace() {
             </label>
           </div>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-600">Gerekçe</span>
+            <span className="mb-1 block text-slate-600">{t("leave.reason")}</span>
             <textarea
               value={form.reason}
               onChange={(event) => setForm({ ...form, reason: event.target.value })}
@@ -216,17 +215,17 @@ export function LeaveWorkspace() {
             disabled={saving}
             className="w-full rounded-xl bg-[#123056] py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
           >
-            {saving ? "Kaydediliyor…" : "Talebi gönder"}
+            {saving ? t("leave.saving") : t("leave.submit")}
           </button>
           {notice ? <p className="text-xs text-sky-800">{notice}</p> : null}
         </form>
 
         <section className="overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
           <div className="flex items-center justify-between gap-3 border-b border-sky-50 px-5 py-4">
-            <h2 className="text-base font-semibold text-[#0b1f3a]">Kayıtlı izin talepleri</h2>
+            <h2 className="text-base font-semibold text-[#0b1f3a]">{t("leave.table")}</h2>
             <div className="flex items-center gap-2">
               <span className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-800">
-                {pending.length} bekleyen · {requests.length} toplam
+                {t("leave.pendingCount", { pending: pending.length, total: requests.length })}
               </span>
               <button
                 type="button"
@@ -236,7 +235,7 @@ export function LeaveWorkspace() {
                 }}
                 className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
               >
-                Yenile
+                {t("common.refresh")}
               </button>
             </div>
           </div>
@@ -244,27 +243,27 @@ export function LeaveWorkspace() {
             <table className="min-w-full text-left text-sm">
               <thead className="bg-[#f7fbff] text-xs uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Kod</th>
-                  <th className="px-4 py-3 font-medium">Çalışan</th>
-                  <th className="px-4 py-3 font-medium">Tür</th>
-                  <th className="px-4 py-3 font-medium">Tarih</th>
-                  <th className="px-4 py-3 font-medium">Gün</th>
-                  <th className="px-4 py-3 font-medium">Durum</th>
-                  <th className="px-4 py-3 font-medium">İşlem</th>
+                  <th className="px-4 py-3 font-medium">{t("leave.code")}</th>
+                  <th className="px-4 py-3 font-medium">{t("leave.employee")}</th>
+                  <th className="px-4 py-3 font-medium">{t("leave.type")}</th>
+                  <th className="px-4 py-3 font-medium">{t("leave.dates")}</th>
+                  <th className="px-4 py-3 font-medium">{t("leave.days")}</th>
+                  <th className="px-4 py-3 font-medium">{t("leave.status")}</th>
+                  <th className="px-4 py-3 font-medium">{t("leave.action")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
                     <td className="px-4 py-8 text-sm text-slate-400" colSpan={7}>
-                      Veritabanından yükleniyor…
+                    {t("leave.loading")}
                     </td>
                   </tr>
                 ) : null}
                 {!loading && requests.length === 0 ? (
                   <tr>
                     <td className="px-4 py-8 text-sm text-slate-400" colSpan={7}>
-                      Kayıtlı izin talebi yok.
+                    {t("leave.empty")}
                     </td>
                   </tr>
                 ) : null}
@@ -275,14 +274,14 @@ export function LeaveWorkspace() {
                       <div className="font-medium text-[#0b1f3a]">{row.employee}</div>
                       <div className="text-xs text-slate-400">{row.department}</div>
                     </td>
-                    <td className="px-4 py-3">{typeLabel[row.type]}</td>
+                    <td className="px-4 py-3">{t(`leave.type.${row.type}` as MessageKey)}</td>
                     <td className="px-4 py-3 text-xs text-slate-600">
                       {row.startDate} → {row.endDate}
                     </td>
                     <td className="px-4 py-3">{row.days}</td>
                     <td className="px-4 py-3">
                       <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusStyle[row.status]}`}>
-                        {statusLabel[row.status]}
+                        {t(`leave.status.${row.status}` as MessageKey)}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -293,14 +292,14 @@ export function LeaveWorkspace() {
                             onClick={() => void setStatus(row.id, "onaylandi")}
                             className="rounded-lg bg-emerald-600 px-2 py-1 text-xs font-medium text-white"
                           >
-                            Onayla
+                            {t("leave.approve")}
                           </button>
                           <button
                             type="button"
                             onClick={() => void setStatus(row.id, "reddedildi")}
                             className="rounded-lg bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700"
                           >
-                            Reddet
+                            {t("leave.reject")}
                           </button>
                         </div>
                       ) : (

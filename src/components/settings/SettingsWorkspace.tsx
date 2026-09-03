@@ -12,8 +12,10 @@ import { seedDemoCorporateData } from "@/lib/seed-data";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { AccessControlCard } from "@/components/settings/AccessControlCard";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 
 export function SettingsWorkspace() {
+  const { t } = useI18n();
   const [companyName, setCompanyName] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [primaryColor, setPrimaryColor] = useState(DEFAULT_PRIMARY_COLOR);
@@ -90,15 +92,11 @@ export function SettingsWorkspace() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Ayarlar</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("settings.kicker")}</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-          <HelpTitle hint="Logo ve kurumsal rengi kaydedin; menü ve PDF raporları bu kimliği kullanır. Alt kartta modül yetkilerini yönetirsiniz.">
-            Şirket özelleştirme (White-Label)
-          </HelpTitle>
+          <HelpTitle hint={t("settings.hint")}>{t("settings.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Logo ve kurumsal renk, executive PDF raporları ile sol menüde görünür.
-        </p>
+        <p className="mt-1 text-sm text-slate-500">{t("settings.lead")}</p>
       </div>
 
       {loading ? <p className="text-sm text-slate-400">Yükleniyor…</p> : null}
@@ -112,7 +110,7 @@ export function SettingsWorkspace() {
       <form onSubmit={save} className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <section className="space-y-4 rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-slate-700">Şirket adı</span>
+          <span className="mb-1 block font-medium text-slate-700">{t("settings.company")}</span>
             <input
               value={companyName}
               onChange={(event) => setCompanyName(event.target.value)}
@@ -121,7 +119,7 @@ export function SettingsWorkspace() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-slate-700">Logo URL</span>
+            <span className="mb-1 block font-medium text-slate-700">{t("settings.logo")}</span>
             <input
               value={logoUrl}
               onChange={(event) => {
@@ -133,11 +131,11 @@ export function SettingsWorkspace() {
               className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
             />
             <span className="mt-1 block text-xs text-slate-400">
-              Açık URL kullanın (PNG/SVG). CORS kapalı görseller PDF’de görünmeyebilir.
+              {t("settings.logoHint")}
             </span>
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-slate-700">Kurumsal tema rengi</span>
+            <span className="mb-1 block font-medium text-slate-700">{t("settings.color")}</span>
             <div className="flex items-center gap-3">
               <input
                 type="color"
@@ -161,12 +159,12 @@ export function SettingsWorkspace() {
             style={{ backgroundColor: previewColor }}
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Palette className="h-4 w-4" />}
-            {saving ? "Kaydediliyor…" : "Markayı kaydet"}
+            {saving ? t("settings.saving") : t("settings.save")}
           </button>
         </section>
 
         <aside className="rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Önizleme</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("settings.preview")}</p>
           <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200">
             <div className="flex items-center gap-3 px-4 py-4 text-white" style={{ backgroundColor: previewColor }}>
               {logoUrl && !logoBroken ? (
@@ -184,12 +182,12 @@ export function SettingsWorkspace() {
               )}
               <div>
                 <p className="text-sm font-semibold">{companyName || "Şirket adı"}</p>
-                <p className="text-xs text-white/75">Executive PDF üst bilgisi</p>
+                <p className="text-xs text-white/75">{t("settings.pdfHeader")}</p>
               </div>
             </div>
             <div className="space-y-2 bg-slate-50 p-4 text-sm text-slate-600">
-              <p>Aday eşleşme ve mülakat skorları bu renk vurgusuyla basılır.</p>
-              {logoBroken ? <p className="text-xs text-rose-700">Logo yüklenemedi; URL’yi kontrol edin.</p> : null}
+              <p>{t("settings.previewBody")}</p>
+              {logoBroken ? <p className="text-xs text-rose-700">{t("settings.logoFail")}</p> : null}
             </div>
           </div>
         </aside>
@@ -198,12 +196,9 @@ export function SettingsWorkspace() {
       <AccessControlCard />
 
       <section className="rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Demo / sunum modu</p>
-        <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">Örnek kurumsal veriler</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          3 aday CV’si, 2 onboarding planı, 2 performans raporu ve 3 mevzuat diyalogu yüklenir. Canlı demo ve test
-          için tasarlanmıştır.
-        </p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("settings.demoKicker")}</p>
+        <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">{t("settings.demoTitle")}</h2>
+        <p className="mt-1 text-sm text-slate-500">{t("settings.demoLead")}</p>
         <button
           type="button"
           onClick={() => void loadDemo()}
@@ -211,7 +206,7 @@ export function SettingsWorkspace() {
           className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
         >
           {seeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-          Örnek Kurumsal Verileri Yükle
+          {t("settings.demoBtn")}
         </button>
       </section>
     </div>

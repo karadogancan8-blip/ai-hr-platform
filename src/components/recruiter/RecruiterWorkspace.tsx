@@ -13,6 +13,8 @@ import { fetchResumes, updateResumeInterview, type StoredResume } from "@/lib/re
 import { DEMO_GUIDES_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
+import { useI18n } from "@/components/i18n/LocaleProvider";
+import { localeMeta } from "@/lib/i18n";
 
 function scoreTone(score: number) {
   if (score >= 90) return "from-sky-500 to-blue-700";
@@ -20,9 +22,9 @@ function scoreTone(score: number) {
   return "from-slate-400 to-slate-600";
 }
 
-function formatWhen(iso: string) {
+function formatWhen(iso: string, locale: string) {
   try {
-    return new Date(iso).toLocaleString("tr-TR", {
+    return new Date(iso).toLocaleString(locale, {
       day: "2-digit",
       month: "short",
       hour: "2-digit",
@@ -48,6 +50,7 @@ type AnalysisResponse = {
 };
 
 export function RecruiterWorkspace() {
+  const { t, locale } = useI18n();
   const [resumes, setResumes] = useState<StoredResume[]>([]);
   const [cvText, setCvText] = useState("");
   const [jobTitle, setJobTitle] = useState("Kıdemli Frontend Geliştirici");
@@ -134,7 +137,7 @@ export function RecruiterWorkspace() {
       const response = await fetch("/api/analyze-cv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cvText, jobTitle }),
+        body: JSON.stringify({ cvText, jobTitle, locale }),
       });
       const payload = (await response.json()) as AnalysisResponse;
       if (!response.ok && !payload.saved) {
@@ -173,6 +176,7 @@ export function RecruiterWorkspace() {
         skills: resume.skills,
         strengths: resume.strengths,
         weaknesses: resume.weaknesses,
+        locale,
       }),
     });
     const payload = (await response.json()) as { guide?: InterviewGuide; error?: string };
@@ -220,18 +224,14 @@ export function RecruiterWorkspace() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">RecruiterAgent</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("recruit.kicker")}</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-            <HelpTitle hint="CV metnini yapıştırın veya dosya yükleyin; RecruiterAgent eşleşme skoru, güçlü yönler ve gelişim alanları üretir.">
-              İşe Alım & CV Analizi
-            </HelpTitle>
+            <HelpTitle hint={t("recruit.hint")}>{t("recruit.title")}</HelpTitle>
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Analiz sonuçları Supabase <code className="text-sky-800">resumes</code> tablosuna yazılır.
-          </p>
+          <p className="mt-1 text-sm text-slate-500">{t("recruit.lead")}</p>
         </div>
         <div className="rounded-2xl border border-sky-100 bg-white px-4 py-3 text-sm shadow-sm">
-          <span className="text-slate-500">Ortalama eşleşme</span>
+          <span className="text-slate-500">{t("recruit.avg")}</span>
           <span className="ml-2 font-semibold text-[#0b1f3a]">{average}%</span>
         </div>
       </div>
@@ -261,12 +261,10 @@ export function RecruiterWorkspace() {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sky-50 text-sky-700">
             <IconUpload className="h-6 w-6" />
           </div>
-          <p className="mt-3 text-base font-medium text-[#0b1f3a]">CV dosyasını sürükleyip bırakın</p>
-          <p className="mt-1 text-sm text-slate-500">
-            Metin tabanlı dosyalar (.txt, .md, .csv) otomatik okunur. PDF için metni aşağıya yapıştırın.
-          </p>
+          <p className="mt-3 text-base font-medium text-[#0b1f3a]">{t("recruit.drop")}</p>
+          <p className="mt-1 text-sm text-slate-500">{t("recruit.dropHint")}</p>
           <label className="mt-4 inline-flex cursor-pointer rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744]">
-            Dosya seç
+            {t("recruit.browse")}
             <input
               type="file"
               accept=".txt,.md,.csv,.json,.pdf,.doc,.docx"
@@ -279,7 +277,7 @@ export function RecruiterWorkspace() {
 
         <section className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-slate-700">Açık pozisyon</span>
+            <span className="mb-1 block font-medium text-slate-700">{t("recruit.job")}</span>
             <input
               value={jobTitle}
               onChange={(event) => setJobTitle(event.target.value)}
@@ -287,12 +285,12 @@ export function RecruiterWorkspace() {
             />
           </label>
           <label className="mt-4 block text-sm">
-            <span className="mb-1 block font-medium text-slate-700">CV / aday metni</span>
+            <span className="mb-1 block font-medium text-slate-700">{t("recruit.cv")}</span>
             <textarea
               value={cvText}
               onChange={(event) => setCvText(event.target.value)}
               rows={8}
-              placeholder="CV içeriğini yapıştırın…"
+              placeholder={t("recruit.cvPlaceholder")}
               className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
             />
           </label>
@@ -303,9 +301,9 @@ export function RecruiterWorkspace() {
               className="inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
             >
               {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              {analyzing ? "Analiz ediliyor…" : "CV / Metin analiz et"}
+              {analyzing ? t("recruit.analyzing") : t("recruit.analyze")}
             </button>
-            <HelpTip text="Açık pozisyon ve CV metnini gönderir; sonuçlar aday kartı olarak kaydedilir." />
+            <HelpTip text={t("recruit.analyzeHint")} />
           </div>
           {notice ? <p className="mt-3 text-xs text-sky-800">{notice}</p> : null}
         </section>
@@ -313,7 +311,7 @@ export function RecruiterWorkspace() {
 
       <section>
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold text-[#0b1f3a]">Kayıtlı aday analizleri</h2>
+          <h2 className="text-base font-semibold text-[#0b1f3a]">{t("recruit.list")}</h2>
           <button
             type="button"
             onClick={() => {
@@ -322,12 +320,12 @@ export function RecruiterWorkspace() {
             }}
             className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
           >
-            Yenile
+            {t("common.refresh")}
           </button>
         </div>
-        {loading ? <p className="text-sm text-slate-400">Veritabanından yükleniyor…</p> : null}
+        {loading ? <p className="text-sm text-slate-400">{t("recruit.loading")}</p> : null}
         {!loading && resumes.length === 0 ? (
-          <p className="text-sm text-slate-400">Henüz kayıtlı analiz yok.</p>
+          <p className="text-sm text-slate-400">{t("recruit.empty")}</p>
         ) : null}
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {resumes.map((resume) => (
@@ -346,7 +344,7 @@ export function RecruiterWorkspace() {
                         : "bg-indigo-50 text-indigo-800"
                     }`}
                   >
-                    Mülakat Skoru: {resume.interviewScore == null ? "—" : resume.interviewScore}
+                    {t("recruit.interviewScore")}: {resume.interviewScore == null ? "—" : resume.interviewScore}
                   </span>
                 </div>
                 <div
@@ -361,7 +359,7 @@ export function RecruiterWorkspace() {
               <AiDisclaimer className="mt-3" />
               {resume.strengths.length ? (
                 <div className="mt-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Güçlü yönler</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">{t("recruit.strengths")}</p>
                   <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-slate-600">
                     {resume.strengths.slice(0, 3).map((item) => (
                       <li key={item}>{item}</li>
@@ -371,7 +369,7 @@ export function RecruiterWorkspace() {
               ) : null}
               {resume.weaknesses.length ? (
                 <div className="mt-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">Gelişim alanları</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">{t("recruit.gaps")}</p>
                   <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-slate-600">
                     {resume.weaknesses.slice(0, 3).map((item) => (
                       <li key={item}>{item}</li>
@@ -389,7 +387,7 @@ export function RecruiterWorkspace() {
                   </span>
                 ))}
               </div>
-              <p className="mt-4 text-xs text-slate-400">{formatWhen(resume.createdAt)}</p>
+              <p className="mt-4 text-xs text-slate-400">{formatWhen(resume.createdAt, localeMeta[locale].htmlLang)}</p>
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <div className="flex items-center gap-1">
                   <button
@@ -398,9 +396,9 @@ export function RecruiterWorkspace() {
                     className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-medium text-sky-900 hover:bg-sky-100"
                   >
                     <ClipboardList className="h-3.5 w-3.5" />
-                    AI Mülakat Rehberi Üret
+                    {t("recruit.guide")}
                   </button>
-                  <HelpTip text="Pozisyona özel teknik ve kültür soruları ile beklenen yanıtları üretir." />
+                  <HelpTip text={t("recruit.guideHint")} />
                 </div>
                 <div className="flex items-center gap-1">
                   <button
@@ -409,9 +407,9 @@ export function RecruiterWorkspace() {
                     className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#123056] px-3 py-2 text-xs font-medium text-white hover:bg-[#0f2744]"
                   >
                     <Video className="h-3.5 w-3.5" />
-                    Mülakat Başlat
+                    {t("recruit.live")}
                   </button>
-                  <HelpTip text="Kamerayı açarak canlı AI mülakat simülasyonu başlatır; konuşup değerlendirme alırsınız." />
+                  <HelpTip text={t("recruit.liveHint")} />
                 </div>
                 <div className="flex items-center gap-1 sm:col-span-2">
                   <button
@@ -420,9 +418,9 @@ export function RecruiterWorkspace() {
                     className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
                     <FileDown className="h-3.5 w-3.5" />
-                    Executive PDF Raporu İndir
+                    {t("recruit.pdf")}
                   </button>
-                  <HelpTip text="Eşleşme, özet ve mülakat notlarını yazdırılabilir yönetici raporuna dönüştürür." />
+                  <HelpTip text={t("recruit.pdfHint")} />
                 </div>
               </div>
             </article>

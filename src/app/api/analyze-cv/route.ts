@@ -1,6 +1,7 @@
 import { generateObject, generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { isGeminiConfigured, toClientError, withGeminiModel } from "@/lib/gemini";
 import { insertResume, type StoredResume } from "@/lib/resumes";
 import { createServerSupabase } from "@/lib/supabase/server";
@@ -159,8 +160,10 @@ async function analyzeCv(
   jobTitle: string,
   jobDescription: string,
   cvText: string,
+  locale = parseRequestLocale("tr"),
 ): Promise<{ object: CvAnalysis; fallback: boolean; warning?: string }> {
   const prompt = analysisPrompt(jobTitle, jobDescription, cvText);
+  const system = `${systemPrompt} ${replyInLocaleInstruction(locale)} Put JSON string values in that language.`;
 
   try {
     const { object } = await withTimeout(
@@ -168,7 +171,7 @@ async function analyzeCv(
         generateObject({
           model,
           schema: cvAnalysisSchema,
-          system: systemPrompt,
+          system,
           prompt,
           maxRetries: 1,
           abortSignal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
@@ -183,7 +186,7 @@ async function analyzeCv(
         withGeminiModel((model) =>
           generateText({
             model,
-            system: `${systemPrompt} Yalnızca JSON nesnesi döndür. Anahtarlar: name, role, experience, location, matchScore, skills, strengths, weaknesses, summary.`,
+            system: `${system} Yalnızca JSON nesnesi döndür.`,
             prompt,
             maxRetries: 1,
             abortSignal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
@@ -209,6 +212,7 @@ export async function POST(request: Request) {
       cvText?: string;
       jobTitle?: string;
       jobDescription?: string;
+      locale?: string;
     };
 
     const cvText = sanitizeCvText(body.cvText ?? "");
@@ -238,7 +242,7 @@ export async function POST(request: Request) {
       object = fallbackCvAnalysis(jobTitle, cvText);
       warning = "Gemini API anahtarı tanımlı değil; kural tabanlı ön analiz üretildi.";
     } else {
-      const result = await analyzeCv(jobTitle, jobDescription, cvText);
+      const result = await analyzeCv(jobTitle, jobDescription, cvText, parseRequestLocale(body.locale));
       object = result.object;
       geminiFallback = result.fallback;
       warning = result.warning ?? "";

@@ -2,6 +2,7 @@ import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { isGeminiConfigured } from "@/lib/gemini";
 import type { InterviewGuide } from "@/lib/interview";
 import { createServerSupabase } from "@/lib/supabase/server";
@@ -162,6 +163,7 @@ export async function POST(request: Request) {
       skills?: string[];
       strengths?: string[];
       weaknesses?: string[];
+      locale?: string;
     } = {};
 
     try {
@@ -194,7 +196,7 @@ export async function POST(request: Request) {
       .join("\n");
 
     const system =
-      "Sen RecruiterAgent adlı kıdemli bir mülakat koçusun. Türkçe yaz. Yalnızca JSON döndür.";
+      `Sen RecruiterAgent adlı kıdemli bir mülakat koçusun. Yalnızca JSON döndür. JSON string değerlerini seçilen dilde yaz. ${replyInLocaleInstruction(parseRequestLocale(body.locale))}`;
     const prompt = `Aday: ${candidateName}
 Pozisyon: ${jobTitle}
 CV özeti: ${summary || profileBits || "belirtilmedi"}

@@ -3,27 +3,29 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   LOCALE_STORAGE_KEY,
-  dictionaries,
   dirForLocale,
   isLocale,
   localeMeta,
+  translate,
   type Locale,
   type LocaleDir,
   type MessageKey,
 } from "@/lib/i18n";
 
+type TranslateVars = Record<string, string | number>;
+
 type LocaleContextValue = {
   locale: Locale;
   dir: LocaleDir;
   setLocale: (locale: Locale) => void;
-  t: (key: MessageKey) => string;
+  t: (key: MessageKey, vars?: TranslateVars) => string;
 };
 
 const LocaleContext = createContext<LocaleContextValue>({
   locale: "tr",
   dir: "ltr",
   setLocale: () => undefined,
-  t: (key) => dictionaries.tr[key],
+  t: (key, vars) => translate("tr", key, vars),
 });
 
 export function useI18n() {
@@ -62,7 +64,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
         window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
         applyDocumentLocale(next);
       },
-      t: (key) => dictionaries[locale][key] ?? dictionaries.tr[key],
+      t: (key, vars) => translate(locale, key, vars),
     }),
     [locale],
   );

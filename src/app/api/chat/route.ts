@@ -1,6 +1,7 @@
 import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
+import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 export const maxDuration = 60;
@@ -95,7 +96,7 @@ export async function POST(request: Request) {
       console.error("[chat] oturum kontrolü hatası:", error);
     }
 
-    let body: { message?: string; messages?: ChatTurn[] } = {};
+    let body: { message?: string; messages?: ChatTurn[]; locale?: string } = {};
     try {
       body = (await request.json()) as typeof body;
     } catch (error) {
@@ -136,7 +137,7 @@ export async function POST(request: Request) {
     try {
       const { text } = await generateText({
         model: google("gemini-1.5-flash"),
-        system: policySystem,
+        system: `${policySystem}\n${replyInLocaleInstruction(parseRequestLocale(body.locale))}`,
         messages,
         maxRetries: 2,
       });

@@ -13,10 +13,12 @@ import { mergeById, readSessionList, writeSessionList } from "@/lib/session-stor
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 
 const SESSION_KEY = DEMO_ONBOARDING_KEY;
 
 export function OnboardingWorkspace() {
+  const { t, locale } = useI18n();
   const [plans, setPlans] = useState<StoredOnboardingPlan[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [employeeName, setEmployeeName] = useState("");
@@ -78,7 +80,7 @@ export function OnboardingWorkspace() {
   async function generate(event: FormEvent) {
     event.preventDefault();
     if (!employeeName.trim()) {
-      setNotice("Çalışan adını girin.");
+      setNotice(t("onb.needName"));
       return;
     }
     setGenerating(true);
@@ -87,17 +89,17 @@ export function OnboardingWorkspace() {
       const response = await fetch("/api/generate-onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employeeName, role, department }),
+        body: JSON.stringify({ employeeName, role, department, locale }),
       });
       const payload = (await response.json()) as { saved?: StoredOnboardingPlan; plan?: StoredOnboardingPlan };
       const saved = payload.saved;
-      if (!saved) throw new Error("Plan üretilemedi.");
+      if (!saved) throw new Error(t("onb.fail"));
       remember([saved, ...plans.filter((item) => item.id !== saved.id)]);
       setSelectedId(saved.id);
-      setNotice(`${saved.employeeName} için 30 günlük plan hazır.`);
+      setNotice(t("onb.ready", { name: saved.employeeName }));
       setChat([]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Plan üretilemedi.");
+      setError(err instanceof Error ? err.message : t("onb.fail"));
     } finally {
       setGenerating(false);
     }
@@ -134,6 +136,7 @@ export function OnboardingWorkspace() {
           role: selected.role,
           department: selected.department,
           summary: selected.summary,
+          locale,
         }),
       });
       const payload = (await response.json()) as { reply?: string };
@@ -154,13 +157,11 @@ export function OnboardingWorkspace() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">OnboardingAgent</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("onb.kicker")}</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-          <HelpTitle hint="Yeni çalışan adı, rol ve departmanı girin; 30 günlük checklist ve oryantasyon sohbeti üretilir.">
-            AI Onboarding Companion
-          </HelpTitle>
+          <HelpTitle hint={t("onb.hint")}>{t("onb.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">Yeni çalışan için 30 günlük uyum planı, checklist ve oryantasyon asistanı.</p>
+        <p className="mt-1 text-sm text-slate-500">{t("onb.lead")}</p>
       </div>
 
       {error ? (
@@ -175,7 +176,7 @@ export function OnboardingWorkspace() {
         className="grid gap-3 rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)] md:grid-cols-4"
       >
         <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">Çalışan adı</span>
+          <span className="mb-1 block font-medium text-slate-700">{t("onb.name")}</span>
           <input
             value={employeeName}
             onChange={(event) => setEmployeeName(event.target.value)}
@@ -184,7 +185,7 @@ export function OnboardingWorkspace() {
           />
         </label>
         <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">Pozisyon</span>
+          <span className="mb-1 block font-medium text-slate-700">{t("onb.role")}</span>
           <input
             value={role}
             onChange={(event) => setRole(event.target.value)}
@@ -192,7 +193,7 @@ export function OnboardingWorkspace() {
           />
         </label>
         <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">Departman</span>
+          <span className="mb-1 block font-medium text-slate-700">{t("onb.dept")}</span>
           <input
             value={department}
             onChange={(event) => setDepartment(event.target.value)}
@@ -206,13 +207,13 @@ export function OnboardingWorkspace() {
             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
           >
             {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            30 günlük plan üret
+            {t("onb.generate")}
           </button>
-          <HelpTip text="Çalışan, rol ve departmana göre 4 haftalık uyum checklist’i ve sohbet asistanı oluşturur." />
+          <HelpTip text={t("onb.generateHint")} />
         </div>
       </form>
 
-      {loading ? <p className="text-sm text-slate-400">Planlar yükleniyor…</p> : null}
+      {loading ? <p className="text-sm text-slate-400">{t("onb.loading")}</p> : null}
 
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.4fr_1fr]">
         <section className="space-y-3">
@@ -248,16 +249,16 @@ export function OnboardingWorkspace() {
               </button>
             );
           })}
-          {!loading && !plans.length ? <p className="text-sm text-slate-400">Henüz onboarding planı yok.</p> : null}
+          {!loading && !plans.length ? <p className="text-sm text-slate-400">{t("onb.empty")}</p> : null}
         </section>
 
         <section className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
           {selected ? (
             <>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-base font-semibold text-[#0b1f3a]">30 günlük checklist</h2>
+                <h2 className="text-base font-semibold text-[#0b1f3a]">{t("onb.checklist")}</h2>
                 <span className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-800">
-                  İlerleme %{progress}
+                  {t("onb.progress", { value: progress })}
                 </span>
               </div>
               <p className="mt-2 text-sm leading-6 text-slate-600">{selected.summary}</p>
@@ -280,7 +281,7 @@ export function OnboardingWorkspace() {
                                 className="mt-1"
                               />
                               <span>
-                                <span className="mr-1 text-[11px] font-semibold text-slate-400">Gün {task.day}</span>
+                                <span className="me-1 text-[11px] font-semibold text-slate-400">{t("onb.day", { day: task.day })}</span>
                                 {task.title}
                               </span>
                             </label>
@@ -292,14 +293,14 @@ export function OnboardingWorkspace() {
               </div>
             </>
           ) : (
-            <p className="text-sm text-slate-400">Plan üretin veya listeden seçin.</p>
+            <p className="text-sm text-slate-400">{t("onb.pick")}</p>
           )}
         </section>
 
         <section className="flex min-h-[420px] flex-col rounded-2xl border border-sky-100 bg-white shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
           <div className="border-b border-sky-50 px-4 py-3">
-            <p className="text-sm font-semibold text-[#0b1f3a]">AI oryantasyon asistanı</p>
-            <p className="text-xs text-slate-500">Seçili çalışanın planına göre soru sorun.</p>
+            <p className="text-sm font-semibold text-[#0b1f3a]">{t("onb.chatTitle")}</p>
+            <p className="text-xs text-slate-500">{t("onb.chatLead")}</p>
           </div>
           <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
             {chat.map((item, index) => (
@@ -312,14 +313,14 @@ export function OnboardingWorkspace() {
                 {item.content}
               </div>
             ))}
-            {chatPending ? <p className="text-xs text-slate-400">Asistan yazıyor…</p> : null}
+            {chatPending ? <p className="text-xs text-slate-400">{t("onb.typing")}</p> : null}
           </div>
           <form onSubmit={sendChat} className="flex gap-2 border-t border-sky-50 p-3">
             <input
               value={chatInput}
               onChange={(event) => setChatInput(event.target.value)}
               disabled={!selected}
-              placeholder="İlk hafta neleri bitirmeliyim?"
+              placeholder={t("onb.placeholder")}
               className="flex-1 rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2 text-sm outline-none focus:border-sky-400"
             />
             <button

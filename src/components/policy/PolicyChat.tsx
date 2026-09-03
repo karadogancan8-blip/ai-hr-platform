@@ -8,12 +8,15 @@ import { readSessionList } from "@/lib/session-store";
 import type { ChatMessage } from "@/lib/types";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { useI18n } from "@/components/i18n/LocaleProvider";
+import { localeMeta } from "@/lib/i18n";
 
-function nowLabel() {
-  return new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+function nowLabel(locale: string) {
+  return new Date().toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
 }
 
 export function PolicyChat() {
+  const { t, locale } = useI18n();
   const [messages, setMessages] = useState<ChatMessage[]>(initialPolicyMessages);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
@@ -38,7 +41,7 @@ export function PolicyChat() {
       id: `u-${Date.now()}`,
       role: "user",
       content: text,
-      time: nowLabel(),
+      time: nowLabel(localeMeta[locale].htmlLang),
     };
     const nextMessages = [...messages, userMsg];
     setMessages(nextMessages);
@@ -52,6 +55,7 @@ export function PolicyChat() {
         body: JSON.stringify({
           message: text,
           messages: nextMessages.map((item) => ({ role: item.role, content: item.content })),
+          locale,
         }),
       });
       const payload = (await response.json()) as { reply?: string; error?: string };
@@ -64,7 +68,7 @@ export function PolicyChat() {
         id: `a-${Date.now()}`,
         role: "assistant",
         content: reply,
-        time: nowLabel(),
+        time: nowLabel(localeMeta[locale].htmlLang),
       };
       setMessages((prev) => [...prev, assistant]);
     } catch (err) {
@@ -74,9 +78,8 @@ export function PolicyChat() {
         {
           id: `a-${Date.now()}`,
           role: "assistant",
-          content:
-            "Bağlantı kesintisi oldu. Genel çerçeve: yıllık izin kıdeme göre 14 veya 20 iş günü; fazla mesai yazılı onay ve haftalık 11 saat sınırı; hibrit çalışmada Salı–Perşembe ofis günüdür. Kesin bilgi için İK ile teyit edin.",
-          time: nowLabel(),
+          content: t("policy.offline"),
+          time: nowLabel(localeMeta[locale].htmlLang),
         },
       ]);
     } finally {
@@ -88,20 +91,16 @@ export function PolicyChat() {
   return (
     <div className="flex min-h-[calc(100vh-8rem)] flex-col">
       <div className="mb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">PolicyAgent</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("policy.kicker")}</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-          <HelpTitle hint="İş Kanunu ve şirket yönetmeliği sorularını yazın; PolicyAgent kısa, uygulanabilir yanıt üretir.">
-            Şirket İçi Mevzuat Soru-Cevap
-          </HelpTitle>
+          <HelpTitle hint={t("policy.hint")}>{t("policy.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Yanıtlar Google Gemini (ücretsiz Flash modeli) üzerinden üretilir.
-        </p>
+        <p className="mt-1 text-sm text-slate-500">{t("policy.lead")}</p>
       </div>
 
       <div className="flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
         <div className="border-b border-sky-50 bg-[#f7fbff] px-5 py-3 text-xs text-slate-500">
-          Kaynak: İK Yönetmeliği 2026 · model: Gemini Flash
+          {t("policy.source")}
         </div>
         <div className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
           {messages.map((message) => (
@@ -128,14 +127,14 @@ export function PolicyChat() {
               </div>
             </div>
           ))}
-          {pending ? <div className="text-xs text-slate-400">PolicyAgent yazılıyor…</div> : null}
+          {pending ? <div className="text-xs text-slate-400">{t("policy.pending")}</div> : null}
           <div ref={endRef} />
         </div>
         <form onSubmit={send} className="flex gap-2 border-t border-sky-50 p-3 sm:p-4">
           <input
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder="Örn. Yıllık izin hakkım kaç gün?"
+            placeholder={t("policy.placeholder")}
             className="flex-1 rounded-xl border border-slate-200 bg-[#f8fbff] px-4 py-3 text-sm outline-none ring-sky-200 placeholder:text-slate-400 focus:border-sky-400 focus:ring-2"
           />
           <button
@@ -144,7 +143,7 @@ export function PolicyChat() {
             className="inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-3 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
           >
             <IconSend className="h-4 w-4" />
-            Gönder
+            {t("common.send")}
           </button>
         </form>
       </div>

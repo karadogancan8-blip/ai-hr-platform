@@ -2,6 +2,7 @@ import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { isGeminiConfigured } from "@/lib/gemini";
 import { fallbackPerformanceReview, insertPerformanceReview, toLocalPerformanceReview } from "@/lib/performance";
 import { createServerSupabase } from "@/lib/supabase/server";
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
   let employeeName = "Çalışan";
   let period = "Bu çeyrek";
   let notes = "";
+  let outputLocale = parseRequestLocale("tr");
 
   try {
     const supabase = await createServerSupabase();
@@ -37,10 +39,12 @@ export async function POST(request: Request) {
         employeeName?: string;
         period?: string;
         notes?: string;
+        locale?: string;
       };
       employeeName = body.employeeName?.trim() || employeeName;
       period = body.period?.trim() || period;
       notes = body.notes?.trim() || "";
+      outputLocale = parseRequestLocale(body.locale);
     } catch (error) {
       console.error("[generate-performance] gövde hatası:", error);
     }
@@ -67,8 +71,7 @@ export async function POST(request: Request) {
     try {
       const result = await generateText({
         model: google("gemini-1.5-flash"),
-        system:
-          "Sen PerformanceAgent adlı İK performans koçusun. Türkçe, adil ve somut yaz. Yalnızca JSON döndür.",
+        system: `Sen PerformanceAgent adlı İK performans koçusun. Adil ve somut yaz. Yalnızca JSON döndür. JSON string değerlerini seçilen dilde yaz. ${replyInLocaleInstruction(outputLocale)}`,
         prompt: `Çalışan: ${employeeName}
 Dönem: ${period}
 Yönetici notları / başarılar: ${notes || "belirtilmedi"}

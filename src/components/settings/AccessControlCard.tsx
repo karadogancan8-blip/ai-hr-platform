@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2, ShieldCheck } from "lucide-react";
+import { useI18n } from "@/components/i18n/LocaleProvider";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import {
   APP_ROLES,
@@ -15,6 +16,7 @@ import {
 } from "@/lib/access-control";
 
 export function AccessControlCard() {
+  const { t } = useI18n();
   const { access, role, canManage, loading } = useAccessControl();
   const [draft, setDraft] = useState<AccessControlMap>(access);
   const [draftRole, setDraftRole] = useState<AppRole>(role);
@@ -59,12 +61,9 @@ export function AccessControlCard() {
           <ShieldCheck className="h-5 w-5" />
         </span>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Enterprise Access Control</p>
-          <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">Modül ve Yetki Yönetimi</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Her gelişmiş özellik için önce modülü açın/kapatın, ardından kimlerin göreceğini seçin. employee ve
-            hr_specialist, admin’in gizlediği hassas modülleri menüde ve raporlarda göremez.
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("access.kicker")}</p>
+          <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">{t("access.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("access.lead")}</p>
         </div>
       </div>
 
