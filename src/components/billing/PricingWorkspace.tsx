@@ -107,7 +107,7 @@ export function PricingWorkspace() {
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
             <HelpTitle hint={t("pricing.hint")}>{t("pricing.title")}</HelpTitle>
           </h1>
-          <p className="mt-2 text-sm leading-6 text-slate-500">{t("pricing.lead")}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-500">{t("pricing.description")}</p>
         </div>
 
         <div className="inline-flex items-center self-start rounded-xl border border-slate-200 bg-white p-0.5">

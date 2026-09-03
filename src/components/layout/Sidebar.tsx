@@ -23,124 +23,67 @@ import { fetchCompanySubscription } from "@/lib/subscription";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
-import { APP_ROLES, type EnterpriseModuleId } from "@/lib/access-control";
+import type { EnterpriseModuleId } from "@/lib/access-control";
 import type { MessageKey } from "@/lib/i18n";
 
 const navItems: {
   href: string;
-  label: string;
-  description: string;
   icon: ComponentType<{ className?: string }>;
   moduleId?: EnterpriseModuleId;
-  labelKey?: MessageKey;
-  descKey?: MessageKey;
+  titleKey: MessageKey;
+  descriptionKey: MessageKey;
 }[] = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    description: "Genel Özet",
-    icon: IconDashboard,
-    labelKey: "nav.dashboard",
-    descKey: "nav.dashboardDesc",
-  },
-  {
-    href: "/ise-alim",
-    label: "İşe Alım & CV Analizi",
-    description: "RecruiterAgent",
-    icon: IconRecruit,
-    labelKey: "nav.recruit",
-  },
-  {
-    href: "/mevzuat",
-    label: "Şirket İçi Mevzuat",
-    description: "PolicyAgent",
-    icon: IconPolicy,
-    labelKey: "nav.policy",
-  },
-  {
-    href: "/izin",
-    label: "İzin & Özlük Yönetimi",
-    description: "HRAdminAgent",
-    icon: IconLeave,
-    labelKey: "nav.leave",
-  },
-  {
-    href: "/onboarding",
-    label: "Onboarding",
-    description: "Uyum Companion",
-    icon: IconOnboarding,
-    labelKey: "nav.onboarding",
-  },
-  {
-    href: "/performans",
-    label: "Performans",
-    description: "Değerlendirme",
-    icon: IconPerformance,
-    labelKey: "nav.performance",
-  },
-  {
-    href: "/dokumanlar",
-    label: "📚 Bilgi Üssü & Dökümanlar",
-    description: "Knowledge Base",
-    icon: BookOpen,
-    labelKey: "nav.knowledge",
-  },
+  { href: "/dashboard", icon: IconDashboard, titleKey: "dashboard.title", descriptionKey: "dashboard.description" },
+  { href: "/ise-alim", icon: IconRecruit, titleKey: "recruit.title", descriptionKey: "recruit.description" },
+  { href: "/mevzuat", icon: IconPolicy, titleKey: "policy.title", descriptionKey: "policy.description" },
+  { href: "/izin", icon: IconLeave, titleKey: "leave.title", descriptionKey: "leave.description" },
+  { href: "/onboarding", icon: IconOnboarding, titleKey: "onb.title", descriptionKey: "onb.description" },
+  { href: "/performans", icon: IconPerformance, titleKey: "perf.title", descriptionKey: "perf.description" },
+  { href: "/dokumanlar", icon: BookOpen, titleKey: "kb.title", descriptionKey: "kb.description" },
   {
     href: "/kultur-profili",
-    label: "Kültür & Profil",
-    description: "Culture Fit",
     icon: Brain,
     moduleId: "culture_fit",
+    titleKey: "enterprise.culture_fit.title",
+    descriptionKey: "enterprise.culture_fit.description",
   },
   {
     href: "/ayrilma-riski",
-    label: "Ayrılma Riski",
-    description: "Flight Risk",
     icon: LineChart,
     moduleId: "flight_risk",
+    titleKey: "enterprise.flight_risk.title",
+    descriptionKey: "enterprise.flight_risk.description",
   },
   {
     href: "/ucret-karsilastirma",
-    label: "Ücret Kıyaslama",
-    description: "Salary Benchmark",
     icon: Wallet,
     moduleId: "salary_benchmark",
+    titleKey: "enterprise.salary_benchmark.title",
+    descriptionKey: "enterprise.salary_benchmark.description",
   },
   {
     href: "/video-mulakat",
-    label: "Video Duygu Analizi",
-    description: "Interview Sentiment",
     icon: Video,
     moduleId: "video_sentiment",
+    titleKey: "enterprise.video_sentiment.title",
+    descriptionKey: "enterprise.video_sentiment.description",
   },
   {
     href: "/uyum-kalkani",
-    label: "Uyum Kalkanı",
-    description: "Compliance Shield",
     icon: ShieldAlert,
     moduleId: "compliance_shield",
+    titleKey: "enterprise.compliance_shield.title",
+    descriptionKey: "enterprise.compliance_shield.description",
   },
   {
     href: "/beceri-acigi",
-    label: "Beceri & Öğrenme",
-    description: "Skill Gap",
     icon: GraduationCap,
     moduleId: "skill_gap",
+    titleKey: "enterprise.skill_gap.title",
+    descriptionKey: "enterprise.skill_gap.description",
   },
-  {
-    href: "/fiyatlandirma",
-    label: "Fiyatlandırma & Üyelik",
-    description: "Paketler",
-    icon: IconCreditCard,
-    labelKey: "nav.pricing",
-  },
-  {
-    href: "/ayarlar",
-    label: "Ayarlar",
-    description: "White-Label & Yetki",
-    icon: IconSettings,
-    labelKey: "nav.settings",
-  },
+  { href: "/fiyatlandirma", icon: IconCreditCard, titleKey: "pricing.title", descriptionKey: "pricing.description" },
+  { href: "/ayarlar", icon: IconSettings, titleKey: "settings.title", descriptionKey: "settings.description" },
 ];
 
 type SidebarProps = {
@@ -157,7 +100,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const branding = useCompanyBranding();
   const { canView, role, loading: accessLoading } = useAccessControl();
   const { t } = useI18n();
-  const roleLabel = APP_ROLES.find((item) => item.id === role)?.label ?? "Şirket Admini";
+  const roleLabel = t(`access.role.${role}` as MessageKey);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
@@ -274,11 +217,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   <Icon className="h-[18px] w-[18px]" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-medium leading-5">
-                    {item.labelKey ? t(item.labelKey) : item.label}
-                  </span>
-                  <span className={`mt-0.5 block text-xs ${active ? "text-sky-200" : "text-slate-400"}`}>
-                    {item.descKey ? t(item.descKey) : item.description}
+                  <span className="block text-sm font-medium leading-5">{t(item.titleKey)}</span>
+                  <span className={`mt-0.5 block text-xs leading-4 ${active ? "text-sky-200" : "text-slate-400"}`}>
+                    {t(item.descriptionKey)}
                   </span>
                   {item.href === "/fiyatlandirma" ? (
                     <span className="mt-1.5 inline-flex max-w-full rounded-full bg-sky-400/20 px-2 py-0.5 text-[10px] font-semibold leading-4 text-sky-100">

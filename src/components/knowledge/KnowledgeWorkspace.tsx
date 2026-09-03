@@ -150,7 +150,7 @@ export function KnowledgeWorkspace() {
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
             <HelpTitle hint={t("kb.hint")}>{t("kb.title")}</HelpTitle>
           </h1>
-          <p className="mt-1 text-sm text-slate-500">{editor ? t("kb.leadEditor") : t("kb.leadEmployee")}</p>
+          <p className="mt-1 text-sm text-slate-500">{t("kb.description")}</p>
         </div>
         {editor ? (
           <div className="flex flex-wrap items-center gap-2">

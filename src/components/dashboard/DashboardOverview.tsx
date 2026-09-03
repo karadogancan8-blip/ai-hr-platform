@@ -5,33 +5,32 @@ import { dashboardStats, recentActivity } from "@/lib/mock-data";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { ENTERPRISE_MODULES } from "@/lib/access-control";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { useI18n } from "@/components/i18n/LocaleProvider";
+import type { MessageKey } from "@/lib/i18n";
 
-const coreLinks = [
-  { href: "/ise-alim", label: "CV analizi başlat" },
-  { href: "/onboarding", label: "Onboarding planı üret" },
-  { href: "/performans", label: "Performans incelemesi" },
-  { href: "/mevzuat", label: "Mevzuat sorusu sor" },
-  { href: "/izin", label: "İzin talebi oluştur" },
+const coreLinks: { href: string; labelKey: MessageKey }[] = [
+  { href: "/ise-alim", labelKey: "dashboard.link.recruit" },
+  { href: "/onboarding", labelKey: "dashboard.link.onboarding" },
+  { href: "/performans", labelKey: "dashboard.link.performance" },
+  { href: "/mevzuat", labelKey: "dashboard.link.policy" },
+  { href: "/izin", labelKey: "dashboard.link.leave" },
 ];
 
 export function DashboardOverview() {
+  const { t } = useI18n();
   const { canView, loading } = useAccessControl();
   const enterpriseLinks = ENTERPRISE_MODULES.filter((item) => !loading && canView(item.id)).map((item) => ({
     href: item.href,
-    label: item.subtitle,
+    label: t(`enterprise.${item.id}.title` as MessageKey),
   }));
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-          <HelpTitle hint="İK operasyonunun özeti; soldaki menüden modüllere geçin, yetkiniz olmayan Enterprise kartlar gizlenir.">
-            Dashboard
-          </HelpTitle>
+          <HelpTitle hint={t("dashboard.hint")}>{t("dashboard.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Recruiter, Policy ve HR Admin ajanlarının operasyon özeti. Hassas Enterprise raporları rolünüze göre gizlenir.
-        </p>
+        <p className="mt-1 text-sm text-slate-500">{t("dashboard.description")}</p>
       </div>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -58,7 +57,7 @@ export function DashboardOverview() {
 
       <section className="grid gap-4 lg:grid-cols-3">
         <article className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)] lg:col-span-2">
-          <h2 className="text-base font-semibold text-[#0b1f3a]">Son ajan aktiviteleri</h2>
+          <h2 className="text-base font-semibold text-[#0b1f3a]">{t("dashboard.activity")}</h2>
           <ul className="mt-4 divide-y divide-slate-100">
             {recentActivity.map((item) => (
               <li key={item.id} className="flex items-start justify-between gap-4 py-3">
@@ -73,14 +72,17 @@ export function DashboardOverview() {
         </article>
 
         <article className="rounded-2xl border border-sky-100 bg-[linear-gradient(180deg,#123056_0%,#1b4f86_100%)] p-5 text-white shadow-[0_8px_30px_rgba(15,55,95,0.16)]">
-          <h2 className="text-base font-semibold">Hızlı erişim</h2>
-          <p className="mt-1 text-sm text-sky-100/80">Yetkiniz olan modüllere geçin.</p>
+          <h2 className="text-base font-semibold">{t("dashboard.quick")}</h2>
+          <p className="mt-1 text-sm text-sky-100/80">{t("dashboard.quickLead")}</p>
           <div className="mt-5 space-y-2">
-            {[...coreLinks, ...enterpriseLinks].map((link) => (
+            {[
+              ...coreLinks.map((link) => ({ href: link.href, label: t(link.labelKey) })),
+              ...enterpriseLinks,
+            ].map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="block rounded-xl bg-white/10 px-4 py-3 text-sm font-medium text-white ring-1 ring-white/10 transition hover:bg-white/20"
+                className="block rounded-xl bg-white/10 px-3 py-2 text-sm hover:bg-white/15"
               >
                 {link.label}
               </Link>

@@ -95,7 +95,7 @@ export function PolicyChat() {
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <HelpTitle hint={t("policy.hint")}>{t("policy.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t("policy.lead")}</p>
+        <p className="mt-1 text-sm text-slate-500">{t("policy.description")}</p>
       </div>
 
       <div className="flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_8px_30px_rgba(15,55,95,0.06)]">

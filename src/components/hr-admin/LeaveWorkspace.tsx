@@ -119,7 +119,7 @@ export function LeaveWorkspace() {
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <HelpTitle hint={t("leave.hint")}>{t("leave.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t("leave.lead")}</p>
+        <p className="mt-1 text-sm text-slate-500">{t("leave.description")}</p>
       </div>
 
       {error ? (

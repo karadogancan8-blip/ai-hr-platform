@@ -226,9 +226,9 @@ export function RecruiterWorkspace() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("recruit.kicker")}</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-            <HelpTitle hint={t("recruit.hint")}>{t("recruit.title")}</HelpTitle>
+          <HelpTitle hint={t("recruit.hint")}>{t("recruit.title")}</HelpTitle>
           </h1>
-          <p className="mt-1 text-sm text-slate-500">{t("recruit.lead")}</p>
+          <p className="mt-1 text-sm text-slate-500">{t("recruit.description")}</p>
         </div>
         <div className="rounded-2xl border border-sky-100 bg-white px-4 py-3 text-sm shadow-sm">
           <span className="text-slate-500">{t("recruit.avg")}</span>

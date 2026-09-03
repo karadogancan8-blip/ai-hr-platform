@@ -5,6 +5,8 @@ import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { ENTERPRISE_MODULES, type EnterpriseModuleId } from "@/lib/access-control";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { useI18n } from "@/components/i18n/LocaleProvider";
+import type { MessageKey } from "@/lib/i18n";
 
 const COPY: Record<
   EnterpriseModuleId,
@@ -91,21 +93,22 @@ const COPY: Record<
 };
 
 export function EnterpriseModulePage({ moduleId }: { moduleId: EnterpriseModuleId }) {
+  const { t } = useI18n();
   const { canView, loading } = useAccessControl();
   const meta = ENTERPRISE_MODULES.find((item) => item.id === moduleId);
   const copy = COPY[moduleId];
   const Icon = copy.icon;
+  const titleKey = `enterprise.${moduleId}.title` as MessageKey;
+  const descriptionKey = `enterprise.${moduleId}.description` as MessageKey;
 
   if (loading) {
-    return <p className="text-sm text-slate-400">Modül yetkisi kontrol ediliyor…</p>;
+    return <p className="text-sm text-slate-400">{t("enterprise.loading")}</p>;
   }
 
   if (!canView(moduleId) || !meta) {
     return (
       <div className="rounded-2xl border border-rose-100 bg-rose-50 px-5 py-8 text-sm text-rose-900">
-        {moduleId === "salary_benchmark"
-          ? "Ücret kıyaslaması yalnızca şirket admini ve İK yöneticilerine açıktır. Standart çalışanlar bu raporu göremez."
-          : "Bu Enterprise modülü şirket admini tarafından kapatılmış veya rolünüze açık değil. Flight Risk ve Salary Benchmarking gibi hassas analitikler employee / hr_specialist rollerinde gizlenir."}
+        {moduleId === "salary_benchmark" ? t("enterprise.deniedSalary") : t("enterprise.denied")}
       </div>
     );
   }
@@ -113,14 +116,12 @@ export function EnterpriseModulePage({ moduleId }: { moduleId: EnterpriseModuleI
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Enterprise Analytics</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("enterprise.kicker")}</p>
         <h1 className="mt-1 flex items-center gap-2 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <Icon className="h-6 w-6 text-sky-700" />
-          <HelpTitle hint="Bu Enterprise analitik yalnızca yetki ayarlarınızda açık ve rolünüze görünürse listelenir; çıktı karar destek niteliğindedir.">
-            {meta.title}
-          </HelpTitle>
+          <HelpTitle hint={t("enterprise.hint")}>{t(titleKey)}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{meta.subtitle}</p>
+        <p className="mt-1 text-sm text-slate-500">{t(descriptionKey)}</p>
       </div>
 
       <section className="grid gap-4 sm:grid-cols-3">
@@ -138,7 +139,7 @@ export function EnterpriseModulePage({ moduleId }: { moduleId: EnterpriseModuleI
       </section>
 
       <article className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
-        <h2 className="text-base font-semibold text-[#0b1f3a]">AI karar destek özeti</h2>
+        <h2 className="text-base font-semibold text-[#0b1f3a]">{t("enterprise.summary")}</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600">
           {copy.findings.map((item) => (
             <li key={item}>{item}</li>

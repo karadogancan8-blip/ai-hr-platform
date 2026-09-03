@@ -96,10 +96,10 @@ export function SettingsWorkspace() {
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <HelpTitle hint={t("settings.hint")}>{t("settings.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t("settings.lead")}</p>
+        <p className="mt-1 text-sm text-slate-500">{t("settings.description")}</p>
       </div>
 
-      {loading ? <p className="text-sm text-slate-400">Yükleniyor…</p> : null}
+      {loading ? <p className="text-sm text-slate-400">{t("settings.loading")}</p> : null}
       {error ? (
         <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
       ) : null}

@@ -161,7 +161,7 @@ export function OnboardingWorkspace() {
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <HelpTitle hint={t("onb.hint")}>{t("onb.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t("onb.lead")}</p>
+        <p className="mt-1 text-sm text-slate-500">{t("onb.description")}</p>
       </div>
 
       {error ? (

@@ -106,7 +106,7 @@ export function PerformanceWorkspace() {
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <HelpTitle hint={t("perf.hint")}>{t("perf.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t("perf.lead")}</p>
+        <p className="mt-1 text-sm text-slate-500">{t("perf.description")}</p>
       </div>
 
       {error ? (

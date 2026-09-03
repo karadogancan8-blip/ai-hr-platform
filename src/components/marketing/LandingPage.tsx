@@ -16,38 +16,14 @@ import {
 import { DemoRequestModal } from "@/components/marketing/DemoRequestModal";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useI18n } from "@/components/i18n/LocaleProvider";
+import type { MessageKey } from "@/lib/i18n";
 
-const modules = [
-  {
-    title: "İşe Alım",
-    badge: "Recruiter AI",
-    icon: Briefcase,
-    text: "CV analizi, aday skorlama ve yönetici özetleriyle işe alımı dakikalara indirin.",
-  },
-  {
-    title: "Mevzuat Botu",
-    badge: "Policy AI",
-    icon: Bot,
-    text: "İş Kanunu ve iç yönergeleriniz için anında, kaynaklı İK yanıtları alın.",
-  },
-  {
-    title: "Onboarding",
-    badge: "30-60-90",
-    icon: Rocket,
-    text: "Yeni işe başlayanlar için görev planı, sohbet asistanı ve ilerleme takibi.",
-  },
-  {
-    title: "Performans",
-    badge: "OKR & Feedback",
-    icon: BarChart3,
-    text: "Dönemsel değerlendirme taslakları ve hedef hizalamasını tek ekranda toplayın.",
-  },
-  {
-    title: "White-Label",
-    badge: "Markanız",
-    icon: Palette,
-    text: "Logo ve kurumsal renklerle platformu kendi İK markanız gibi sunun.",
-  },
+const modules: { titleKey: MessageKey; descriptionKey: MessageKey; badgeKey: MessageKey; icon: typeof Briefcase }[] = [
+  { titleKey: "recruit.title", descriptionKey: "recruit.description", badgeKey: "landing.recruit.badge", icon: Briefcase },
+  { titleKey: "policy.title", descriptionKey: "policy.description", badgeKey: "landing.policy.badge", icon: Bot },
+  { titleKey: "onb.title", descriptionKey: "onb.description", badgeKey: "landing.onb.badge", icon: Rocket },
+  { titleKey: "perf.title", descriptionKey: "perf.description", badgeKey: "landing.perf.badge", icon: BarChart3 },
+  { titleKey: "settings.title", descriptionKey: "settings.description", badgeKey: "landing.settings.badge", icon: Palette },
 ];
 
 const stats = [
@@ -94,28 +70,25 @@ export function LandingPage() {
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-sky-100">
               <Sparkles className="h-3.5 w-3.5" />
-              Enterprise B2B SaaS
+              {t("landing.badge")}
             </span>
             <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-[2.75rem] lg:leading-tight">
-              Yapay Zeka Destekli Yeni Nesil İK Yönetim Platformu
+              {t("landing.heroTitle")}
             </h1>
-            <p className="mt-4 max-w-xl text-base leading-7 text-sky-100/90">
-              İşe alım, mevzuat, onboarding ve performansı tek kiracı-güvenli çalışma alanında birleştirin. İK ekipleri
-              evrak değil, karar üretsin.
-            </p>
+            <p className="mt-4 max-w-xl text-base leading-7 text-sky-100/90">{t("landing.heroLead")}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/login"
                 className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#123056] shadow-lg shadow-slate-900/20 hover:bg-sky-50"
               >
-                14 Gün Ücretsiz Deneyin
+                {t("pricing.trial")}
               </Link>
               <button
                 type="button"
                 onClick={() => setDemoOpen(true)}
                 className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/5 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
               >
-                Demo Randevusu Alın
+                {t("landing.demoCta")}
               </button>
             </div>
           </div>
@@ -138,12 +111,12 @@ export function LandingPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Modüller</p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">Kurumsal İK yığını tek platformda</h2>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("landing.modulesKicker")}</p>
+        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">{t("landing.modulesTitle")}</h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {modules.map((mod) => (
             <article
-              key={mod.title}
+              key={mod.titleKey}
               className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]"
             >
               <div className="flex items-start justify-between gap-3">
@@ -151,11 +124,11 @@ export function LandingPage() {
                   <mod.icon className="h-5 w-5" />
                 </span>
                 <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-sky-800">
-                  {mod.badge}
+                  {t(mod.badgeKey)}
                 </span>
               </div>
-              <h3 className="mt-4 text-base font-semibold text-[#0b1f3a]">{mod.title}</h3>
-              <p className="mt-1.5 text-sm leading-6 text-slate-500">{mod.text}</p>
+              <h3 className="mt-4 text-base font-semibold text-[#0b1f3a]">{t(mod.titleKey)}</h3>
+              <p className="mt-1.5 text-sm leading-6 text-slate-500">{t(mod.descriptionKey)}</p>
             </article>
           ))}
         </div>
@@ -174,9 +147,9 @@ export function LandingPage() {
       </section>
 
       <footer className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-10 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <p>© {new Date().getFullYear()} Nexus HR · KVKK & GDPR uyumlu çok kiracılı altyapı</p>
+        <p>© {new Date().getFullYear()} Nexus HR · {t("landing.footer")}</p>
         <Link href="/fiyatlandirma" className="font-medium text-sky-800 hover:underline">
-          Paketleri inceleyin
+          {t("landing.plans")}
         </Link>
       </footer>
 

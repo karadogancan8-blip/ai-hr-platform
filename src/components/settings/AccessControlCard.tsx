@@ -14,6 +14,7 @@ import {
   type AppRole,
   type ModuleVisibility,
 } from "@/lib/access-control";
+import type { MessageKey } from "@/lib/i18n";
 
 export function AccessControlCard() {
   const { t } = useI18n();
@@ -63,7 +64,7 @@ export function AccessControlCard() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("access.kicker")}</p>
           <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">{t("access.title")}</h2>
-          <p className="mt-1 text-sm text-slate-500">{t("access.lead")}</p>
+          <p className="mt-1 text-sm text-slate-500">{t("access.description")}</p>
         </div>
       </div>
 
@@ -86,7 +87,7 @@ export function AccessControlCard() {
         >
           {APP_ROLES.map((item) => (
             <option key={item.id} value={item.id}>
-              {item.label} — {item.hint}
+              {t(`access.role.${item.id}` as MessageKey)} — {t(`access.roleHint.${item.id}` as MessageKey)}
             </option>
           ))}
         </select>
@@ -103,7 +104,7 @@ export function AccessControlCard() {
               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-sm font-semibold text-[#0b1f3a]">{module.title}</h3>
+                    <h3 className="text-sm font-semibold text-[#0b1f3a]">{t(`enterprise.${module.id}.title` as MessageKey)}</h3>
                     {module.sensitive ? (
                       <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-rose-700">
                         {t("access.sensitive")}
@@ -117,7 +118,7 @@ export function AccessControlCard() {
                       {item.enabled ? t("access.active") : t("access.inactive")}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-xs text-slate-500">{module.subtitle}</p>
+                  <p className="mt-0.5 text-xs text-slate-500">{t(`enterprise.${module.id}.description` as MessageKey)}</p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[420px]">
                   <label className="flex items-center justify-between gap-3 rounded-xl border border-sky-100 bg-white px-3 py-2">
@@ -162,7 +163,7 @@ export function AccessControlCard() {
                     >
                       {VISIBILITY_OPTIONS.map((option) => (
                         <option key={option.id} value={option.id}>
-                          {option.label}
+                          {t(`access.vis.${option.id}` as MessageKey)}
                         </option>
                       ))}
                     </select>
