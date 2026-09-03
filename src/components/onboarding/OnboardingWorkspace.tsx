@@ -8,10 +8,11 @@ import {
   updateOnboardingTasks,
   type StoredOnboardingPlan,
 } from "@/lib/onboarding";
+import { DEMO_ONBOARDING_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { mergeById, readSessionList, writeSessionList } from "@/lib/session-store";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
-const SESSION_KEY = "nexus-onboarding-plans";
+const SESSION_KEY = DEMO_ONBOARDING_KEY;
 
 export function OnboardingWorkspace() {
   const [plans, setPlans] = useState<StoredOnboardingPlan[]>([]);
@@ -65,6 +66,11 @@ export function OnboardingWorkspace() {
 
   useEffect(() => {
     void load();
+    function onSeed() {
+      void load();
+    }
+    window.addEventListener(DEMO_SEEDED_EVENT, onSeed);
+    return () => window.removeEventListener(DEMO_SEEDED_EVENT, onSeed);
   }, []);
 
   async function generate(event: FormEvent) {

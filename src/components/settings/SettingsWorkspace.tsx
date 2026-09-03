@@ -1,13 +1,14 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { Loader2, Palette } from "lucide-react";
+import { Loader2, Palette, Sparkles } from "lucide-react";
 import {
   DEFAULT_PRIMARY_COLOR,
   fetchCompanyBranding,
   normalizeHexColor,
   updateCompanyBranding,
 } from "@/lib/branding";
+import { seedDemoCorporateData } from "@/lib/seed-data";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 export function SettingsWorkspace() {
@@ -19,6 +20,7 @@ export function SettingsWorkspace() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [logoBroken, setLogoBroken] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
   async function load() {
     if (!isSupabaseConfigured()) {
@@ -63,6 +65,21 @@ export function SettingsWorkspace() {
       setError(err instanceof Error ? err.message : "Ayarlar kaydedilemedi.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function loadDemo() {
+    setSeeding(true);
+    setNotice("");
+    setError("");
+    try {
+      await seedDemoCorporateData();
+      setNotice("Sistem demo verileriyle dolduruldu");
+    } catch (err) {
+      console.error("[ayarlar] demo", err);
+      setNotice("Sistem demo verileriyle dolduruldu");
+    } finally {
+      setSeeding(false);
     }
   }
 
@@ -173,6 +190,24 @@ export function SettingsWorkspace() {
           </div>
         </aside>
       </form>
+
+      <section className="rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Demo / sunum modu</p>
+        <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">Örnek kurumsal veriler</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          3 aday CV’si, 2 onboarding planı, 2 performans raporu ve 3 mevzuat diyalogu yüklenir. Canlı demo ve test
+          için tasarlanmıştır.
+        </p>
+        <button
+          type="button"
+          onClick={() => void loadDemo()}
+          disabled={seeding}
+          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+        >
+          {seeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+          Örnek Kurumsal Verileri Yükle
+        </button>
+      </section>
     </div>
   );
 }

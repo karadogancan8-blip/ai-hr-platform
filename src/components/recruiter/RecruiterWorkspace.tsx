@@ -8,6 +8,7 @@ import { InterviewModal } from "@/components/recruiter/InterviewModal";
 import { PrintReportModal } from "@/components/reports/PrintReportModal";
 import type { InterviewGuide } from "@/lib/interview";
 import { fetchResumes, updateResumeInterview, type StoredResume } from "@/lib/resumes";
+import { DEMO_GUIDES_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 function scoreTone(score: number) {
@@ -86,6 +87,23 @@ export function RecruiterWorkspace() {
 
   useEffect(() => {
     void loadResumes();
+    try {
+      const raw = window.sessionStorage.getItem(DEMO_GUIDES_KEY);
+      if (raw) setGuides(JSON.parse(raw) as Record<string, InterviewGuide>);
+    } catch {
+      /* yok */
+    }
+    function onSeed() {
+      void loadResumes();
+      try {
+        const raw = window.sessionStorage.getItem(DEMO_GUIDES_KEY);
+        if (raw) setGuides(JSON.parse(raw) as Record<string, InterviewGuide>);
+      } catch {
+        /* yok */
+      }
+    }
+    window.addEventListener(DEMO_SEEDED_EVENT, onSeed);
+    return () => window.removeEventListener(DEMO_SEEDED_EVENT, onSeed);
   }, []);
 
   async function ingestFiles(list: FileList | null) {

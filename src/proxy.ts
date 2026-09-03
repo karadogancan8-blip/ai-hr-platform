@@ -5,6 +5,7 @@ import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "@/lib/supaba
 const PUBLIC_PREFIXES = ["/login", "/auth"];
 
 function isPublicPath(pathname: string) {
+  if (pathname === "/" || pathname === "/fiyatlandirma") return true;
   return PUBLIC_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 

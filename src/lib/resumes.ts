@@ -1,5 +1,5 @@
 import { getSupabase } from "./supabase";
-import { getCompanyId, type AppSupabase } from "./tenant";
+import { getCompanyId, resolveOptionalCompanyId, type AppSupabase } from "./tenant";
 import type { ResumeRow } from "./database.types";
 
 export type StoredResume = {
@@ -24,6 +24,8 @@ export type ResumeInsert = {
   skills?: string[];
   strengths?: string[];
   weaknesses?: string[];
+  interviewScore?: number | null;
+  interviewNotes?: string;
 };
 
 function missingColumn(message: string) {
@@ -64,7 +66,7 @@ export async function fetchResumes(client?: AppSupabase) {
 
 export async function insertResume(input: ResumeInsert, client?: AppSupabase) {
   const supabase = client ?? getSupabase();
-  const companyId = await getCompanyId(supabase);
+  const companyId = await resolveOptionalCompanyId(supabase);
   const payload: Record<string, string | number | string[] | null> = {
     company_id: companyId,
     candidate_name: input.name,
@@ -77,6 +79,8 @@ export async function insertResume(input: ResumeInsert, client?: AppSupabase) {
     skills: input.skills ?? [],
     strengths: input.strengths ?? [],
     weaknesses: input.weaknesses ?? [],
+    interview_score: input.interviewScore ?? null,
+    interview_notes: input.interviewNotes ?? "",
   };
 
   for (let attempt = 0; attempt < 12; attempt += 1) {
@@ -88,7 +92,8 @@ export async function insertResume(input: ResumeInsert, client?: AppSupabase) {
         name: input.name || mapped.name,
         role: input.role || mapped.role,
         matchScore: input.matchScore,
-        interviewScore: mapped.interviewScore,
+        interviewScore: mapped.interviewScore ?? input.interviewScore ?? null,
+        interviewNotes: mapped.interviewNotes || (input.interviewNotes ?? ""),
         summary: input.summary || mapped.summary,
         skills: mapped.skills.length ? mapped.skills : (input.skills ?? []),
         strengths: mapped.strengths.length ? mapped.strengths : (input.strengths ?? []),
@@ -97,7 +102,15 @@ export async function insertResume(input: ResumeInsert, client?: AppSupabase) {
     }
 
     const column = missingColumn(error.message);
-    if (!column || column === "company_id" || !(column in payload)) throw new Error(error.message);
+    if (column && column in payload && column !== "company_id") {
+      delete payload[column];
+      continue;
+    }
+    if (/company_id|invalid input syntax for type uuid|foreign key|null value/i.test(error.message) && "company_id" in payload) {
+      delete payload.company_id;
+      continue;
+    }
+    if (!column || !(column in payload)) throw new Error(error.message);
     delete payload[column];
   }
 

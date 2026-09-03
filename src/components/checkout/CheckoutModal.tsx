@@ -7,6 +7,7 @@ import type { Plan } from "@/lib/plans";
 type CheckoutModalProps = {
   open: boolean;
   plan: Plan | null;
+  chargeLabel?: string;
   onClose: () => void;
   onConfirm: () => Promise<void>;
 };
@@ -24,7 +25,7 @@ function formatExpiry(value: string) {
   return `${digits.slice(0, 2)}/${digits.slice(2)}`;
 }
 
-export function CheckoutModal({ open, plan, onClose, onConfirm }: CheckoutModalProps) {
+export function CheckoutModal({ open, plan, chargeLabel, onClose, onConfirm }: CheckoutModalProps) {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [expiry, setExpiry] = useState("");
@@ -87,7 +88,7 @@ export function CheckoutModal({ open, plan, onClose, onConfirm }: CheckoutModalP
               {plan.name} planına abone ol
             </h2>
             <p className="mt-1 text-sm text-slate-500">
-              {plan.priceLabel} / {plan.priceHint.toLowerCase()} · Stripe / iyzico bağlanabilir
+              {chargeLabel ?? "Özel fiyatlandırma"} · Stripe / iyzico bağlanabilir
             </p>
           </div>
           <button

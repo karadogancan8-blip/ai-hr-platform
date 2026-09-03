@@ -1,0 +1,182 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import {
+  BarChart3,
+  Bot,
+  Briefcase,
+  Palette,
+  Rocket,
+  ShieldCheck,
+  Sparkles,
+  Timer,
+  Zap,
+} from "lucide-react";
+import { DemoRequestModal } from "@/components/marketing/DemoRequestModal";
+
+const modules = [
+  {
+    title: "İşe Alım",
+    badge: "Recruiter AI",
+    icon: Briefcase,
+    text: "CV analizi, aday skorlama ve yönetici özetleriyle işe alımı dakikalara indirin.",
+  },
+  {
+    title: "Mevzuat Botu",
+    badge: "Policy AI",
+    icon: Bot,
+    text: "İş Kanunu ve iç yönergeleriniz için anında, kaynaklı İK yanıtları alın.",
+  },
+  {
+    title: "Onboarding",
+    badge: "30-60-90",
+    icon: Rocket,
+    text: "Yeni işe başlayanlar için görev planı, sohbet asistanı ve ilerleme takibi.",
+  },
+  {
+    title: "Performans",
+    badge: "OKR & Feedback",
+    icon: BarChart3,
+    text: "Dönemsel değerlendirme taslakları ve hedef hizalamasını tek ekranda toplayın.",
+  },
+  {
+    title: "White-Label",
+    badge: "Markanız",
+    icon: Palette,
+    text: "Logo ve kurumsal renklerle platformu kendi İK markanız gibi sunun.",
+  },
+];
+
+const stats = [
+  { value: "%85", label: "Zaman tasarrufu", icon: Timer, hint: "Manuel tarama ve evrak döngülerinde" },
+  { value: "10x", label: "Hızlı işe alım", icon: Zap, hint: "İlk elemeden mülakat rehberine" },
+  { value: "KVKK & GDPR", label: "Uyumlu altyapı", icon: ShieldCheck, hint: "Kiracı izolasyonu ve denetim izi" },
+];
+
+export function LandingPage() {
+  const [demoOpen, setDemoOpen] = useState(false);
+
+  return (
+    <div className="min-h-full bg-[#f4f8fc] text-slate-800">
+      <header className="border-b border-sky-100/80 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#123056] text-sm font-semibold text-white">
+              N
+            </span>
+            <span className="text-sm font-semibold tracking-tight text-[#0b1f3a]">Nexus HR</span>
+          </Link>
+          <nav className="flex items-center gap-2 text-sm">
+            <Link href="/fiyatlandirma" className="hidden rounded-lg px-3 py-2 text-slate-600 hover:bg-sky-50 sm:inline">
+              Fiyatlandırma
+            </Link>
+            <Link href="/login" className="rounded-lg px-3 py-2 text-slate-600 hover:bg-sky-50">
+              Giriş
+            </Link>
+            <Link
+              href="/login"
+              className="rounded-xl bg-[#123056] px-3.5 py-2 text-sm font-medium text-white hover:bg-[#0f2744]"
+            >
+              14 gün ücretsiz
+            </Link>
+          </nav>
+        </div>
+      </header>
+
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0b1f3a] via-[#123056] to-[#1a4a7a]">
+        <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-sky-400/20 blur-3xl" />
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:py-24">
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-sky-100">
+              <Sparkles className="h-3.5 w-3.5" />
+              Enterprise B2B SaaS
+            </span>
+            <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-[2.75rem] lg:leading-tight">
+              Yapay Zeka Destekli Yeni Nesil İK Yönetim Platformu
+            </h1>
+            <p className="mt-4 max-w-xl text-base leading-7 text-sky-100/90">
+              İşe alım, mevzuat, onboarding ve performansı tek kiracı-güvenli çalışma alanında birleştirin. İK ekipleri
+              evrak değil, karar üretsin.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#123056] shadow-lg shadow-slate-900/20 hover:bg-sky-50"
+              >
+                14 Gün Ücretsiz Deneyin
+              </Link>
+              <button
+                type="button"
+                onClick={() => setDemoOpen(true)}
+                className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/5 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+              >
+                Demo Randevusu Alın
+              </button>
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            {stats.map((item) => (
+              <div
+                key={item.label}
+                className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-4 backdrop-blur-sm"
+              >
+                <item.icon className="mt-0.5 h-5 w-5 shrink-0 text-sky-200" />
+                <div>
+                  <p className="text-lg font-semibold text-white">{item.value}</p>
+                  <p className="text-sm font-medium text-sky-100">{item.label}</p>
+                  <p className="mt-0.5 text-xs text-sky-200/70">{item.hint}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Modüller</p>
+        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">Kurumsal İK yığını tek platformda</h2>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {modules.map((mod) => (
+            <article
+              key={mod.title}
+              className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-50 text-[#123056]">
+                  <mod.icon className="h-5 w-5" />
+                </span>
+                <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-sky-800">
+                  {mod.badge}
+                </span>
+              </div>
+              <h3 className="mt-4 text-base font-semibold text-[#0b1f3a]">{mod.title}</h3>
+              <p className="mt-1.5 text-sm leading-6 text-slate-500">{mod.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-sky-100 bg-white">
+        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-12 sm:grid-cols-3 sm:px-6">
+          {stats.map((item) => (
+            <div key={`panel-${item.label}`} className="text-center">
+              <p className="text-3xl font-semibold tracking-tight text-[#123056]">{item.value}</p>
+              <p className="mt-1 text-sm font-medium text-[#0b1f3a]">{item.label}</p>
+              <p className="mt-1 text-xs text-slate-500">{item.hint}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <footer className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-10 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <p>© {new Date().getFullYear()} Nexus HR · KVKK & GDPR uyumlu çok kiracılı altyapı</p>
+        <Link href="/fiyatlandirma" className="font-medium text-sky-800 hover:underline">
+          Paketleri inceleyin
+        </Link>
+      </footer>
+
+      <DemoRequestModal open={demoOpen} onClose={() => setDemoOpen(false)} />
+    </div>
+  );
+}

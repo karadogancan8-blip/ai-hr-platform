@@ -1,8 +1,10 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { IconSend } from "@/components/icons";
 import { initialPolicyMessages } from "@/lib/mock-data";
+import { DEMO_POLICY_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
+import { readSessionList } from "@/lib/session-store";
 import type { ChatMessage } from "@/lib/types";
 
 function nowLabel() {
@@ -14,6 +16,16 @@ export function PolicyChat() {
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function hydrate() {
+      const demo = readSessionList<ChatMessage>(DEMO_POLICY_KEY);
+      if (demo.length) setMessages(demo);
+    }
+    hydrate();
+    window.addEventListener(DEMO_SEEDED_EVENT, hydrate);
+    return () => window.removeEventListener(DEMO_SEEDED_EVENT, hydrate);
+  }, []);
 
   async function send(event: FormEvent) {
     event.preventDefault();

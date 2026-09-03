@@ -6,10 +6,11 @@ import {
   fetchPerformanceReviews,
   type StoredPerformanceReview,
 } from "@/lib/performance";
+import { DEMO_PERFORMANCE_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { mergeById, readSessionList, writeSessionList } from "@/lib/session-store";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
-const SESSION_KEY = "nexus-performance-reviews";
+const SESSION_KEY = DEMO_PERFORMANCE_KEY;
 
 function scoreBadge(score: number) {
   if (score >= 4) return "bg-emerald-50 text-emerald-800";
@@ -57,6 +58,11 @@ export function PerformanceWorkspace() {
 
   useEffect(() => {
     void load();
+    function onSeed() {
+      void load();
+    }
+    window.addEventListener(DEMO_SEEDED_EVENT, onSeed);
+    return () => window.removeEventListener(DEMO_SEEDED_EVENT, onSeed);
   }, []);
 
   async function generate(event: FormEvent) {
