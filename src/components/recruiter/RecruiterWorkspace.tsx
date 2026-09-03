@@ -5,6 +5,8 @@ import { IconUpload } from "@/components/icons";
 import { ClipboardList, FileDown, Loader2, Sparkles, Video } from "lucide-react";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 import { InterviewModal } from "@/components/recruiter/InterviewModal";
+import { LiveInterviewModal } from "@/components/recruiter/LiveInterviewModal";
+import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
 import { PrintReportModal } from "@/components/reports/PrintReportModal";
 import type { InterviewGuide } from "@/lib/interview";
 import { fetchResumes, updateResumeInterview, type StoredResume } from "@/lib/resumes";
@@ -62,6 +64,7 @@ export function RecruiterWorkspace() {
   const [guideError, setGuideError] = useState("");
   const [savingInterview, setSavingInterview] = useState(false);
   const [printResume, setPrintResume] = useState<StoredResume | null>(null);
+  const [liveResume, setLiveResume] = useState<StoredResume | null>(null);
   const branding = useCompanyBranding();
 
   const average = useMemo(() => {
@@ -195,6 +198,20 @@ export function RecruiterWorkspace() {
     }
   }
 
+  async function openLiveInterview(resume: StoredResume) {
+    setLiveResume(resume);
+    setGuideError("");
+    if (guides[resume.id]) return;
+    setGuideLoading(true);
+    try {
+      await loadInterviewGuide(resume);
+    } catch (err) {
+      setGuideError(err instanceof Error ? err.message : "Rehber üretilemedi.");
+    } finally {
+      setGuideLoading(false);
+    }
+  }
+
   function openPrintReport(resume: StoredResume) {
     setPrintResume(resume);
   }
@@ -205,7 +222,9 @@ export function RecruiterWorkspace() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">RecruiterAgent</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-            İşe Alım & CV Analizi
+            <HelpTitle hint="CV metnini yapıştırın veya dosya yükleyin; RecruiterAgent eşleşme skoru, güçlü yönler ve gelişim alanları üretir.">
+              İşe Alım & CV Analizi
+            </HelpTitle>
           </h1>
           <p className="mt-1 text-sm text-slate-500">
             Analiz sonuçları Supabase <code className="text-sky-800">resumes</code> tablosuna yazılır.
@@ -277,14 +296,17 @@ export function RecruiterWorkspace() {
               className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
             />
           </label>
-          <button
-            type="submit"
-            disabled={analyzing}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
-          >
-            {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            {analyzing ? "Analiz ediliyor…" : "CV / Metin analiz et"}
-          </button>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <button
+              type="submit"
+              disabled={analyzing}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+            >
+              {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {analyzing ? "Analiz ediliyor…" : "CV / Metin analiz et"}
+            </button>
+            <HelpTip text="Açık pozisyon ve CV metnini gönderir; sonuçlar aday kartı olarak kaydedilir." />
+          </div>
           {notice ? <p className="mt-3 text-xs text-sky-800">{notice}</p> : null}
         </section>
       </form>
@@ -369,30 +391,39 @@ export function RecruiterWorkspace() {
               </div>
               <p className="mt-4 text-xs text-slate-400">{formatWhen(resume.createdAt)}</p>
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={() => void openInterview(resume, "guide")}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-medium text-sky-900 hover:bg-sky-100"
-                >
-                  <ClipboardList className="h-3.5 w-3.5" />
-                  AI Mülakat Rehberi Üret
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void openInterview(resume, "live")}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#123056] px-3 py-2 text-xs font-medium text-white hover:bg-[#0f2744]"
-                >
-                  <Video className="h-3.5 w-3.5" />
-                  Mülakat Başlat
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openPrintReport(resume)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 sm:col-span-2"
-                >
-                  <FileDown className="h-3.5 w-3.5" />
-                  Executive PDF Raporu İndir
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => void openInterview(resume, "guide")}
+                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-medium text-sky-900 hover:bg-sky-100"
+                  >
+                    <ClipboardList className="h-3.5 w-3.5" />
+                    AI Mülakat Rehberi Üret
+                  </button>
+                  <HelpTip text="Pozisyona özel teknik ve kültür soruları ile beklenen yanıtları üretir." />
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => void openLiveInterview(resume)}
+                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#123056] px-3 py-2 text-xs font-medium text-white hover:bg-[#0f2744]"
+                  >
+                    <Video className="h-3.5 w-3.5" />
+                    Mülakat Başlat
+                  </button>
+                  <HelpTip text="Kamerayı açarak canlı AI mülakat simülasyonu başlatır; konuşup değerlendirme alırsınız." />
+                </div>
+                <div className="flex items-center gap-1 sm:col-span-2">
+                  <button
+                    type="button"
+                    onClick={() => openPrintReport(resume)}
+                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    <FileDown className="h-3.5 w-3.5" />
+                    Executive PDF Raporu İndir
+                  </button>
+                  <HelpTip text="Eşleşme, özet ve mülakat notlarını yazdırılabilir yönetici raporuna dönüştürür." />
+                </div>
               </div>
             </article>
           ))}
@@ -425,6 +456,37 @@ export function RecruiterWorkspace() {
             setInterviewResume(null);
           } catch (err) {
             setGuideError(err instanceof Error ? err.message : "Skor kaydedilemedi.");
+          } finally {
+            setSavingInterview(false);
+          }
+        }}
+      />
+      <LiveInterviewModal
+        open={Boolean(liveResume)}
+        resume={liveResume}
+        guide={liveResume ? (guides[liveResume.id] ?? null) : null}
+        saving={savingInterview}
+        onClose={() => {
+          if (savingInterview) return;
+          setLiveResume(null);
+        }}
+        onComplete={async ({ score, notes }) => {
+          if (!liveResume) return;
+          setSavingInterview(true);
+          try {
+            const updated = await updateResumeInterview(liveResume.id, {
+              interviewScore: score,
+              interviewNotes: notes,
+            });
+            setResumes((prev) => prev.map((item) => (item.id === updated.id ? { ...item, ...updated } : item)));
+            setNotice(`${liveResume.name} için canlı mülakat skoru ${score} olarak kaydedildi.`);
+          } catch {
+            setNotice(`${liveResume.name} için simülasyon skoru ${score}. Kayıt yerel olarak gösterildi.`);
+            setResumes((prev) =>
+              prev.map((item) =>
+                item.id === liveResume.id ? { ...item, interviewScore: score, interviewNotes: notes } : item,
+              ),
+            );
           } finally {
             setSavingInterview(false);
           }

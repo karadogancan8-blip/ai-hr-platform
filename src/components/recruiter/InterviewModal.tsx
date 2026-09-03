@@ -12,6 +12,7 @@ import {
 } from "@/lib/interview";
 import type { StoredResume } from "@/lib/resumes";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
+import { HelpTip } from "@/components/ui/HelpTip";
 
 type InterviewModalProps = {
   open: boolean;
@@ -206,6 +207,7 @@ export function InterviewModal({
               <FileDown className="h-4 w-4" />
               Executive PDF Raporu İndir
             </button>
+            <HelpTip text="Aday özeti ve mülakat puanlarını yazdırılabilir yönetici PDF’ine aktarır." />
             <button
               type="button"
               disabled={saving || loading || !guide || unanswered > 0}

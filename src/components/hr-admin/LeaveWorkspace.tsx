@@ -8,6 +8,7 @@ import {
 } from "@/lib/leave-requests";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import type { LeaveRequest, LeaveStatus, LeaveType } from "@/lib/types";
+import { HelpTitle } from "@/components/ui/HelpTip";
 
 const typeLabel: Record<LeaveType, string> = {
   yillik: "Yıllık izin",
@@ -125,7 +126,9 @@ export function LeaveWorkspace() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">HRAdminAgent</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-          İzin & Özlük Yönetimi
+          <HelpTitle hint="Çalışan izin talebini kaydedin; onay veya red durumunu aynı listeden güncelleyin.">
+            İzin & Özlük Yönetimi
+          </HelpTitle>
         </h1>
         <p className="mt-1 text-sm text-slate-500">
           Talepler doğrudan Supabase <code className="text-sky-800">leave_requests</code> tablosuna yazılır.

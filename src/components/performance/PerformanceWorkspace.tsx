@@ -10,6 +10,7 @@ import { DEMO_PERFORMANCE_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { mergeById, readSessionList, writeSessionList } from "@/lib/session-store";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
+import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
 
 const SESSION_KEY = DEMO_PERFORMANCE_KEY;
 
@@ -99,7 +100,11 @@ export function PerformanceWorkspace() {
     <div className="space-y-6">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">PerformanceAgent</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">Otomatik performans değerlendirme</h1>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+          <HelpTitle hint="Dönem notlarından güçlü yön, gelişim alanı, skor önerisi ve gelecek çeyrek hedefleri üretir.">
+            Otomatik performans değerlendirme
+          </HelpTitle>
+        </h1>
         <p className="mt-1 text-sm text-slate-500">
           Dönem notlarından güçlü yönler, gelişim alanları, skor önerisi ve gelecek çeyrek hedefleri üretilir.
         </p>
@@ -142,14 +147,17 @@ export function PerformanceWorkspace() {
             className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
           />
         </label>
-        <button
-          type="submit"
-          disabled={generating}
-          className="inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
-        >
-          {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-          Performans inceleme raporu üret
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="submit"
+            disabled={generating}
+            className="inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+          >
+            {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            Performans inceleme raporu üret
+          </button>
+          <HelpTip text="Yönetici notlarından skor önerisi, güçlü yönler ve gelecek çeyrek hedefleri üretir." />
+        </div>
       </form>
 
       {latest ? (

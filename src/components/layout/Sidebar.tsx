@@ -254,15 +254,15 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-medium leading-5">{item.label}</span>
-                  <span className={`block text-xs ${active ? "text-sky-200" : "text-slate-400"}`}>
+                  <span className={`mt-0.5 block text-xs ${active ? "text-sky-200" : "text-slate-400"}`}>
                     {item.description}
                   </span>
+                  {item.href === "/fiyatlandirma" ? (
+                    <span className="mt-1.5 inline-flex max-w-full rounded-full bg-sky-400/20 px-2 py-0.5 text-[10px] font-semibold leading-4 text-sky-100">
+                      {planBadgeLabel[plan]}
+                    </span>
+                  ) : null}
                 </span>
-                {item.href === "/fiyatlandirma" ? (
-                  <span className="mt-1 shrink-0 rounded-full bg-sky-400/20 px-2 py-0.5 text-[10px] font-semibold text-sky-100">
-                    {planBadgeLabel[plan]}
-                  </span>
-                ) : null}
               </Link>
             );
           })}

@@ -4,6 +4,7 @@ import { Brain, GraduationCap, LineChart, ShieldAlert, Video, Wallet } from "luc
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { ENTERPRISE_MODULES, type EnterpriseModuleId } from "@/lib/access-control";
+import { HelpTitle } from "@/components/ui/HelpTip";
 
 const COPY: Record<
   EnterpriseModuleId,
@@ -114,7 +115,9 @@ export function EnterpriseModulePage({ moduleId }: { moduleId: EnterpriseModuleI
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Enterprise Analytics</p>
         <h1 className="mt-1 flex items-center gap-2 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <Icon className="h-6 w-6 text-sky-700" />
-          {meta.title}
+          <HelpTitle hint="Bu Enterprise analitik yalnızca yetki ayarlarınızda açık ve rolünüze görünürse listelenir; çıktı karar destek niteliğindedir.">
+            {meta.title}
+          </HelpTitle>
         </h1>
         <p className="mt-1 text-sm text-slate-500">{meta.subtitle}</p>
       </div>

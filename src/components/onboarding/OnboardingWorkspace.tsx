@@ -12,6 +12,7 @@ import { DEMO_ONBOARDING_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { mergeById, readSessionList, writeSessionList } from "@/lib/session-store";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
+import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
 
 const SESSION_KEY = DEMO_ONBOARDING_KEY;
 
@@ -154,7 +155,11 @@ export function OnboardingWorkspace() {
     <div className="space-y-6">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">OnboardingAgent</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">AI Onboarding Companion</h1>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+          <HelpTitle hint="Yeni çalışan adı, rol ve departmanı girin; 30 günlük checklist ve oryantasyon sohbeti üretilir.">
+            AI Onboarding Companion
+          </HelpTitle>
+        </h1>
         <p className="mt-1 text-sm text-slate-500">Yeni çalışan için 30 günlük uyum planı, checklist ve oryantasyon asistanı.</p>
       </div>
 
@@ -194,7 +199,7 @@ export function OnboardingWorkspace() {
             className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
           />
         </label>
-        <div className="flex items-end">
+        <div className="flex items-end gap-2">
           <button
             type="submit"
             disabled={generating}
@@ -203,6 +208,7 @@ export function OnboardingWorkspace() {
             {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
             30 günlük plan üret
           </button>
+          <HelpTip text="Çalışan, rol ve departmana göre 4 haftalık uyum checklist’i ve sohbet asistanı oluşturur." />
         </div>
       </form>
 

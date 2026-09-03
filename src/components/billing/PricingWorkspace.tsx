@@ -6,7 +6,6 @@ import { Check } from "lucide-react";
 import { CheckoutModal } from "@/components/checkout/CheckoutModal";
 import { DemoRequestModal } from "@/components/marketing/DemoRequestModal";
 import {
-  planBadgeLabel,
   planChargeLabel,
   planMonthlyEquivalent,
   plans,
@@ -14,6 +13,7 @@ import {
   type Plan,
   type PlanId,
 } from "@/lib/plans";
+import { HelpTitle } from "@/components/ui/HelpTip";
 import { fetchCompanySubscription, updateCompanySubscription } from "@/lib/subscription";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -86,7 +86,11 @@ export function PricingWorkspace() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Üyelik</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">Fiyatlandırma & Paketler</h1>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+            <HelpTitle hint="Aylık veya yıllık faturalamayı seçin; kartlar çalışan ölçeğine göre paketi gösterir.">
+              Fiyatlandırma & Paketler
+            </HelpTitle>
+          </h1>
           <p className="mt-1 text-sm text-slate-500">
             Çalışan ölçeğinize göre paket seçin. Yıllık ödemede 2 ay ücretsiz uygulanır.
           </p>
@@ -129,33 +133,36 @@ export function PricingWorkspace() {
         <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p>
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3">
         {plans.map((plan) => {
           const current = authed && currentPlan === plan.id;
           return (
             <article
               key={plan.id}
-              className={`relative flex flex-col rounded-3xl border bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)] ${
-                plan.popular ? "border-sky-400 ring-4 ring-sky-100" : "border-sky-100"
+              className={`flex flex-col rounded-2xl border bg-white p-6 ${
+                plan.popular ? "border-slate-300" : "border-slate-200"
               }`}
             >
-              {plan.popular ? (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#123056] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
-                  En popüler
-                </span>
-              ) : null}
-              <div className="flex items-start justify-between gap-2">
-                <h2 className="text-lg font-semibold text-[#0b1f3a]">{plan.name}</h2>
-                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">
-                  {plan.seatLabel}
-                </span>
+              <div className="flex flex-wrap items-center gap-2">
+                {plan.popular ? (
+                  <span className="rounded-full bg-slate-900 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                    En popüler
+                  </span>
+                ) : null}
+                {current ? (
+                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                    Mevcut paket
+                  </span>
+                ) : null}
               </div>
-              <p className="mt-1 text-sm text-slate-500">{plan.description}</p>
-              <p className="mt-5 flex items-end gap-1">
-                <span className="text-3xl font-semibold tracking-tight text-[#0b1f3a]">
+              <h2 className="mt-3 text-lg font-semibold text-slate-900">{plan.name}</h2>
+              <p className="mt-1 text-xs font-medium text-slate-500">{plan.seatLabel}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-500">{plan.description}</p>
+              <p className="mt-6 flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
+                <span className="text-3xl font-semibold tracking-tight text-slate-900">
                   {plan.monthlyPrice == null ? "Özel" : planChargeLabel(plan, cycle).split(" / ")[0]}
                 </span>
-                <span className="mb-1 text-sm text-slate-400">
+                <span className="text-sm text-slate-400">
                   {plan.monthlyPrice == null
                     ? "fiyatlandırma"
                     : cycle === "yearly"
@@ -163,11 +170,11 @@ export function PricingWorkspace() {
                       : "/ ay"}
                 </span>
               </p>
-              <p className="text-xs text-slate-400">{planMonthlyEquivalent(plan, cycle)}</p>
+              <p className="mt-1 text-xs leading-5 text-slate-400">{planMonthlyEquivalent(plan, cycle)}</p>
               <ul className="mt-5 flex-1 space-y-2.5">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2 text-sm text-slate-600">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" />
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                     {feature}
                   </li>
                 ))}
@@ -180,21 +187,21 @@ export function PricingWorkspace() {
                     disabled={current && plan.monthlyPrice != null}
                     className={`w-full rounded-xl py-2.5 text-sm font-medium ${
                       current && plan.monthlyPrice != null
-                        ? "bg-slate-100 text-slate-500"
+                        ? "cursor-default bg-slate-100 text-slate-500"
                         : plan.popular
-                          ? "bg-[#123056] text-white hover:bg-[#0f2744]"
-                          : "bg-sky-50 text-sky-900 hover:bg-sky-100"
+                          ? "bg-slate-900 text-white hover:bg-slate-800"
+                          : "bg-slate-50 text-slate-800 hover:bg-slate-100"
                     }`}
                   >
-                    {current && plan.monthlyPrice != null ? `${planBadgeLabel[plan.id]} aktif` : "Hemen Başla"}
+                    {current && plan.monthlyPrice != null ? "Bu paket aktif" : "Hemen Başla"}
                   </button>
                 ) : (
                   <Link
                     href="/login?next=/fiyatlandirma"
                     className={`block w-full rounded-xl py-2.5 text-center text-sm font-medium ${
                       plan.popular
-                        ? "bg-[#123056] text-white hover:bg-[#0f2744]"
-                        : "bg-sky-50 text-sky-900 hover:bg-sky-100"
+                        ? "bg-slate-900 text-white hover:bg-slate-800"
+                        : "bg-slate-50 text-slate-800 hover:bg-slate-100"
                     }`}
                   >
                     Hemen Başla
@@ -203,7 +210,7 @@ export function PricingWorkspace() {
                 <button
                   type="button"
                   onClick={() => requestDemo(plan)}
-                  className="w-full rounded-xl border border-sky-100 py-2.5 text-sm font-medium text-sky-900 hover:bg-sky-50"
+                  className="w-full rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Demo Talep Et
                 </button>

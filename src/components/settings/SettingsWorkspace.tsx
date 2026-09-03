@@ -11,6 +11,7 @@ import {
 import { seedDemoCorporateData } from "@/lib/seed-data";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { AccessControlCard } from "@/components/settings/AccessControlCard";
+import { HelpTitle } from "@/components/ui/HelpTip";
 
 export function SettingsWorkspace() {
   const [companyName, setCompanyName] = useState("");
@@ -91,7 +92,9 @@ export function SettingsWorkspace() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Ayarlar</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-          Şirket özelleştirme (White-Label)
+          <HelpTitle hint="Logo ve kurumsal rengi kaydedin; menü ve PDF raporları bu kimliği kullanır. Alt kartta modül yetkilerini yönetirsiniz.">
+            Şirket özelleştirme (White-Label)
+          </HelpTitle>
         </h1>
         <p className="mt-1 text-sm text-slate-500">
           Logo ve kurumsal renk, executive PDF raporları ile sol menüde görünür.

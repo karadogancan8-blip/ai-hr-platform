@@ -4,6 +4,7 @@ import Link from "next/link";
 import { dashboardStats, recentActivity } from "@/lib/mock-data";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { ENTERPRISE_MODULES } from "@/lib/access-control";
+import { HelpTitle } from "@/components/ui/HelpTip";
 
 const coreLinks = [
   { href: "/ise-alim", label: "CV analizi başlat" },
@@ -23,7 +24,11 @@ export function DashboardOverview() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">Dashboard</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+          <HelpTitle hint="İK operasyonunun özeti; soldaki menüden modüllere geçin, yetkiniz olmayan Enterprise kartlar gizlenir.">
+            Dashboard
+          </HelpTitle>
+        </h1>
         <p className="mt-1 text-sm text-slate-500">
           Recruiter, Policy ve HR Admin ajanlarının operasyon özeti. Hassas Enterprise raporları rolünüze göre gizlenir.
         </p>

@@ -7,6 +7,7 @@ import { DEMO_POLICY_KEY, DEMO_SEEDED_EVENT } from "@/lib/seed-data";
 import { readSessionList } from "@/lib/session-store";
 import type { ChatMessage } from "@/lib/types";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
+import { HelpTitle } from "@/components/ui/HelpTip";
 
 function nowLabel() {
   return new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
@@ -89,7 +90,9 @@ export function PolicyChat() {
       <div className="mb-4">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">PolicyAgent</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-          Şirket İçi Mevzuat Soru-Cevap
+          <HelpTitle hint="İş Kanunu ve şirket yönetmeliği sorularını yazın; PolicyAgent kısa, uygulanabilir yanıt üretir.">
+            Şirket İçi Mevzuat Soru-Cevap
+          </HelpTitle>
         </h1>
         <p className="mt-1 text-sm text-slate-500">
           Yanıtlar Google Gemini (ücretsiz Flash modeli) üzerinden üretilir.
