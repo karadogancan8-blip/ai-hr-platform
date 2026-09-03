@@ -121,3 +121,20 @@ export function IconSend({ className }: IconProps) {
     </svg>
   );
 }
+
+export function IconOnboarding({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M12 3v4M12 21a7 7 0 0 0 7-7c0-4-3-7-7-11-4 4-7 7-7 11a7 7 0 0 0 7 7Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <circle cx="12" cy="14" r="2" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+export function IconPerformance({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M4 19V9M10 19V5M16 19v-7M20 19H3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}

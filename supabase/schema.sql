@@ -166,3 +166,52 @@ create policy "resumes_company"
   to authenticated
   using (company_id = public.current_company_id())
   with check (company_id = public.current_company_id());
+
+create table if not exists public.onboarding_plans (
+  id uuid primary key default gen_random_uuid(),
+  company_id uuid not null references public.companies (id) on delete cascade,
+  employee_name text not null,
+  role text not null,
+  department text not null,
+  plan jsonb not null default '{}'::jsonb,
+  status text not null default 'aktif',
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.performance_reviews (
+  id uuid primary key default gen_random_uuid(),
+  company_id uuid not null references public.companies (id) on delete cascade,
+  employee_name text not null,
+  period text not null,
+  notes text,
+  summary text,
+  strengths text[] not null default '{}',
+  improvements text[] not null default '{}',
+  goals text[] not null default '{}',
+  score integer not null default 3 check (score >= 1 and score <= 5),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists onboarding_plans_company_id_idx on public.onboarding_plans (company_id);
+create index if not exists performance_reviews_company_id_idx on public.performance_reviews (company_id);
+
+alter table public.onboarding_plans enable row level security;
+alter table public.performance_reviews enable row level security;
+
+grant all on table public.onboarding_plans to authenticated, service_role;
+grant all on table public.performance_reviews to authenticated, service_role;
+
+drop policy if exists "onboarding_plans_company" on public.onboarding_plans;
+drop policy if exists "performance_reviews_company" on public.performance_reviews;
+
+create policy "onboarding_plans_company"
+  on public.onboarding_plans for all
+  to authenticated
+  using (company_id = public.current_company_id())
+  with check (company_id = public.current_company_id());
+
+create policy "performance_reviews_company"
+  on public.performance_reviews for all
+  to authenticated
+  using (company_id = public.current_company_id())
+  with check (company_id = public.current_company_id());

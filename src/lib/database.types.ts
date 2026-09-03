@@ -51,6 +51,31 @@ export type ResumeRow = {
   created_at?: string | null;
 };
 
+export type OnboardingPlanRow = {
+  id: string;
+  company_id?: string | null;
+  employee_name?: string | null;
+  role?: string | null;
+  department?: string | null;
+  plan?: Json | null;
+  status?: string | null;
+  created_at?: string | null;
+};
+
+export type PerformanceReviewRow = {
+  id: string;
+  company_id?: string | null;
+  employee_name?: string | null;
+  period?: string | null;
+  notes?: string | null;
+  summary?: string | null;
+  strengths?: string[] | null;
+  improvements?: string[] | null;
+  goals?: string[] | null;
+  score?: number | null;
+  created_at?: string | null;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -90,6 +115,24 @@ export type Database = {
           created_at?: string;
         };
         Update: Partial<ResumeRow>;
+        Relationships: [];
+      };
+      onboarding_plans: {
+        Row: OnboardingPlanRow;
+        Insert: Partial<Omit<OnboardingPlanRow, "id" | "created_at">> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<OnboardingPlanRow>;
+        Relationships: [];
+      };
+      performance_reviews: {
+        Row: PerformanceReviewRow;
+        Insert: Partial<Omit<PerformanceReviewRow, "id" | "created_at">> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<PerformanceReviewRow>;
         Relationships: [];
       };
     };

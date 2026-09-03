@@ -55,6 +55,8 @@ export function DashboardOverview() {
           <div className="mt-5 space-y-2">
             {[
               { href: "/ise-alim", label: "CV analizi başlat" },
+              { href: "/onboarding", label: "Onboarding planı üret" },
+              { href: "/performans", label: "Performans incelemesi" },
               { href: "/mevzuat", label: "Mevzuat sorusu sor" },
               { href: "/izin", label: "İzin talebi oluştur" },
             ].map((link) => (

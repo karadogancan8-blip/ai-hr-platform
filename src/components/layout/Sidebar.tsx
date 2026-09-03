@@ -9,6 +9,8 @@ import {
   IconCreditCard,
   IconDashboard,
   IconLeave,
+  IconOnboarding,
+  IconPerformance,
   IconPolicy,
   IconRecruit,
   IconSettings,
@@ -43,6 +45,18 @@ const navItems = [
     label: "İzin & Özlük Yönetimi",
     description: "HRAdminAgent",
     icon: IconLeave,
+  },
+  {
+    href: "/onboarding",
+    label: "Onboarding",
+    description: "Uyum Companion",
+    icon: IconOnboarding,
+  },
+  {
+    href: "/performans",
+    label: "Performans",
+    description: "Değerlendirme",
+    icon: IconPerformance,
   },
   {
     href: "/fiyatlandirma",
