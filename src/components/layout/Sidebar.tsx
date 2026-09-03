@@ -185,7 +185,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       />
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-[272px] flex-col border-r border-white/10 bg-[linear-gradient(180deg,#0b1f3a_0%,#123056_55%,#0e2744_100%)] text-slate-100 shadow-xl transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-40 flex h-screen w-[272px] flex-col overflow-y-auto border-r border-white/10 bg-[linear-gradient(180deg,#0b1f3a_0%,#123056_55%,#0e2744_100%)] text-slate-100 shadow-xl transition-transform duration-200 overscroll-contain lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -221,7 +221,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3">
+        <nav className="space-y-1 px-3 pb-2">
           <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-200/50">
             Modüller
           </p>

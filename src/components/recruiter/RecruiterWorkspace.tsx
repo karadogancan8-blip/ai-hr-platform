@@ -41,6 +41,8 @@ type AnalysisResponse = {
   weaknesses?: string[];
   saved?: StoredResume;
   error?: string;
+  fallback?: boolean;
+  warning?: string;
 };
 
 export function RecruiterWorkspace() {
@@ -132,17 +134,21 @@ export function RecruiterWorkspace() {
         body: JSON.stringify({ cvText, jobTitle }),
       });
       const payload = (await response.json()) as AnalysisResponse;
-      if (!response.ok) {
+      if (!response.ok && !payload.saved) {
         throw new Error(payload.error || "Analiz isteği başarısız.");
       }
 
       const saved = payload.saved;
       if (!saved) {
-        throw new Error("Analiz tamamlandı ancak resumes tablosuna yazılamadı.");
+        throw new Error(payload.error || "Analiz tamamlandı ancak sonuç oluşturulamadı.");
       }
 
       setResumes((prev) => [saved, ...prev]);
-      setNotice(`${saved.name} resumes tablosuna kaydedildi.`);
+      setNotice(
+        payload.fallback || payload.warning
+          ? `${saved.name} için analiz hazır. ${payload.warning || "Yedek (fallback) analiz kullanıldı."}`
+          : `${saved.name} resumes tablosuna kaydedildi.`,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Analiz veya kayıt başarısız.");
     } finally {
