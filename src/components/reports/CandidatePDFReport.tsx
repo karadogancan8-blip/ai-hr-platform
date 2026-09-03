@@ -10,6 +10,7 @@ export type CandidatePDFReportProps = {
   guide: InterviewGuide | null;
   ratings?: InterviewRating[];
   generatedAt?: Date;
+  useSafeLogo?: boolean;
 };
 
 export function CandidatePDFReport({
@@ -18,6 +19,7 @@ export function CandidatePDFReport({
   guide,
   ratings = [],
   generatedAt = new Date(),
+  useSafeLogo = true,
 }: CandidatePDFReportProps) {
   const questions = guide ? allQuestions(guide) : [];
   const accent = branding.primaryColor;
@@ -36,12 +38,11 @@ export function CandidatePDFReport({
     >
       <header className="flex items-center justify-between px-10 py-7 text-white" style={{ backgroundColor: accent }}>
         <div className="flex items-center gap-4">
-          {branding.logoUrl ? (
+          {branding.logoUrl && !useSafeLogo ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={branding.logoUrl}
               alt={branding.companyName}
-              crossOrigin="anonymous"
               className="h-14 w-14 rounded-xl bg-white object-contain p-1"
             />
           ) : (

@@ -1,11 +1,6 @@
 import { createGoogleGenerativeAI, google as googleProvider } from "@ai-sdk/google";
 
-const DEFAULT_MODELS = [
-  "gemini-2.5-flash",
-  "gemini-flash-latest",
-  "gemini-1.5-flash-latest",
-  "gemini-2.5-flash-lite",
-] as const;
+const DEFAULT_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash"] as const;
 
 const RETRYABLE =
   /not found|NOT_FOUND|404|deprecated|no longer available|high demand|overloaded|unavailable|RESOURCE_EXHAUSTED|429|quota/i;
@@ -24,8 +19,12 @@ export function isGeminiConfigured() {
 
 export function geminiModelId() {
   const configured = process.env.GEMINI_MODEL?.trim();
-  if (configured === "gemini-1.5-flash") return "gemini-2.5-flash";
-  return configured || "gemini-2.5-flash";
+  if (!configured) return "gemini-2.0-flash";
+  if (configured === "gemini-2.5-flash" || configured === "gemini-2.5-flash-lite" || configured === "gemini-flash-latest") {
+    return "gemini-2.0-flash";
+  }
+  if (configured === "gemini-1.5-flash-latest") return "gemini-1.5-flash";
+  return configured;
 }
 
 function googleClient() {
@@ -38,7 +37,7 @@ function googleClient() {
   return createGoogleGenerativeAI({ apiKey });
 }
 
-/** `google('gemini-2.5-flash')` eşdeğeri; model yoksa veya kota dolarsa Flash yedeklerine düşer. */
+/** `google('gemini-2.0-flash')`; yoksa `google('gemini-1.5-flash')` kullanılır. */
 export function gemini(modelId = geminiModelId()) {
   return googleClient()(modelId);
 }

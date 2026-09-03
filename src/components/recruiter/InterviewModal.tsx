@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FileDown, Loader2, Star, X } from "lucide-react";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
-import { CandidatePDFReport } from "@/components/reports/CandidatePDFReport";
+import { downloadCandidatePdf } from "@/lib/download-candidate-pdf";
 import {
   allQuestions,
   interviewFinalScore,
   type InterviewGuide,
   type InterviewRating,
 } from "@/lib/interview";
-import { exportElementToPdf } from "@/lib/pdf-report";
 import type { StoredResume } from "@/lib/resumes";
 
 type InterviewModalProps = {
@@ -40,7 +39,7 @@ export function InterviewModal({
   const [ratings, setRatings] = useState<InterviewRating[]>([]);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
-  const reportRef = useRef<HTMLDivElement>(null);
+  const [exportNotice, setExportNotice] = useState("");
   const branding = useCompanyBranding();
 
   useEffect(() => {
@@ -122,6 +121,11 @@ export function InterviewModal({
           {exportError ? (
             <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{exportError}</p>
           ) : null}
+          {exportNotice ? (
+            <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+              {exportNotice}
+            </p>
+          ) : null}
 
           {guide && !loading ? (
             <>
@@ -202,15 +206,21 @@ export function InterviewModal({
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              disabled={exporting || loading || !guide}
+              disabled={exporting || saving}
               onClick={() => {
-                const node = reportRef.current;
-                if (!node) return;
                 setExporting(true);
                 setExportError("");
-                void exportElementToPdf(node, `${resume.name}-executive-rapor`)
+                setExportNotice("");
+                void downloadCandidatePdf({
+                  resume: { ...resume, interviewScore: resume.interviewScore ?? score },
+                  branding,
+                  guide,
+                  ratings,
+                  fileName: `${resume.name}-executive-rapor`,
+                })
+                  .then(() => setExportNotice("Executive PDF indirildi."))
                   .catch((err) => {
-                    setExportError(err instanceof Error ? err.message : "PDF oluşturulamadı.");
+                    setExportError(err instanceof Error ? err.message : "PDF indirilemedi.");
                   })
                   .finally(() => setExporting(false));
               }}
@@ -240,16 +250,6 @@ export function InterviewModal({
             </button>
           </div>
         </footer>
-        <div className="pointer-events-none fixed top-0 -left-[12000px] z-[-1]">
-          <div ref={reportRef}>
-            <CandidatePDFReport
-              resume={{ ...resume, interviewScore: resume.interviewScore ?? score }}
-              branding={branding}
-              guide={guide}
-              ratings={ratings}
-            />
-          </div>
-        </div>
       </div>
     </div>
   );
