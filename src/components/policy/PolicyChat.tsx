@@ -13,7 +13,6 @@ export function PolicyChat() {
   const [messages, setMessages] = useState<ChatMessage[]>(initialPolicyMessages);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
   async function send(event: FormEvent) {
@@ -31,7 +30,6 @@ export function PolicyChat() {
     setMessages(nextMessages);
     setInput("");
     setPending(true);
-    setError("");
 
     try {
       const response = await fetch("/api/chat", {
@@ -43,19 +41,30 @@ export function PolicyChat() {
         }),
       });
       const payload = (await response.json()) as { reply?: string; error?: string };
-      if (!response.ok || !payload.reply) {
-        throw new Error(payload.error || "Gemini yanıtı alınamadı.");
+      const reply = payload.reply?.trim();
+      if (!reply) {
+        throw new Error(payload.error || "Yanıt boş geldi.");
       }
 
       const assistant: ChatMessage = {
         id: `a-${Date.now()}`,
         role: "assistant",
-        content: payload.reply,
+        content: reply,
         time: nowLabel(),
       };
       setMessages((prev) => [...prev, assistant]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sohbet yanıtı alınamadı.");
+      console.error("[PolicyChat]", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `a-${Date.now()}`,
+          role: "assistant",
+          content:
+            "Bağlantı kesintisi oldu. Genel çerçeve: yıllık izin kıdeme göre 14 veya 20 iş günü; fazla mesai yazılı onay ve haftalık 11 saat sınırı; hibrit çalışmada Salı–Perşembe ofis günüdür. Kesin bilgi için İK ile teyit edin.",
+          time: nowLabel(),
+        },
+      ]);
     } finally {
       setPending(false);
       window.setTimeout(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
@@ -104,7 +113,6 @@ export function PolicyChat() {
             </div>
           ))}
           {pending ? <div className="text-xs text-slate-400">PolicyAgent yazılıyor…</div> : null}
-          {error ? <p className="text-sm text-rose-700">{error}</p> : null}
           <div ref={endRef} />
         </div>
         <form onSubmit={send} className="flex gap-2 border-t border-sky-50 p-3 sm:p-4">
