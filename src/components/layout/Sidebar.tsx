@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentType } from "react";
 import { LogOut } from "lucide-react";
-import { Brain, GraduationCap, LineChart, ShieldAlert, Video, Wallet } from "lucide-react";
+import { Brain, BookOpen, GraduationCap, LineChart, ShieldAlert, Video, Wallet } from "lucide-react";
 import {
   IconClose,
   IconCreditCard,
@@ -77,6 +77,13 @@ const navItems: {
     description: "Değerlendirme",
     icon: IconPerformance,
     labelKey: "nav.performance",
+  },
+  {
+    href: "/dokumanlar",
+    label: "📚 Bilgi Üssü & Dökümanlar",
+    description: "Knowledge Base",
+    icon: BookOpen,
+    labelKey: "nav.knowledge",
   },
   {
     href: "/kultur-profili",

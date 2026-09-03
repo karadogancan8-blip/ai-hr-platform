@@ -110,6 +110,10 @@ export function isSalaryPrivileged(role: AppRole) {
   return role === "company_admin" || role === "hr_manager";
 }
 
+export function isKnowledgeEditor(role: AppRole) {
+  return role === "company_admin" || role === "hr_manager" || role === "hr_specialist";
+}
+
 export function canManageAccess(role: AppRole) {
   return role === "company_admin";
 }
