@@ -67,6 +67,37 @@ export const recentActivity = [
   },
 ];
 
+export const liveOperations = [
+  {
+    id: "l1",
+    agent: "RecruiterAgent",
+    title: "Özgeçmiş analizi kuyruğu işleniyor",
+    time: "şimdi",
+    live: true,
+  },
+  {
+    id: "l2",
+    agent: "PolicyAgent",
+    title: "Mevzuat yanıtı üretiliyor",
+    time: "şimdi",
+    live: true,
+  },
+  {
+    id: "l3",
+    agent: "HRAdminAgent",
+    title: "İzin onayları senkronize ediliyor",
+    time: "1 dk",
+    live: false,
+  },
+  {
+    id: "l4",
+    agent: "RecruiterAgent",
+    title: "Mülakat rehberi hazırlanıyor",
+    time: "2 dk",
+    live: false,
+  },
+];
+
 export const mockCandidates: Candidate[] = [
   {
     id: "c1",
