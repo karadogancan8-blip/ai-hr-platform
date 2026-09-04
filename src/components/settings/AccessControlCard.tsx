@@ -57,7 +57,7 @@ export function AccessControlCard() {
   }
 
   return (
-    <section className="flex min-h-[420px] flex-col space-y-6 rounded-2xl border border-slate-200/70 bg-white p-6 transition-all duration-200">
+    <section className="flex min-h-[600px] w-full flex-col space-y-6 rounded-2xl border border-slate-200/70 bg-white p-6 transition-none">
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-[#123056]">
           <ShieldCheck className="h-5 w-5" />
@@ -86,7 +86,8 @@ export function AccessControlCard() {
         <SelectField
           value={draftRole}
           onChange={(event) => setDraftRole(event.target.value as AppRole)}
-          wrapperClassName="max-w-md"
+          className="h-10 w-full"
+          wrapperClassName="max-w-md h-10"
         >
           {APP_ROLES.map((item) => (
             <option key={item.id} value={item.id}>
@@ -162,7 +163,7 @@ export function AccessControlCard() {
                           },
                         }))
                       }
-                      className="text-xs"
+                      className="h-10 w-full text-xs"
                     >
                       {VISIBILITY_OPTIONS.map((option) => (
                         <option key={option.id} value={option.id}>
