@@ -7,11 +7,11 @@ import { HelpTitle } from "@/components/ui/HelpTip";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
 
-const shortcuts: { href: string; labelKey: MessageKey; icon: typeof FileSearch }[] = [
-  { href: "/ise-alim", labelKey: "dashboard.link.recruit", icon: FileSearch },
-  { href: "/izin", labelKey: "dashboard.link.leave", icon: ClipboardList },
-  { href: "/mevzuat", labelKey: "dashboard.link.policy", icon: Bot },
-  { href: "/performans", labelKey: "dashboard.link.performance", icon: TrendingUp },
+const shortcuts: { href: string; labelKey: MessageKey; icon: typeof FileSearch; iconClass: string }[] = [
+  { href: "/ise-alim", labelKey: "dashboard.link.recruit", icon: FileSearch, iconClass: "bg-sky-50 text-sky-700" },
+  { href: "/izin", labelKey: "dashboard.link.leave", icon: ClipboardList, iconClass: "bg-indigo-50 text-indigo-700" },
+  { href: "/mevzuat", labelKey: "dashboard.link.policy", icon: Bot, iconClass: "bg-violet-50 text-violet-700" },
+  { href: "/performans", labelKey: "dashboard.link.performance", icon: TrendingUp, iconClass: "bg-emerald-50 text-emerald-700" },
 ];
 
 const feed = [
@@ -84,9 +84,9 @@ export function DashboardOverview() {
           </article>
         </div>
 
-        <aside className="flex min-h-[42rem] flex-col overflow-hidden rounded-2xl bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-950 p-6 text-white">
-          <h2 className="text-base font-semibold tracking-tight">{t("dashboard.quick")}</h2>
-          <p className="mt-1 text-sm leading-6 text-sky-100/75">{t("dashboard.quickLead")}</p>
+        <aside className="flex min-h-[42rem] flex-col overflow-hidden rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-indigo-50/70 via-white to-slate-50 p-6 shadow-sm transition-shadow hover:shadow-md">
+          <h2 className="text-base font-semibold tracking-tight text-slate-800">{t("dashboard.quick")}</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">{t("dashboard.quickLead")}</p>
           <div className="mt-6 flex flex-1 flex-col gap-2.5">
             {shortcuts.map((item) => {
               const Icon = item.icon;
@@ -94,9 +94,9 @@ export function DashboardOverview() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group flex items-center gap-3 rounded-xl bg-white/10 px-3.5 py-3 text-sm font-medium text-white ring-1 ring-white/10 transition hover:bg-sky-400/20 hover:ring-sky-300/40"
+                  className="group flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white/90 px-3.5 py-3 text-sm font-medium text-slate-800 transition-all hover:border-indigo-300 hover:bg-indigo-50/50"
                 >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-400/20 text-sky-100 group-hover:bg-sky-400 group-hover:text-slate-900">
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${item.iconClass}`}>
                     <Icon className="h-4 w-4" />
                   </span>
                   <span>{t(item.labelKey)}</span>
