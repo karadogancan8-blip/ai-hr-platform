@@ -198,7 +198,7 @@ export function InterviewModal({
             ) : null}
           </div>
           <div className="flex min-w-0 flex-wrap items-center gap-2 overflow-visible">
-            <HelpTip text="Aday özeti ve mülakat puanlarını yazdırılabilir yönetici PDF’ine aktarır." side="top" align="start" sideOffset={8} />
+            <HelpTip text="Aday özeti ve mülakat puanlarını yazdırılabilir yönetici PDF’ine aktarır." side="top" align="start" sideOffset={6} />
             <button
               type="button"
               disabled={saving}

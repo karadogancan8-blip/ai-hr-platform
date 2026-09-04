@@ -401,7 +401,7 @@ export function RecruiterWorkspace() {
             />
           </label>
           <div className="mt-4 flex min-w-0 flex-wrap items-center gap-2 overflow-visible">
-            <HelpTip text={t("recruit.analyzeHint")} side="top" align="start" sideOffset={8} />
+            <HelpTip text={t("recruit.analyzeHint")} side="top" align="start" sideOffset={6} />
             <button
               type="submit"
               disabled={analyzing}
@@ -501,7 +501,7 @@ export function RecruiterWorkspace() {
               <p className="mt-4 text-xs text-slate-400">{formatWhen(resume.createdAt, localeMeta[locale].htmlLang)}</p>
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <div className="flex min-w-0 items-center gap-1 overflow-visible">
-                  <HelpTip text={t("recruit.guideHint")} side="top" align="start" sideOffset={8} />
+                  <HelpTip text={t("recruit.guideHint")} side="top" align="start" sideOffset={6} />
                   <button
                     type="button"
                     onClick={() => void openInterview(resume, "guide")}
@@ -512,7 +512,7 @@ export function RecruiterWorkspace() {
                   </button>
                 </div>
                 <div className="flex min-w-0 items-center gap-1 overflow-visible">
-                  <HelpTip text={t("recruit.liveHint")} side="top" align="start" sideOffset={8} />
+                  <HelpTip text={t("recruit.liveHint")} side="top" align="start" sideOffset={6} />
                   <button
                     type="button"
                     onClick={() => void openLiveInterview(resume)}
@@ -523,7 +523,7 @@ export function RecruiterWorkspace() {
                   </button>
                 </div>
                 <div className="flex min-w-0 items-center gap-1 overflow-visible sm:col-span-2">
-                  <HelpTip text={t("recruit.pdfHint")} side="top" align="start" sideOffset={8} />
+                  <HelpTip text={t("recruit.pdfHint")} side="top" align="start" sideOffset={6} />
                   <button
                     type="button"
                     onClick={() => openPrintReport(resume)}

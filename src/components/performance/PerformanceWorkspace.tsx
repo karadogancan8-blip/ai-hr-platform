@@ -151,7 +151,7 @@ export function PerformanceWorkspace() {
           />
         </label>
         <div className="flex min-w-0 flex-wrap items-center gap-2 overflow-visible">
-          <HelpTip text={t("perf.generateHint")} side="top" align="start" sideOffset={8} />
+          <HelpTip text={t("perf.generateHint")} side="top" align="start" sideOffset={6} />
           <button
             type="submit"
             disabled={generating}

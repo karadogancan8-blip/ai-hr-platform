@@ -201,7 +201,7 @@ export function OnboardingWorkspace() {
           />
         </label>
         <div className="flex min-w-0 items-end gap-2 overflow-visible">
-          <HelpTip text={t("onb.generateHint")} side="top" align="start" sideOffset={8} />
+          <HelpTip text={t("onb.generateHint")} side="top" align="start" sideOffset={6} />
           <button
             type="submit"
             disabled={generating}
