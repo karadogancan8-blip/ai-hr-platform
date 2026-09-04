@@ -98,7 +98,7 @@ export function PolicyChat() {
         <p className="mt-1 text-sm text-slate-500">{t("policy.description")}</p>
       </div>
 
-      <div className="flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+      <div className="flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white">
         <div className="border-b border-sky-50 bg-[#f7fbff] px-5 py-3 text-xs text-slate-500">
           {t("policy.source")}
         </div>

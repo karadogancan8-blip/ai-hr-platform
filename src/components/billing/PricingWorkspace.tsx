@@ -35,20 +35,22 @@ function FeatureRow({ text, emphasis }: { text: string; emphasis?: boolean }) {
   );
 }
 
-export function PricingWorkspace() {
+export function PricingWorkspace({ variant = "public" }: { variant?: "public" | "account" }) {
   const { t } = useI18n();
+  const account = variant === "account";
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
   const [currentPlan, setCurrentPlan] = useState<PlanId>("free");
-  const [authed, setAuthed] = useState(false);
+  const [authed, setAuthed] = useState(account);
   const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
   const [demoPlan, setDemoPlan] = useState<Plan | null>(null);
   const [demoOpen, setDemoOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(account);
 
   async function loadPlan() {
-    if (!isSupabaseConfigured()) {
+    if (variant === "public" || !isSupabaseConfigured()) {
+      setAuthed(false);
       setLoading(false);
       return;
     }
@@ -74,7 +76,7 @@ export function PricingWorkspace() {
 
   useEffect(() => {
     void loadPlan();
-  }, []);
+  }, [variant]);
 
   async function applyPlan(plan: Plan) {
     const updated = await updateCompanySubscription(plan.id);
@@ -103,11 +105,17 @@ export function PricingWorkspace() {
     <div className="space-y-10">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-xl">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-800">{t("pricing.kicker")}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+            {account ? t("settings.billingKicker") : t("pricing.kicker")}
+          </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-            <HelpTitle hint={t("pricing.hint")}>{t("pricing.title")}</HelpTitle>
+            <HelpTitle hint={t("pricing.hint")}>
+              {account ? t("settings.billingTitle") : t("pricing.title")}
+            </HelpTitle>
           </h1>
-          <p className="mt-2 text-sm leading-6 text-slate-500">{t("pricing.description")}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-500">
+            {account ? t("settings.billingLead") : t("pricing.description")}
+          </p>
         </div>
 
         <div className="inline-flex items-center self-start rounded-xl border border-slate-200 bg-white p-0.5">
@@ -158,10 +166,8 @@ export function PricingWorkspace() {
           return (
             <article
               key={plan.id}
-              className={`flex h-full min-h-[36rem] flex-col rounded-2xl border bg-white px-7 py-7 ${
-                plan.popular
-                  ? "border-[#123056] shadow-[0_18px_40px_-24px_rgba(18,48,86,0.55)] ring-1 ring-[#123056]/10"
-                  : "border-slate-200"
+              className={`flex h-full min-h-[36rem] flex-col rounded-2xl border bg-white px-7 py-8 ${
+                plan.popular ? "border-slate-300 bg-slate-50/60" : "border-slate-200/70"
               }`}
             >
               <div className="min-h-[1.5rem]">
@@ -234,7 +240,7 @@ export function PricingWorkspace() {
                   </button>
                 ) : (
                   <Link
-                    href="/login?next=/fiyatlandirma"
+                    href="/login?next=/ayarlar/abonelik"
                     className={`block w-full rounded-xl py-2.5 text-center text-sm font-medium ${
                       plan.popular
                         ? "bg-[#123056] text-white hover:bg-[#0f2744]"

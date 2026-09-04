@@ -8,6 +8,7 @@ import { InterviewModal } from "@/components/recruiter/InterviewModal";
 import { LiveInterviewModal } from "@/components/recruiter/LiveInterviewModal";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { DeleteIconButton } from "@/components/ui/DeleteIconButton";
 import { PrintReportModal } from "@/components/reports/PrintReportModal";
 import type { InterviewGuide } from "@/lib/interview";
 import { deleteResume, fetchResumes, updateResumeInterview, type StoredResume } from "@/lib/resumes";
@@ -296,8 +297,8 @@ export function RecruiterWorkspace() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-2xl border border-sky-100 bg-white px-4 py-3 text-sm shadow-sm">
+    <div className="space-y-8">
+      <div className="rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-4 text-sm">
         <p className="text-xs font-semibold text-[#0b1f3a]">{t("recruit.applyLink")}</p>
         <p className="mt-0.5 text-[11px] text-slate-500">{t("recruit.applyHint")}</p>
         <div className="mt-2 flex items-center gap-2">
@@ -320,9 +321,9 @@ export function RecruiterWorkspace() {
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <HelpTitle hint={t("recruit.hint")}>{t("recruit.title")}</HelpTitle>
           </h1>
-          <p className="mt-1 text-sm text-slate-500">{t("recruit.description")}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-500">{t("recruit.description")}</p>
         </div>
-        <div className="rounded-2xl border border-sky-100 bg-white px-4 py-3 text-sm shadow-sm">
+        <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-4 text-sm">
           <span className="text-slate-500">{t("recruit.avg")}</span>
           <span className="ml-2 font-semibold text-[#0b1f3a]">{average}%</span>
         </div>
@@ -333,7 +334,7 @@ export function RecruiterWorkspace() {
       ) : null}
 
       {pendingApps.length ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200/70 bg-slate-50 px-4 py-3 text-sm text-slate-700">
           <p>{t("recruit.pendingApps", { count: pendingApps.length })}</p>
           <button
             type="button"
@@ -360,7 +361,7 @@ export function RecruiterWorkspace() {
           className={`rounded-2xl border-2 border-dashed p-8 text-center transition ${
             dragging
               ? "border-sky-500 bg-sky-50"
-              : "border-sky-200 bg-white shadow-[0_8px_30px_rgba(15,55,95,0.06)]"
+              : "border-slate-300 bg-white"
           }`}
         >
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sky-50 text-sky-700">
@@ -380,7 +381,7 @@ export function RecruiterWorkspace() {
           {fileName ? <p className="mt-3 text-xs text-sky-800">{fileName}</p> : null}
         </section>
 
-        <section className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+        <section className="rounded-2xl border border-slate-200/70 bg-white p-6">
           <label className="block text-sm">
             <span className="mb-1 block font-medium text-slate-700">{t("recruit.job")}</span>
             <input
@@ -436,15 +437,13 @@ export function RecruiterWorkspace() {
           {resumes.map((resume) => (
             <article
               key={resume.id}
-              className="relative flex flex-col rounded-2xl border border-sky-100 bg-white p-4 pt-11 shadow-[0_8px_30px_rgba(15,55,95,0.06)]"
+              className="group relative flex flex-col rounded-2xl border border-slate-200/70 bg-white p-5"
             >
-              <button
-                type="button"
+              <DeleteIconButton
+                label={t("common.delete")}
                 onClick={() => setDeleteId(resume.id)}
-                className="absolute top-3 right-3 rounded-lg bg-rose-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-rose-700"
-              >
-                {t("common.delete")}
-              </button>
+                className="absolute top-3 right-3"
+              />
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="text-sm font-semibold text-[#0b1f3a]">{resume.name}</h3>

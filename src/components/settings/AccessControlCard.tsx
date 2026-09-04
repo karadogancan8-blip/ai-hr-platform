@@ -56,7 +56,7 @@ export function AccessControlCard() {
   }
 
   return (
-    <section className="rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+    <section className="rounded-2xl border border-slate-200/70 bg-white p-6">
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-[#123056]">
           <ShieldCheck className="h-5 w-5" />
@@ -64,7 +64,7 @@ export function AccessControlCard() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("access.kicker")}</p>
           <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">{t("access.title")}</h2>
-          <p className="mt-1 text-sm text-slate-500">{t("access.description")}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-500">{t("access.description")}</p>
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export function AccessControlCard() {
                   <p className="mt-0.5 text-xs text-slate-500">{t(`enterprise.${module.id}.description` as MessageKey)}</p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[420px]">
-                  <label className="flex items-center justify-between gap-3 rounded-xl border border-sky-100 bg-white px-3 py-2">
+                  <label className="flex items-center justify-between gap-3 rounded-xl border border-slate-200/70 bg-white px-3 py-2">
                     <span className="text-xs font-medium text-slate-600">{t("access.moduleStatus")}</span>
                     <button
                       type="button"

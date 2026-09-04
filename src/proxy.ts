@@ -64,6 +64,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
+  if (user && pathname === "/fiyatlandirma") {
+    return NextResponse.redirect(new URL("/ayarlar/abonelik", request.url));
+  }
+
   return response;
 }
 

@@ -36,7 +36,7 @@ export function AppealsInbox() {
   }
 
   return (
-    <section className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+    <section className="rounded-2xl border border-slate-200/70 bg-white p-5">
       <h2 className="text-base font-semibold text-[#0b1f3a]">{t("appeals.title")}</h2>
       <p className="mt-1 text-sm text-slate-500">{t("appeals.lead")}</p>
       {!rows.length ? <p className="mt-4 text-sm text-slate-400">{t("appeals.empty")}</p> : null}

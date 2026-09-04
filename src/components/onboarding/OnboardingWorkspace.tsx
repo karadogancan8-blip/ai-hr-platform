@@ -173,7 +173,7 @@ export function OnboardingWorkspace() {
 
       <form
         onSubmit={generate}
-        className="grid gap-3 rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)] md:grid-cols-4"
+        className="grid gap-3 rounded-2xl border border-slate-200/70 bg-white p-5 md:grid-cols-4"
       >
         <label className="text-sm">
           <span className="mb-1 block font-medium text-slate-700">{t("onb.name")}</span>
@@ -229,7 +229,7 @@ export function OnboardingWorkspace() {
                   setChat([]);
                 }}
                 className={`w-full rounded-2xl border p-4 text-left shadow-sm ${
-                  active ? "border-sky-300 bg-sky-50" : "border-sky-100 bg-white"
+                  active ? "border-sky-300 bg-sky-50" : "border-slate-200/70 bg-white"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -252,7 +252,7 @@ export function OnboardingWorkspace() {
           {!loading && !plans.length ? <p className="text-sm text-slate-400">{t("onb.empty")}</p> : null}
         </section>
 
-        <section className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+        <section className="rounded-2xl border border-slate-200/70 bg-white p-5">
           {selected ? (
             <>
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -297,7 +297,7 @@ export function OnboardingWorkspace() {
           )}
         </section>
 
-        <section className="flex min-h-[420px] flex-col rounded-2xl border border-sky-100 bg-white shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+        <section className="flex min-h-[420px] flex-col rounded-2xl border border-slate-200/70 bg-white">
           <div className="border-b border-sky-50 px-4 py-3">
             <p className="text-sm font-semibold text-[#0b1f3a]">{t("onb.chatTitle")}</p>
             <p className="text-xs text-slate-500">{t("onb.chatLead")}</p>

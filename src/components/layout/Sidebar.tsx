@@ -82,7 +82,7 @@ const navItems: {
     titleKey: "enterprise.skill_gap.title",
     descriptionKey: "enterprise.skill_gap.description",
   },
-  { href: "/fiyatlandirma", icon: IconCreditCard, titleKey: "pricing.title", descriptionKey: "pricing.description" },
+  { href: "/ayarlar/abonelik", icon: IconCreditCard, titleKey: "settings.billingTitle", descriptionKey: "settings.billingLead" },
   { href: "/ayarlar", icon: IconSettings, titleKey: "settings.title", descriptionKey: "settings.description" },
 ];
 
@@ -195,7 +195,10 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               return true;
             })
             .map((item) => {
-            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const active =
+              item.href === "/ayarlar"
+                ? pathname === "/ayarlar"
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
             const Icon = item.icon;
 
             return (
@@ -221,7 +224,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   <span className={`mt-0.5 block text-xs leading-4 ${active ? "text-sky-200" : "text-slate-400"}`}>
                     {t(item.descriptionKey)}
                   </span>
-                  {item.href === "/fiyatlandirma" ? (
+                  {item.href === "/ayarlar/abonelik" ? (
                     <span className="mt-1.5 inline-flex max-w-full rounded-full bg-sky-400/20 px-2 py-0.5 text-[10px] font-semibold leading-4 text-sky-100">
                       {planBadgeLabel[plan]}
                     </span>

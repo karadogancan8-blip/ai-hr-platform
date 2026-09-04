@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
 import { Loader2, Palette, Sparkles } from "lucide-react";
 import {
   DEFAULT_PRIMARY_COLOR,
@@ -91,13 +92,13 @@ export function SettingsWorkspace() {
   const previewColor = normalizeHexColor(primaryColor);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("settings.kicker")}</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("settings.kicker")}</p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
           <HelpTitle hint={t("settings.hint")}>{t("settings.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t("settings.description")}</p>
+        <p className="mt-2 text-sm leading-7 text-slate-500">{t("settings.description")}</p>
       </div>
 
       {loading ? <p className="text-sm text-slate-400">{t("settings.loading")}</p> : null}
@@ -109,7 +110,7 @@ export function SettingsWorkspace() {
       ) : null}
 
       <form onSubmit={save} className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <section className="space-y-4 rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+        <section className="space-y-4 rounded-2xl border border-slate-200/70 bg-white p-6">
           <label className="block text-sm">
           <span className="mb-1 block font-medium text-slate-700">{t("settings.company")}</span>
             <input
@@ -164,7 +165,7 @@ export function SettingsWorkspace() {
           </button>
         </section>
 
-        <aside className="rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+        <aside className="rounded-2xl border border-slate-200/70 bg-slate-50 p-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("settings.preview")}</p>
           <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200">
             <div className="flex items-center gap-3 px-4 py-4 text-white" style={{ backgroundColor: previewColor }}>
@@ -196,19 +197,31 @@ export function SettingsWorkspace() {
 
       <AccessControlCard />
 
-      <section className="rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("legal.kicker")}</p>
-        <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">{t("settings.legalTitle")}</h2>
-        <p className="mt-1 text-sm text-slate-500">{t("settings.legalLead")}</p>
+      <section className="rounded-2xl border border-slate-200/70 bg-white p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("settings.billingKicker")}</p>
+        <h2 className="mt-2 text-lg font-semibold text-slate-900">{t("settings.billingTitle")}</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-500">{t("settings.billingLead")}</p>
+        <Link
+          href="/ayarlar/abonelik"
+          className="mt-4 inline-flex rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744]"
+        >
+          {t("settings.billingCta")}
+        </Link>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200/70 bg-white p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("legal.kicker")}</p>
+        <h2 className="mt-2 text-lg font-semibold text-slate-900">{t("settings.legalTitle")}</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-500">{t("settings.legalLead")}</p>
         <div className="mt-4">
           <LegalLinks className="text-sm" />
         </div>
       </section>
 
-      <section className="rounded-2xl border border-sky-100 bg-white p-6 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("settings.demoKicker")}</p>
-        <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">{t("settings.demoTitle")}</h2>
-        <p className="mt-1 text-sm text-slate-500">{t("settings.demoLead")}</p>
+      <section className="rounded-2xl border border-slate-200/70 bg-white p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("settings.demoKicker")}</p>
+        <h2 className="mt-2 text-lg font-semibold text-slate-900">{t("settings.demoTitle")}</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-500">{t("settings.demoLead")}</p>
         <button
           type="button"
           onClick={() => void loadDemo()}

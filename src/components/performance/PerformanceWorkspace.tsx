@@ -120,7 +120,7 @@ export function PerformanceWorkspace() {
         <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p>
       ) : null}
 
-      <form onSubmit={generate} className="space-y-4 rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+      <form onSubmit={generate} className="space-y-4 rounded-2xl border border-slate-200/70 bg-white p-5">
         <div className="grid gap-3 md:grid-cols-2">
           <label className="text-sm">
             <span className="mb-1 block font-medium text-slate-700">{t("perf.employee")}</span>
@@ -175,7 +175,7 @@ export function PerformanceWorkspace() {
 
       {latest ? (
         <section className="grid gap-4 lg:grid-cols-2">
-          <article className="rounded-2xl border border-sky-100 bg-white p-5 shadow-sm">
+          <article className="rounded-2xl border border-slate-200/70 bg-white p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold text-[#0b1f3a]">{latest.employeeName}</h2>
@@ -224,7 +224,7 @@ export function PerformanceWorkspace() {
               type="button"
               key={review.id}
               onClick={() => setLatest(review)}
-              className="rounded-2xl border border-sky-100 bg-white p-4 text-left shadow-sm hover:border-sky-200"
+              className="rounded-2xl border border-slate-200/70 bg-white p-5 text-left hover:border-slate-300"
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-[#0b1f3a]">{review.employeeName}</p>

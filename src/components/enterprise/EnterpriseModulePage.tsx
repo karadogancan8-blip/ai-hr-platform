@@ -128,7 +128,7 @@ export function EnterpriseModulePage({ moduleId }: { moduleId: EnterpriseModuleI
         {copy.kpis.map((kpi) => (
           <article
             key={kpi.label}
-            className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]"
+            className="rounded-2xl border border-slate-200/70 bg-white p-5"
           >
             <p className="text-sm text-slate-500">{kpi.label}</p>
             <p className="mt-2 text-3xl font-semibold text-[#0b1f3a]">{kpi.value}</p>
@@ -138,7 +138,7 @@ export function EnterpriseModulePage({ moduleId }: { moduleId: EnterpriseModuleI
         ))}
       </section>
 
-      <article className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+      <article className="rounded-2xl border border-slate-200/70 bg-white p-5">
         <h2 className="text-base font-semibold text-[#0b1f3a]">{t("enterprise.summary")}</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600">
           {copy.findings.map((item) => (

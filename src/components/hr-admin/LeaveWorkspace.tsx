@@ -11,6 +11,7 @@ import { isSupabaseConfigured } from "@/lib/supabase";
 import type { LeaveRequest, LeaveStatus, LeaveType } from "@/lib/types";
 import { HelpTitle } from "@/components/ui/HelpTip";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { DeleteIconButton } from "@/components/ui/DeleteIconButton";
 import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
 import { AppealsInbox } from "@/components/hr-admin/AppealsInbox";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
@@ -132,13 +133,13 @@ export function LeaveWorkspace() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("leave.kicker")}</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <HelpTitle hint={t("leave.hint")}>{t("leave.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t("leave.description")}</p>
+        <p className="mt-2 text-sm leading-7 text-slate-500">{t("leave.description")}</p>
       </div>
 
       {error ? (
@@ -148,7 +149,7 @@ export function LeaveWorkspace() {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,380px)_1fr]">
         <form
           onSubmit={submit}
-          className="space-y-4 rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_8px_30px_rgba(15,55,95,0.06)]"
+          className="space-y-4 rounded-2xl border border-slate-200/70 bg-white p-6"
         >
           <h2 className="text-base font-semibold text-[#0b1f3a]">{t("leave.form")}</h2>
           <label className="block text-sm">
@@ -226,7 +227,7 @@ export function LeaveWorkspace() {
           {notice ? <p className="text-xs text-sky-800">{notice}</p> : null}
         </form>
 
-        <section className="overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-[0_8px_30px_rgba(15,55,95,0.06)]">
+        <section className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white">
           <div className="flex items-center justify-between gap-3 border-b border-sky-50 px-5 py-4">
             <h2 className="text-base font-semibold text-[#0b1f3a]">{t("leave.table")}</h2>
             <div className="flex items-center gap-2">
@@ -274,24 +275,24 @@ export function LeaveWorkspace() {
                   </tr>
                 ) : null}
                 {requests.map((row) => (
-                  <tr key={row.id} className="align-top">
-                    <td className="px-4 py-3 font-medium text-slate-700">{shortId(row.id)}</td>
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-[#0b1f3a]">{row.employee}</div>
-                      <div className="text-xs text-slate-400">{row.department}</div>
+                  <tr key={row.id} className="group align-top">
+                    <td className="px-4 py-4 font-medium text-slate-700">{shortId(row.id)}</td>
+                    <td className="px-4 py-4">
+                      <div className="font-medium text-slate-900">{row.employee}</div>
+                      <div className="mt-1 text-xs text-slate-400">{row.department}</div>
                     </td>
-                    <td className="px-4 py-3">{t(`leave.type.${row.type}` as MessageKey)}</td>
-                    <td className="px-4 py-3 text-xs text-slate-600">
+                    <td className="px-4 py-4">{t(`leave.type.${row.type}` as MessageKey)}</td>
+                    <td className="px-4 py-4 text-xs leading-5 text-slate-600">
                       {row.startDate} → {row.endDate}
                     </td>
-                    <td className="px-4 py-3">{row.days}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-4">{row.days}</td>
+                    <td className="px-4 py-4">
                       <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusStyle[row.status]}`}>
                         {t(`leave.status.${row.status}` as MessageKey)}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-2">
+                    <td className="px-4 py-4">
+                      <div className="flex flex-wrap items-center gap-2">
                         {row.status === "beklemede" ? (
                           <>
                             <button
@@ -310,13 +311,7 @@ export function LeaveWorkspace() {
                             </button>
                           </>
                         ) : null}
-                        <button
-                          type="button"
-                          onClick={() => setDeleteId(row.id)}
-                          className="rounded-lg bg-rose-600 px-2 py-1 text-xs font-medium text-white hover:bg-rose-700"
-                        >
-                          {t("common.delete")}
-                        </button>
+                        <DeleteIconButton label={t("common.delete")} onClick={() => setDeleteId(row.id)} />
                       </div>
                     </td>
                   </tr>
