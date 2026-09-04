@@ -10,6 +10,7 @@ import {
 import { isSupabaseConfigured } from "@/lib/supabase";
 import type { LeaveRequest, LeaveStatus, LeaveType } from "@/lib/types";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { SelectField } from "@/components/ui/SelectField";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { DeleteIconButton } from "@/components/ui/DeleteIconButton";
 import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
@@ -163,29 +164,27 @@ export function LeaveWorkspace() {
           </label>
           <label className="block text-sm">
             <span className="mb-1 block text-slate-600">{t("leave.dept")}</span>
-            <select
+            <SelectField
               value={form.department}
               onChange={(event) => setForm({ ...form, department: event.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
             >
               {["İnsan Kaynakları", "Finans", "Satış", "Ürün", "Operasyon", "Teknoloji"].map((dept) => (
                 <option key={dept}>{dept}</option>
               ))}
-            </select>
+            </SelectField>
           </label>
           <label className="block text-sm">
             <span className="mb-1 block text-slate-600">{t("leave.type")}</span>
-            <select
+            <SelectField
               value={form.type}
               onChange={(event) => setForm({ ...form, type: event.target.value as LeaveType })}
-              className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
             >
               {(["yillik", "mazeret", "hastalik", "ucretsiz"] as LeaveType[]).map((key) => (
                 <option key={key} value={key}>
               {t(`leave.type.${key}` as MessageKey)}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-sm">

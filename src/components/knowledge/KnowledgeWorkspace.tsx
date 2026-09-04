@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { BookOpen, Plus, Sparkles, X } from "lucide-react";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { SelectField } from "@/components/ui/SelectField";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
@@ -154,17 +155,17 @@ export function KnowledgeWorkspace() {
         </div>
         {editor ? (
           <div className="flex flex-wrap items-center gap-2">
-            <select
+            <SelectField
               value={sector}
               onChange={(event) => setSector(event.target.value as (typeof SECTORS)[number])}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
+              wrapperClassName="min-w-[11rem]"
             >
               {SECTORS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
               ))}
-            </select>
+            </SelectField>
             <button
               type="button"
               onClick={generateSectorPack}
@@ -322,15 +323,14 @@ export function KnowledgeWorkspace() {
               placeholder={t("kb.titlePh")}
               className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
             />
-            <select
+            <SelectField
               value={draftTab}
               onChange={(event) => setDraftTab(event.target.value as Exclude<KbTab, "all">)}
-              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
             >
               <option value="guides">{t("kb.tab.guides")}</option>
               <option value="hr">{t("kb.tab.hr")}</option>
               <option value="templates">{t("kb.tab.templates")}</option>
-            </select>
+            </SelectField>
             <textarea
               required
               value={draftBody}

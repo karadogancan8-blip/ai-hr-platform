@@ -5,6 +5,7 @@ import { FileUp, X } from "lucide-react";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
 import { submitAppeal, type AppealModule } from "@/lib/appeals";
+import { SelectField } from "@/components/ui/SelectField";
 
 export type PersonnelFile = {
   id: string;
@@ -139,18 +140,17 @@ export function HrDocsAndAppeal({
         <form onSubmit={submitAppealForm} className="mt-4 space-y-3">
           <label className="block text-sm">
             <span className="mb-1 block text-slate-600">{t("appeal.reason")}</span>
-            <select
+            <SelectField
               value={reason}
               onChange={(event) => setReason(event.target.value)}
               required
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 outline-none focus:border-sky-400"
             >
               <option value="">{t("appeal.reasonPlaceholder")}</option>
               <option value="score">{t("appeal.reasonScore")}</option>
               <option value="facts">{t("appeal.reasonFacts")}</option>
               <option value="docs">{t("appeal.reasonDocs")}</option>
               <option value="other">{t("appeal.reasonOther")}</option>
-            </select>
+            </SelectField>
           </label>
           <label className="block text-sm">
             <span className="mb-1 block text-slate-600">{t("appeal.detail")}</span>

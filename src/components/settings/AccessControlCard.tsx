@@ -15,6 +15,7 @@ import {
   type ModuleVisibility,
 } from "@/lib/access-control";
 import type { MessageKey } from "@/lib/i18n";
+import { SelectField } from "@/components/ui/SelectField";
 
 export function AccessControlCard() {
   const { t } = useI18n();
@@ -80,17 +81,17 @@ export function AccessControlCard() {
 
       <label className="mt-5 block text-sm">
         <span className="mb-1 block font-medium text-slate-700">{t("access.roleSession")}</span>
-        <select
+        <SelectField
           value={draftRole}
           onChange={(event) => setDraftRole(event.target.value as AppRole)}
-          className="w-full max-w-md rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 text-sm outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+          wrapperClassName="max-w-md"
         >
           {APP_ROLES.map((item) => (
             <option key={item.id} value={item.id}>
               {t(`access.role.${item.id}` as MessageKey)} — {t(`access.roleHint.${item.id}` as MessageKey)}
             </option>
           ))}
-        </select>
+        </SelectField>
       </label>
 
       <div className="mt-5 space-y-3">
@@ -147,7 +148,7 @@ export function AccessControlCard() {
                   </label>
                   <label className="block">
                     <span className="mb-1 block text-[11px] font-medium text-slate-500">{t("access.visibility")}</span>
-                    <select
+                    <SelectField
                       value={item.visibility}
                       disabled={!canManage || !item.enabled}
                       onChange={(event) =>
@@ -159,14 +160,14 @@ export function AccessControlCard() {
                           },
                         }))
                       }
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-sky-400 disabled:opacity-50"
+                      className="text-xs"
                     >
                       {VISIBILITY_OPTIONS.map((option) => (
                         <option key={option.id} value={option.id}>
                           {t(`access.vis.${option.id}` as MessageKey)}
                         </option>
                       ))}
-                    </select>
+                    </SelectField>
                   </label>
                 </div>
               </div>

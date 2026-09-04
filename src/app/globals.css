@@ -3,11 +3,13 @@
 :root {
   --background: #eef4fb;
   --foreground: #0b1f3a;
+  --primary: #123056;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -19,4 +21,14 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select::-ms-expand {
+  display: none;
 }

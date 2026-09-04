@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { CheckoutModal } from "@/components/checkout/CheckoutModal";
 import { DemoRequestModal } from "@/components/marketing/DemoRequestModal";
+import { EnterpriseQuoteModal } from "@/components/billing/EnterpriseQuoteModal";
 import {
   PLAN_MULTILINGUAL_FEATURE,
   planChargeLabel,
@@ -44,6 +45,7 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
   const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
   const [demoPlan, setDemoPlan] = useState<Plan | null>(null);
   const [demoOpen, setDemoOpen] = useState(false);
+  const [quoteOpen, setQuoteOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(account);
@@ -89,8 +91,7 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
     setNotice("");
     setError("");
     if (plan.monthlyPrice == null) {
-      setDemoPlan(plan);
-      setDemoOpen(true);
+      setQuoteOpen(true);
       return;
     }
     setCheckoutPlan(plan);
@@ -283,6 +284,7 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
           setDemoPlan(null);
         }}
       />
+      <EnterpriseQuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} />
     </div>
   );
 }
