@@ -2,6 +2,21 @@ import type { LeaveRequest, LeaveStatus, LeaveType } from "./types";
 import { getSupabase } from "./supabase";
 import { getCompanyId, type AppSupabase } from "./tenant";
 import type { LeaveRequestRow } from "./database.types";
+import { readLocalJson, writeLocalJson } from "./session-store";
+
+export const LEAVE_CACHE_KEY = "nexus-leave-requests";
+export const LEAVE_UPDATED_EVENT = "nexus-leave-updated";
+
+export function readLeaveCache(): LeaveRequest[] {
+  return readLocalJson<LeaveRequest[]>(LEAVE_CACHE_KEY, []);
+}
+
+export function persistLeaveCache(rows: LeaveRequest[]) {
+  writeLocalJson(LEAVE_CACHE_KEY, rows);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(LEAVE_UPDATED_EVENT));
+  }
+}
 
 const leaveTypes: LeaveType[] = ["yillik", "mazeret", "hastalik", "ucretsiz"];
 const leaveStatuses: LeaveStatus[] = ["beklemede", "onaylandi", "reddedildi"];

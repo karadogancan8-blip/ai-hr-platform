@@ -1,27 +1,37 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import { FileDown } from "lucide-react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FileDown, Loader2 } from "lucide-react";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { HelpTitle } from "@/components/ui/HelpTip";
 import { SelectField } from "@/components/ui/SelectField";
 import { useI18n } from "@/components/i18n/LocaleProvider";
+import { downloadElementPdf } from "@/lib/download-pdf";
+import {
+  LEAVE_UPDATED_EVENT,
+  fetchLeaveRequests,
+  persistLeaveCache,
+  readLeaveCache,
+} from "@/lib/leave-requests";
+import { isSupabaseConfigured } from "@/lib/supabase";
 import { readLocalJson, writeLocalJson } from "@/lib/session-store";
 import {
   TIMESHEET_STORAGE_KEY,
   TIMESHEET_UPDATED_EVENT,
   WEEK_DAYS,
+  computeMonthPayroll,
   createTimesheetEntry,
   currentMonday,
   currentMonthKey,
   emptyDays,
-  monthlyReport,
+  syncTimesheetsWithApprovedLeave,
   weekLabel,
   type TimesheetEntry,
   type TimesheetStatus,
   type WeekDay,
   type WorkMode,
 } from "@/lib/timesheets";
+import type { LeaveRequest } from "@/lib/types";
 import type { MessageKey } from "@/lib/i18n";
 
 const statusStyle: Record<TimesheetStatus, string> = {
@@ -32,6 +42,7 @@ const statusStyle: Record<TimesheetStatus, string> = {
 
 type TimesheetTableProps = {
   variant?: "page" | "embed";
+  leaves?: LeaveRequest[];
 };
 
 function persist(next: TimesheetEntry[]) {
@@ -39,11 +50,12 @@ function persist(next: TimesheetEntry[]) {
   window.dispatchEvent(new Event(TIMESHEET_UPDATED_EVENT));
 }
 
-export function TimesheetTable({ variant = "embed" }: TimesheetTableProps) {
+export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: TimesheetTableProps) {
   const { t } = useI18n();
   const { role } = useAccessControl();
   const hrDesk = role === "company_admin" || role === "hr_manager";
   const [rows, setRows] = useState<TimesheetEntry[]>([]);
+  const [localLeaves, setLocalLeaves] = useState<LeaveRequest[]>([]);
   const [notice, setNotice] = useState("");
   const [reportOpen, setReportOpen] = useState(false);
   const [form, setForm] = useState({
@@ -54,18 +66,47 @@ export function TimesheetTable({ variant = "embed" }: TimesheetTableProps) {
     note: "",
   });
 
-  function load() {
+  const leaves = leavesFromParent ?? localLeaves;
+  const month = currentMonthKey();
+
+  function loadTimesheets() {
     setRows(readLocalJson<TimesheetEntry[]>(TIMESHEET_STORAGE_KEY, []));
   }
 
-  useEffect(() => {
-    load();
-    window.addEventListener(TIMESHEET_UPDATED_EVENT, load);
-    return () => window.removeEventListener(TIMESHEET_UPDATED_EVENT, load);
-  }, []);
+  function loadLeavesFromCache() {
+    if (leavesFromParent) return;
+    setLocalLeaves(readLeaveCache());
+  }
 
-  const month = currentMonthKey();
-  const report = useMemo(() => monthlyReport(rows, month), [rows, month]);
+  useEffect(() => {
+    loadTimesheets();
+    loadLeavesFromCache();
+    window.addEventListener(TIMESHEET_UPDATED_EVENT, loadTimesheets);
+    window.addEventListener(LEAVE_UPDATED_EVENT, loadLeavesFromCache);
+    return () => {
+      window.removeEventListener(TIMESHEET_UPDATED_EVENT, loadTimesheets);
+      window.removeEventListener(LEAVE_UPDATED_EVENT, loadLeavesFromCache);
+    };
+  }, [leavesFromParent]);
+
+  useEffect(() => {
+    if (leavesFromParent || !isSupabaseConfigured()) return;
+    void fetchLeaveRequests()
+      .then((fetched) => {
+        persistLeaveCache(fetched);
+        setLocalLeaves(fetched);
+      })
+      .catch(() => setLocalLeaves(readLeaveCache()));
+  }, [leavesFromParent]);
+
+  useEffect(() => {
+    const synced = syncTimesheetsWithApprovedLeave(rows, leaves, month);
+    if (JSON.stringify(synced) === JSON.stringify(rows)) return;
+    setRows(synced);
+    persist(synced);
+  }, [leaves, month, rows]);
+
+  const payroll = useMemo(() => computeMonthPayroll(rows, leaves, month), [rows, leaves, month]);
 
   function setDay(day: WeekDay, mode: WorkMode) {
     setForm((prev) => ({ ...prev, days: { ...prev.days, [day]: mode } }));
@@ -78,7 +119,7 @@ export function TimesheetTable({ variant = "embed" }: TimesheetTableProps) {
       return;
     }
     const created = createTimesheetEntry(form);
-    const next = [created, ...rows];
+    const next = syncTimesheetsWithApprovedLeave([created, ...rows], leaves, month);
     setRows(next);
     persist(next);
     setForm((prev) => ({ ...prev, employee: "", overtimeHours: 0, note: "", days: emptyDays() }));
@@ -86,10 +127,23 @@ export function TimesheetTable({ variant = "embed" }: TimesheetTableProps) {
   }
 
   function setStatus(id: string, status: TimesheetStatus) {
-    const next = rows.map((item) => (item.id === id ? { ...item, status } : item));
+    const next = syncTimesheetsWithApprovedLeave(
+      rows.map((item) => (item.id === id ? { ...item, status } : item)),
+      leaves,
+      month,
+    );
     setRows(next);
     persist(next);
   }
+
+  const kpis = [
+    { label: t("timesheet.kpi.business"), value: payroll.businessDays },
+    { label: t("timesheet.kpi.leave"), value: payroll.leaveDays },
+    { label: t("timesheet.kpi.work"), value: payroll.workDays },
+    { label: t("timesheet.kpi.office"), value: payroll.office },
+    { label: t("timesheet.kpi.remote"), value: payroll.remote },
+    { label: t("timesheet.kpi.missing"), value: payroll.missing },
+  ];
 
   return (
     <section id="puantaj" className="min-h-[560px] w-full space-y-4 rounded-2xl border border-slate-200/70 bg-white p-5 transition-none">
@@ -112,6 +166,15 @@ export function TimesheetTable({ variant = "embed" }: TimesheetTableProps) {
         {notice ? (
           <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p>
         ) : null}
+      </div>
+
+      <div className="grid min-h-[5.5rem] grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
+        {kpis.map((item) => (
+          <article key={item.label} className="rounded-xl border border-slate-100 bg-[#f8fbff] px-3 py-3">
+            <p className="text-[11px] font-medium leading-4 text-slate-500">{item.label}</p>
+            <p className="mt-1 text-xl font-semibold tabular-nums text-[#0b1f3a]">{item.value}</p>
+          </article>
+        ))}
       </div>
 
       <form onSubmit={submit} className="grid gap-3 rounded-2xl border border-slate-100 bg-[#f8fbff] p-4 md:grid-cols-2 xl:grid-cols-4">
@@ -179,17 +242,22 @@ export function TimesheetTable({ variant = "embed" }: TimesheetTableProps) {
       </form>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-slate-500">{t("timesheet.monthTotal", { month, overtime: report.overtime })}</p>
-        {hrDesk ? (
-          <button
-            type="button"
-            onClick={() => setReportOpen(true)}
-            className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 px-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          >
-            <FileDown className="h-4 w-4" />
-            {t("timesheet.report")}
-          </button>
-        ) : null}
+        <p className="text-xs text-slate-500">
+          {t("timesheet.formula", {
+            month,
+            business: payroll.businessDays,
+            leave: payroll.leaveDays,
+            work: payroll.workDays,
+          })}
+        </p>
+        <button
+          type="button"
+          onClick={() => setReportOpen(true)}
+          className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 px-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+        >
+          <FileDown className="h-4 w-4" />
+          {t("timesheet.report")}
+        </button>
       </div>
 
       <div className="min-h-[220px] overflow-x-auto rounded-2xl border border-slate-100">
@@ -260,36 +328,23 @@ export function TimesheetTable({ variant = "embed" }: TimesheetTableProps) {
         </table>
       </div>
 
-      {reportOpen ? (
-        <TimesheetReportModal
-          month={month}
-          office={report.office}
-          remote={report.remote}
-          overtime={report.overtime}
-          rows={report.rows}
-          onClose={() => setReportOpen(false)}
-        />
-      ) : null}
+      {reportOpen ? <TimesheetReportModal month={month} payroll={payroll} onClose={() => setReportOpen(false)} /> : null}
     </section>
   );
 }
 
 function TimesheetReportModal({
   month,
-  office,
-  remote,
-  overtime,
-  rows,
+  payroll,
   onClose,
 }: {
   month: string;
-  office: number;
-  remote: number;
-  overtime: number;
-  rows: TimesheetEntry[];
+  payroll: ReturnType<typeof computeMonthPayroll>;
   onClose: () => void;
 }) {
   const { t } = useI18n();
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -299,29 +354,86 @@ function TimesheetReportModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  async function exportPdf() {
+    if (!sheetRef.current) return;
+    setExporting(true);
+    try {
+      await downloadElementPdf(sheetRef.current, `puantaj-raporu-${month}.pdf`);
+    } catch (error) {
+      console.error("[puantaj] pdf", error);
+      window.print();
+    } finally {
+      setExporting(false);
+    }
+  }
+
   return (
     <div className="print-overlay fixed inset-0 z-[80] flex items-end justify-center bg-slate-900/45 p-4 sm:items-center">
       <style>{`
         @media print {
           body * { visibility: hidden; }
           #timesheet-print-root, #timesheet-print-root * { visibility: visible; }
-          #timesheet-print-root { position: absolute; left: 0; top: 0; width: 100%; }
+          #timesheet-print-root { position: absolute; left: 0; top: 0; width: 100%; background: white; }
         }
       `}</style>
       <button type="button" className="print-chrome absolute inset-0" aria-label={t("common.close")} onClick={onClose} />
-      <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
-        <div id="timesheet-print-root" className="print-sheet space-y-4">
+      <div className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
+        <div id="timesheet-print-root" ref={sheetRef} className="print-sheet space-y-4 bg-white">
           <h3 className="text-lg font-semibold text-slate-900">{t("timesheet.reportTitle", { month })}</h3>
           <p className="text-sm text-slate-600">
-            {t("timesheet.reportStats", { office, remote, overtime, count: rows.length })}
+            {t("timesheet.formula", {
+              month,
+              business: payroll.businessDays,
+              leave: payroll.leaveDays,
+              work: payroll.workDays,
+            })}
           </p>
-          <ul className="min-h-[8rem] space-y-2 text-sm text-slate-700">
-            {rows.map((row) => (
-              <li key={row.id} className="rounded-xl border border-slate-100 px-3 py-2">
-                {row.employee} · {weekLabel(row.weekStart)} · {row.overtimeHours} {t("timesheet.otHours")}
-              </li>
-            ))}
-          </ul>
+          <p className="text-sm text-slate-600">
+            {t("timesheet.reportStats", {
+              office: payroll.office,
+              remote: payroll.remote,
+              overtime: payroll.overtime,
+              leave: payroll.leaveDays,
+              missing: payroll.missing,
+              count: payroll.employees.length,
+            })}
+          </p>
+          <div className="overflow-x-auto rounded-xl border border-slate-100">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-3 py-2 font-medium">{t("timesheet.employee")}</th>
+                  <th className="px-3 py-2 font-medium">{t("timesheet.kpi.office")}</th>
+                  <th className="px-3 py-2 font-medium">{t("timesheet.kpi.remote")}</th>
+                  <th className="px-3 py-2 font-medium">{t("timesheet.kpi.leave")}</th>
+                  <th className="px-3 py-2 font-medium">{t("timesheet.kpi.work")}</th>
+                  <th className="px-3 py-2 font-medium">{t("timesheet.kpi.missing")}</th>
+                  <th className="px-3 py-2 font-medium">{t("timesheet.otHours")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {payroll.employees.length === 0 ? (
+                  <tr>
+                    <td className="px-3 py-6 text-slate-400" colSpan={7}>
+                      {t("timesheet.reportEmpty")}
+                    </td>
+                  </tr>
+                ) : (
+                  payroll.employees.map((row) => (
+                    <tr key={row.employee}>
+                      <td className="px-3 py-2 font-medium text-slate-800">{row.employee}</td>
+                      <td className="px-3 py-2 tabular-nums">{row.office}</td>
+                      <td className="px-3 py-2 tabular-nums">{row.remote}</td>
+                      <td className="px-3 py-2 tabular-nums">{row.leaveDays}</td>
+                      <td className="px-3 py-2 tabular-nums">{row.workDays}</td>
+                      <td className="px-3 py-2 tabular-nums">{row.missing}</td>
+                      <td className="px-3 py-2 tabular-nums">{row.overtime}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
         <div className="print-chrome mt-4 flex justify-end gap-2">
           <button
@@ -334,9 +446,18 @@ function TimesheetReportModal({
           <button
             type="button"
             onClick={() => window.print()}
-            className="h-10 rounded-xl bg-[#123056] px-4 text-sm font-medium text-white"
+            className="h-10 rounded-xl border border-slate-200 px-4 text-sm font-medium text-slate-700"
           >
             {t("timesheet.print")}
+          </button>
+          <button
+            type="button"
+            disabled={exporting}
+            onClick={() => void exportPdf()}
+            className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#123056] px-4 text-sm font-medium text-white disabled:opacity-50"
+          >
+            {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
+            {t("timesheet.downloadPdf")}
           </button>
         </div>
       </div>

@@ -1,10 +1,12 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   deleteLeaveRequest,
   fetchLeaveRequests,
   insertLeaveRequest,
+  persistLeaveCache,
+  readLeaveCache,
   updateLeaveStatus,
 } from "@/lib/leave-requests";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -47,6 +49,7 @@ export function LeaveWorkspace() {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const persistReady = useRef(false);
   const [form, setForm] = useState({
     employee: "",
     department: "İnsan Kaynakları",
@@ -62,10 +65,9 @@ export function LeaveWorkspace() {
   );
 
   async function loadRequests() {
+    const cached = readLeaveCache();
+    if (cached.length) setRequests(cached);
     if (!isSupabaseConfigured()) {
-      setError(
-        "Supabase yapılandırılmamış. NEXT_PUBLIC_SUPABASE_URL ve anon/publishable anahtarı .env.local dosyasına ekleyin.",
-      );
       setLoading(false);
       return;
     }
@@ -73,8 +75,10 @@ export function LeaveWorkspace() {
       setError("");
       const rows = await fetchLeaveRequests();
       setRequests(rows);
+      persistLeaveCache(rows);
     } catch (err) {
       setError(err instanceof Error ? err.message : "İzin talepleri yüklenemedi.");
+      if (cached.length) setRequests(cached);
     } finally {
       setLoading(false);
     }
@@ -83,6 +87,14 @@ export function LeaveWorkspace() {
   useEffect(() => {
     void loadRequests();
   }, []);
+
+  useEffect(() => {
+    if (!persistReady.current) {
+      persistReady.current = true;
+      return;
+    }
+    persistLeaveCache(requests);
+  }, [requests]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -322,7 +334,7 @@ export function LeaveWorkspace() {
         </section>
       </div>
 
-      <TimesheetTable variant="embed" />
+      <TimesheetTable variant="embed" leaves={requests} />
 
       <HrDocsAndAppeal
         storageKey="nexus-docs-leave"

@@ -200,7 +200,9 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             const active =
               item.href === "/ayarlar"
                 ? pathname === "/ayarlar"
-                : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                : item.href === "/izin"
+                  ? pathname === "/izin" || pathname.startsWith("/ozluk")
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
             const Icon = item.icon;
 
             return (
