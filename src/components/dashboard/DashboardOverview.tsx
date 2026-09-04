@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Bot, ClipboardList, FileSearch, TrendingUp } from "lucide-react";
+import { Bot, ClipboardList, Clock, FileSearch, TrendingUp } from "lucide-react";
 import { dashboardStats, liveOperations, recentActivity } from "@/lib/mock-data";
+import { CompanyPulseCard } from "@/components/dashboard/CompanyPulseCard";
 import { HelpTitle } from "@/components/ui/HelpTip";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
@@ -10,6 +11,7 @@ import type { MessageKey } from "@/lib/i18n";
 const shortcuts: { href: string; labelKey: MessageKey; icon: typeof FileSearch; iconClass: string }[] = [
   { href: "/ise-alim", labelKey: "dashboard.link.recruit", icon: FileSearch, iconClass: "bg-sky-50 text-sky-700" },
   { href: "/izin", labelKey: "dashboard.link.leave", icon: ClipboardList, iconClass: "bg-indigo-50 text-indigo-700" },
+  { href: "/puantaj", labelKey: "dashboard.link.timesheet", icon: Clock, iconClass: "bg-amber-50 text-amber-700" },
   { href: "/mevzuat", labelKey: "dashboard.link.policy", icon: Bot, iconClass: "bg-violet-50 text-violet-700" },
   { href: "/performans", labelKey: "dashboard.link.performance", icon: TrendingUp, iconClass: "bg-emerald-50 text-emerald-700" },
 ];
@@ -106,6 +108,8 @@ export function DashboardOverview() {
           </div>
         </aside>
       </section>
+
+      <CompanyPulseCard />
     </div>
   );
 }

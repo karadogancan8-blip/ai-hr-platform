@@ -15,6 +15,7 @@ import {
   IconPolicy,
   IconRecruit,
   IconSettings,
+  IconTimesheet,
 } from "../icons";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -37,6 +38,7 @@ const navItems: {
   { href: "/ise-alim", icon: IconRecruit, titleKey: "recruit.title", descriptionKey: "recruit.description" },
   { href: "/mevzuat", icon: IconPolicy, titleKey: "policy.title", descriptionKey: "policy.description" },
   { href: "/izin", icon: IconLeave, titleKey: "leave.title", descriptionKey: "leave.description" },
+  { href: "/puantaj", icon: IconTimesheet, titleKey: "timesheet.title", descriptionKey: "timesheet.description" },
   { href: "/onboarding", icon: IconOnboarding, titleKey: "onb.title", descriptionKey: "onb.description" },
   { href: "/performans", icon: IconPerformance, titleKey: "perf.title", descriptionKey: "perf.description" },
   { href: "/dokumanlar", icon: BookOpen, titleKey: "kb.title", descriptionKey: "kb.description" },

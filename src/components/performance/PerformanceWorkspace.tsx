@@ -13,6 +13,7 @@ import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
 import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
 import { AppealsInbox } from "@/components/hr-admin/AppealsInbox";
+import { SkillGapPlanPanel } from "@/components/performance/SkillGapPlanPanel";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 
@@ -214,6 +215,8 @@ export function PerformanceWorkspace() {
           </article>
         </section>
       ) : null}
+
+      <SkillGapPlanPanel review={latest} />
 
       <section>
         <h2 className="mb-3 text-base font-semibold text-[#0b1f3a]">{t("perf.saved")}</h2>
