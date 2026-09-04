@@ -92,7 +92,7 @@ export function SettingsWorkspace() {
   const previewColor = normalizeHexColor(primaryColor);
 
   return (
-    <div className="space-y-8">
+    <div className="flex min-h-[650px] w-full flex-col space-y-8 transition-all duration-200">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("settings.kicker")}</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
@@ -101,23 +101,25 @@ export function SettingsWorkspace() {
         <p className="mt-2 text-sm leading-7 text-slate-500">{t("settings.description")}</p>
       </div>
 
-      {loading ? <p className="text-sm text-slate-400">{t("settings.loading")}</p> : null}
-      {error ? (
-        <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
-      ) : null}
-      {notice ? (
-        <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p>
-      ) : null}
+      <div className="min-h-12">
+        {loading ? <p className="text-sm text-slate-400">{t("settings.loading")}</p> : null}
+        {error ? (
+          <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
+        ) : null}
+        {notice ? (
+          <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p>
+        ) : null}
+      </div>
 
-      <form onSubmit={save} className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <section className="space-y-4 rounded-2xl border border-slate-200/70 bg-white p-6">
+      <form onSubmit={save} className="grid flex-1 items-stretch gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <section className="flex flex-1 flex-col space-y-6 rounded-2xl border border-slate-200/70 bg-white p-6">
           <label className="block text-sm">
           <span className="mb-1 block font-medium text-slate-700">{t("settings.company")}</span>
             <input
               value={companyName}
               onChange={(event) => setCompanyName(event.target.value)}
               required
-              className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+              className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 outline-none transition-all focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
             />
           </label>
           <label className="block text-sm">
@@ -130,7 +132,7 @@ export function SettingsWorkspace() {
               }}
               type="text"
               placeholder="https://cdn.sirket.com/logo.png"
-              className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+              className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 outline-none transition-all focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
             />
             <span className="mt-1 block text-xs text-slate-400">
               {t("settings.logoHint")}
@@ -150,14 +152,14 @@ export function SettingsWorkspace() {
                 value={primaryColor}
                 onChange={(event) => setPrimaryColor(event.target.value)}
                 placeholder="#123056"
-                className="flex-1 rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 font-mono text-sm outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+                className="flex-1 appearance-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 font-mono text-sm outline-none transition-all focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
               />
             </div>
           </label>
           <button
             type="submit"
             disabled={saving || loading}
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+            className="mt-auto inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
             style={{ backgroundColor: previewColor }}
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Palette className="h-4 w-4" />}
@@ -165,7 +167,7 @@ export function SettingsWorkspace() {
           </button>
         </section>
 
-        <aside className="rounded-2xl border border-slate-200/70 bg-slate-50 p-6">
+        <aside className="flex min-h-[280px] flex-1 flex-col rounded-2xl border border-slate-200/70 bg-slate-50 p-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("settings.preview")}</p>
           <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200">
             <div className="flex items-center gap-3 px-4 py-4 text-white" style={{ backgroundColor: previewColor }}>

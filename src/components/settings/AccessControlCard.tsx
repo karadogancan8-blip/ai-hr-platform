@@ -57,7 +57,7 @@ export function AccessControlCard() {
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200/70 bg-white p-6">
+    <section className="flex min-h-[420px] flex-col space-y-6 rounded-2xl border border-slate-200/70 bg-white p-6 transition-all duration-200">
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-[#123056]">
           <ShieldCheck className="h-5 w-5" />
@@ -69,17 +69,19 @@ export function AccessControlCard() {
         </div>
       </div>
 
-      {loading ? <p className="mt-4 text-sm text-slate-400">{t("access.loading")}</p> : null}
-      {error ? (
-        <p className="mt-4 rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
-      ) : null}
-      {notice ? (
-        <p className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-          {notice}
-        </p>
-      ) : null}
+      <div className="min-h-12">
+        {loading ? <p className="text-sm text-slate-400">{t("access.loading")}</p> : null}
+        {error ? (
+          <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
+        ) : null}
+        {notice ? (
+          <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            {notice}
+          </p>
+        ) : null}
+      </div>
 
-      <label className="mt-5 block text-sm">
+      <label className="block text-sm">
         <span className="mb-1 block font-medium text-slate-700">{t("access.roleSession")}</span>
         <SelectField
           value={draftRole}
@@ -94,7 +96,7 @@ export function AccessControlCard() {
         </SelectField>
       </label>
 
-      <div className="mt-5 space-y-3">
+      <div className="flex-1 space-y-3">
         {ENTERPRISE_MODULES.map((module) => {
           const item = draft[module.id];
           return (
