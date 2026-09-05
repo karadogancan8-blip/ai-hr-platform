@@ -16,6 +16,7 @@ import {
   IconRecruit,
   IconSettings,
   IconTimesheet,
+  IconWall,
 } from "../icons";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -35,6 +36,7 @@ const navItems: {
   descriptionKey: MessageKey;
 }[] = [
   { href: "/dashboard", icon: IconDashboard, titleKey: "dashboard.title", descriptionKey: "dashboard.description" },
+  { href: "/sosyal", icon: IconWall, titleKey: "wall.title", descriptionKey: "wall.lead" },
   { href: "/ise-alim", icon: IconRecruit, titleKey: "recruit.title", descriptionKey: "recruit.description" },
   { href: "/mevzuat", icon: IconPolicy, titleKey: "policy.title", descriptionKey: "policy.description" },
   { href: "/izin", icon: IconLeave, titleKey: "leave.title", descriptionKey: "leave.description" },

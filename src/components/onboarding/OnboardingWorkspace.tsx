@@ -14,6 +14,7 @@ import { isSupabaseConfigured } from "@/lib/supabase";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
 import { useI18n } from "@/components/i18n/LocaleProvider";
+import { ItProvisioningList } from "@/components/onboarding/ItProvisioningList";
 
 const SESSION_KEY = DEMO_ONBOARDING_KEY;
 
@@ -333,6 +334,8 @@ export function OnboardingWorkspace() {
           </form>
         </section>
       </div>
+
+      <ItProvisioningList employeeName={selected?.employeeName ?? employeeName} />
     </div>
   );
 }

@@ -140,6 +140,16 @@ export function IconTimesheet({ className }: IconProps) {
   );
 }
 
+export function IconWall({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="8" cy="9" r="2.2" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="16" cy="9" r="2.2" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M4.5 18c.8-2.4 2.8-4 5.5-4s4.7 1.6 5.5 4M14 14.2c.7-.5 1.6-.7 2.5-.7 2.4 0 4.2 1.4 5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function IconPerformance({ className }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>

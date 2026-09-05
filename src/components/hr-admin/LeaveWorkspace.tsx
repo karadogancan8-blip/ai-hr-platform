@@ -18,6 +18,8 @@ import { DeleteIconButton } from "@/components/ui/DeleteIconButton";
 import { HrDocsAndAppeal } from "@/components/hr-docs/HrDocsAndAppeal";
 import { AppealsInbox } from "@/components/hr-admin/AppealsInbox";
 import { TimesheetTable } from "@/components/hr-admin/TimesheetTable";
+import { EsignDesk } from "@/components/hr-admin/EsignDesk";
+import { ProfileSelfService } from "@/components/hr-admin/ProfileSelfService";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
@@ -335,6 +337,9 @@ export function LeaveWorkspace() {
       </div>
 
       <TimesheetTable variant="embed" leaves={requests} />
+
+      <EsignDesk />
+      <ProfileSelfService />
 
       <HrDocsAndAppeal
         storageKey="nexus-docs-leave"
