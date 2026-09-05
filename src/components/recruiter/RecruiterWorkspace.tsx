@@ -5,6 +5,7 @@ import { ClipboardList, Copy, FileDown, Loader2, Sparkles, Video } from "lucide-
 import { IconUpload } from "@/components/icons";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 import { InterviewModal } from "@/components/recruiter/InterviewModal";
+import { AiInterviewGuidePopup } from "@/components/recruiter/AiInterviewGuidePopup";
 import { LiveInterviewModal } from "@/components/recruiter/LiveInterviewModal";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -71,6 +72,7 @@ export function RecruiterWorkspace() {
   const [notice, setNotice] = useState("");
   const [guides, setGuides] = useState<Record<string, InterviewGuide>>({});
   const [interviewResume, setInterviewResume] = useState<StoredResume | null>(null);
+  const [qsResume, setQsResume] = useState<StoredResume | null>(null);
   const [interviewMode, setInterviewMode] = useState<"guide" | "live">("guide");
   const [guideLoading, setGuideLoading] = useState(false);
   const [guideError, setGuideError] = useState("");
@@ -263,6 +265,20 @@ export function RecruiterWorkspace() {
     return payload.guide;
   }
 
+  async function openQuestionGuide(resume: StoredResume) {
+    setQsResume(resume);
+    setGuideError("");
+    if (guides[resume.id]) return;
+    setGuideLoading(true);
+    try {
+      await loadInterviewGuide(resume);
+    } catch (err) {
+      setGuideError(err instanceof Error ? err.message : t("recruit.guideFail"));
+    } finally {
+      setGuideLoading(false);
+    }
+  }
+
   async function openInterview(resume: StoredResume, mode: "guide" | "live") {
     setInterviewResume(resume);
     setInterviewMode(mode);
@@ -348,6 +364,7 @@ export function RecruiterWorkspace() {
 
       <form onSubmit={analyze} className="space-y-4">
         <section
+          id="cv-upload"
           onDragOver={(event) => {
             event.preventDefault();
             setDragging(true);
@@ -500,6 +517,17 @@ export function RecruiterWorkspace() {
               </div>
               <p className="mt-4 text-xs text-slate-400">{formatWhen(resume.createdAt, localeMeta[locale].htmlLang)}</p>
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="flex min-w-0 items-center gap-1 overflow-visible sm:col-span-2">
+                  <HelpTip text={t("recruit.qsHint")} side="top" align="start" sideOffset={6} />
+                  <button
+                    type="button"
+                    onClick={() => void openQuestionGuide(resume)}
+                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full bg-violet-600 px-3 py-2 text-center text-xs font-medium leading-tight text-white hover:bg-violet-700"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                    <span className="min-w-0">{t("recruit.qsGenerate")}</span>
+                  </button>
+                </div>
                 <div className="flex min-w-0 items-center gap-1 overflow-visible">
                   <HelpTip text={t("recruit.guideHint")} side="top" align="start" sideOffset={6} />
                   <button
@@ -539,6 +567,17 @@ export function RecruiterWorkspace() {
         </div>
       </section>
 
+      <AiInterviewGuidePopup
+        open={Boolean(qsResume)}
+        resume={qsResume}
+        guide={qsResume ? (guides[qsResume.id] ?? null) : null}
+        loading={guideLoading}
+        error={guideError}
+        onClose={() => {
+          setQsResume(null);
+          setGuideError("");
+        }}
+      />
       <InterviewModal
         open={Boolean(interviewResume)}
         mode={interviewMode}

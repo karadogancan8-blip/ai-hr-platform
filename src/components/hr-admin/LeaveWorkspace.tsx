@@ -20,6 +20,7 @@ import { AppealsInbox } from "@/components/hr-admin/AppealsInbox";
 import { TimesheetTable } from "@/components/hr-admin/TimesheetTable";
 import { EsignDesk } from "@/components/hr-admin/EsignDesk";
 import { ProfileSelfService } from "@/components/hr-admin/ProfileSelfService";
+import { ExpenseDesk } from "@/components/hr-admin/ExpenseDesk";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
@@ -164,6 +165,7 @@ export function LeaveWorkspace() {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,380px)_1fr]">
         <form
+          id="leave-form"
           onSubmit={submit}
           className="space-y-4 rounded-2xl border border-slate-200/70 bg-white p-6"
         >
@@ -338,6 +340,7 @@ export function LeaveWorkspace() {
 
       <TimesheetTable variant="embed" leaves={requests} />
 
+      <ExpenseDesk />
       <EsignDesk />
       <ProfileSelfService />
 

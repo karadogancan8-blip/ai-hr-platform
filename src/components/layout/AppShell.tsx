@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { AppHeader } from "@/components/header";
+import { CommandBar } from "@/components/layout/CommandBar";
 import { LegalLinks } from "@/components/legal/LegalLinks";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -18,6 +19,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <footer className="shrink-0 border-t border-slate-200/80 bg-white px-4 py-4 sm:px-6 lg:px-8">
           <LegalLinks />
         </footer>
+        <CommandBar />
       </div>
     </div>
   );

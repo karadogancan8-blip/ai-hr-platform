@@ -1,9 +1,10 @@
 "use client";
 
 import { IconMenu } from "@/components/icons";
+import { Search } from "lucide-react";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { COMMAND_OPEN_EVENT } from "@/lib/command-bar";
 
 type AppHeaderProps = {
   onMenu: () => void;
@@ -30,6 +31,15 @@ export function AppHeader({ onMenu }: AppHeaderProps) {
         </div>
       </div>
       <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event(COMMAND_OPEN_EVENT))}
+          className="hidden h-9 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 hover:bg-slate-50 sm:inline-flex"
+        >
+          <Search className="h-3.5 w-3.5" />
+          {t("cmd.open")}
+          <kbd className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold">⌘K</kbd>
+        </button>
         <LanguageSwitcher />
         <div className="hidden rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-800 sm:block">
           {t("header.isolation")}

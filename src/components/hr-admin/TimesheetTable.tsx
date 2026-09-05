@@ -31,7 +31,7 @@ import {
   type WeekDay,
   type WorkMode,
 } from "@/lib/timesheets";
-import type { LeaveRequest } from "@/lib/types";
+import { ShiftSwapPanel } from "@/components/hr-admin/ShiftSwapPanel";
 import type { MessageKey } from "@/lib/i18n";
 
 const statusStyle: Record<TimesheetStatus, string> = {
@@ -146,6 +146,7 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
   ];
 
   return (
+    <>
     <section id="puantaj" className="min-h-[560px] w-full space-y-4 rounded-2xl border border-slate-200/70 bg-white p-5 transition-none">
       {variant === "page" ? (
         <div>
@@ -330,6 +331,8 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
 
       {reportOpen ? <TimesheetReportModal month={month} payroll={payroll} onClose={() => setReportOpen(false)} /> : null}
     </section>
+    <ShiftSwapPanel />
+    </>
   );
 }
 
