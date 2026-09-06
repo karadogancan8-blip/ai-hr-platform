@@ -32,7 +32,7 @@ import {
   type WorkMode,
 } from "@/lib/timesheets";
 import { ShiftSwapPanel } from "@/components/hr-admin/ShiftSwapPanel";
-import { cardSurface, moduleTone, tableShell } from "@/components/ui/surface";
+import { btnDangerSm, btnPrimary, btnSecondary, btnSuccessSm, cardSurface, moduleStripe, moduleTone, tableShell } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
 import type { LeaveRequest } from "@/lib/types";
 
@@ -149,19 +149,19 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
 
   return (
     <>
-    <section id="puantaj" className={`${cardSurface} min-h-[560px] w-full space-y-4 transition-none`}>
+    <section id="puantaj" className={`${cardSurface} ${moduleStripe.leave} min-h-[560px] w-full space-y-4 transition-none`}>
       {variant === "page" ? (
         <div>
-          <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.ops.kicker}`}>{t("timesheet.kicker")}</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+          <p className={`text-xs font-medium uppercase tracking-wide ${moduleTone.leave.kicker}`}>{t("timesheet.kicker")}</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
             <HelpTitle hint={t("timesheet.hint")}>{t("timesheet.title")}</HelpTitle>
           </h1>
           <p className="mt-1 text-sm text-slate-500">{t("timesheet.description")}</p>
         </div>
       ) : (
         <div>
-          <h2 className="text-base font-semibold text-[#0b1f3a]">{t("timesheet.title")}</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">{t("timesheet.embedLead")}</p>
+          <h2 className="text-lg font-bold text-slate-900">{t("timesheet.title")}</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-700">{t("timesheet.embedLead")}</p>
         </div>
       )}
 
@@ -175,7 +175,7 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
         {kpis.map((item) => (
           <article key={item.label} className="rounded-xl border border-slate-100 bg-[#f8fbff] px-3 py-3">
             <p className="text-[11px] font-medium leading-4 text-slate-500">{item.label}</p>
-            <p className="mt-1 text-xl font-semibold tabular-nums text-[#0b1f3a]">{item.value}</p>
+            <p className="mt-1 text-xl font-bold tabular-nums text-slate-900">{item.value}</p>
           </article>
         ))}
       </div>
@@ -237,7 +237,7 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
         <div className="flex items-end md:col-span-2 xl:col-span-4">
           <button
             type="submit"
-            className="inline-flex h-10 items-center rounded-xl bg-[#123056] px-4 text-sm font-medium text-white hover:bg-[#0f2744]"
+            className={btnPrimary}
           >
             {t("timesheet.submit")}
           </button>
@@ -256,7 +256,7 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
         <button
           type="button"
           onClick={() => setReportOpen(true)}
-          className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 px-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className={btnSecondary}
         >
           <FileDown className="h-4 w-4" />
           {t("timesheet.report")}
@@ -282,7 +282,7 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
           <tbody className="divide-y divide-slate-100">
             {rows.length === 0 ? (
               <tr>
-                <td className="px-3 py-8 text-sm text-slate-400" colSpan={hrDesk ? 10 : 9}>
+                <td className="px-3 py-8 text-sm text-slate-500" colSpan={hrDesk ? 10 : 9}>
                   {t("timesheet.empty")}
                 </td>
               </tr>
@@ -309,14 +309,14 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
                           <button
                             type="button"
                             onClick={() => setStatus(row.id, "approved")}
-                            className="rounded-lg bg-emerald-600 px-2 py-1 text-xs font-medium text-white"
+                            className={btnSuccessSm}
                           >
                             {t("timesheet.approve")}
                           </button>
                           <button
                             type="button"
                             onClick={() => setStatus(row.id, "rejected")}
-                            className="rounded-lg bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700"
+                            className={btnDangerSm}
                           >
                             {t("timesheet.reject")}
                           </button>
@@ -419,7 +419,7 @@ function TimesheetReportModal({
               <tbody className="divide-y divide-slate-100">
                 {payroll.employees.length === 0 ? (
                   <tr>
-                    <td className="px-3 py-6 text-slate-400" colSpan={7}>
+                    <td className="px-3 py-6 text-slate-500" colSpan={7}>
                       {t("timesheet.reportEmpty")}
                     </td>
                   </tr>
@@ -459,7 +459,7 @@ function TimesheetReportModal({
             type="button"
             disabled={exporting}
             onClick={() => void exportPdf()}
-            className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#123056] px-4 text-sm font-medium text-white disabled:opacity-50"
+            className={btnPrimary}
           >
             {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
             {t("timesheet.downloadPdf")}

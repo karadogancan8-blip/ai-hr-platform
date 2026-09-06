@@ -13,6 +13,7 @@ import {
 import type { StoredResume } from "@/lib/resumes";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTip } from "@/components/ui/HelpTip";
+import { btnPrimary } from "@/components/ui/surface";
 
 type InterviewModalProps = {
   open: boolean;
@@ -223,7 +224,7 @@ export function InterviewModal({
                     .join("\n"),
                 })
               }
-              className="rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+              className={btnPrimary}
             >
               {saving ? "Kaydediliyor…" : "Mülakat Değerlendirmesini Kaydet"}
             </button>

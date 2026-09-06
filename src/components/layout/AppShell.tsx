@@ -9,7 +9,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#f4f7fb] text-slate-800">
+    <div className="min-h-screen bg-slate-50/80 text-slate-900">
       <Sidebar open={open} onClose={() => setOpen(false)} />
 
       <div className="flex min-h-screen flex-col lg:ps-[272px]">

@@ -5,6 +5,7 @@ import { useI18n } from "@/components/i18n/LocaleProvider";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import type { InterviewGuide } from "@/lib/interview";
 import type { StoredResume } from "@/lib/resumes";
+import { btnPrimary } from "@/components/ui/surface";
 
 type AiInterviewGuidePopupProps = {
   open: boolean;
@@ -55,7 +56,7 @@ export function AiInterviewGuidePopup({ open, resume, guide, loading, error, onC
         </div>
         <AiDisclaimer className="mt-3" />
         <div className="mt-4 flex justify-end">
-          <button type="button" onClick={onClose} className="h-10 rounded-full bg-[#123056] px-5 text-sm font-medium text-white">
+          <button type="button" onClick={onClose} className={`h-10 ${btnPrimary}`}>
             {t("common.close")}
           </button>
         </div>

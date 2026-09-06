@@ -7,7 +7,7 @@ import { SelectField } from "@/components/ui/SelectField";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { EXPENSE_STORAGE_KEY, EXPENSE_UPDATED_EVENT, type ExpenseCategory, type ExpenseRow } from "@/lib/expenses";
 import { readLocalJson, writeLocalJson } from "@/lib/session-store";
-import { cardSurface, moduleTone } from "@/components/ui/surface";
+import { btnDangerSm, btnPrimary, btnSecondary, btnSuccessSm, cardSurface, moduleStripe, moduleTone } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
 
 function persist(rows: ExpenseRow[]) {
@@ -82,12 +82,12 @@ export function ExpenseDesk() {
   }
 
   return (
-    <section id="expenses" className={`${cardSurface} min-h-[28rem] w-full space-y-4 transition-none`}>
+    <section id="expenses" className={`${cardSurface} ${moduleStripe.ops} min-h-[28rem] w-full space-y-4 transition-none`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.ops.kicker}`}>{t("expense.kicker")}</p>
-          <h2 className="mt-1 text-base font-semibold text-[#0b1f3a]">{t("expense.title")}</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">{t("expense.lead")}</p>
+          <p className={`text-xs font-medium uppercase tracking-wide ${moduleTone.ops.kicker}`}>{t("expense.kicker")}</p>
+          <h2 className="mt-1 text-lg font-bold text-slate-900">{t("expense.title")}</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-700">{t("expense.lead")}</p>
         </div>
         <span className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full ${moduleTone.ops.icon}`}>
           <Receipt className="h-4 w-4" />
@@ -141,14 +141,14 @@ export function ExpenseDesk() {
           />
         </label>
         <div className="flex items-end gap-2 md:col-span-4">
-          <button type="submit" className="h-10 rounded-full bg-[#123056] px-5 text-sm font-medium text-white">
+          <button type="submit" className={btnPrimary}>
             {t("expense.submit")}
           </button>
           {hrDesk ? (
             <button
               type="button"
               onClick={exportList}
-              className="h-10 rounded-full border border-slate-200 px-4 text-sm font-medium text-slate-700"
+              className={btnSecondary}
             >
               {t("expense.export")}
             </button>
@@ -172,7 +172,7 @@ export function ExpenseDesk() {
           <tbody className="divide-y divide-slate-100">
             {rows.length === 0 ? (
               <tr>
-                <td className="px-4 py-8 text-slate-400" colSpan={hrDesk ? 6 : 5}>
+                <td className="px-4 py-8 text-slate-500" colSpan={hrDesk ? 6 : 5}>
                   {t("expense.empty")}
                 </td>
               </tr>
@@ -194,14 +194,14 @@ export function ExpenseDesk() {
                         <button
                           type="button"
                           onClick={() => setStatus(row.id, "approved")}
-                          className="h-8 rounded-full bg-emerald-600 px-3 text-xs font-medium text-white"
+                          className={btnSuccessSm}
                         >
                           {t("expense.approve")}
                         </button>
                         <button
                           type="button"
                           onClick={() => setStatus(row.id, "rejected")}
-                          className="h-8 rounded-full bg-slate-200 px-3 text-xs font-medium"
+                          className={btnDangerSm}
                         >
                           {t("expense.reject")}
                         </button>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
-import { cardSurface } from "@/components/ui/surface";
+import { btnDangerSm, btnPrimarySm, btnSuccessSm, cardSurface, moduleStripe } from "@/components/ui/surface";
 import {
   APPEALS_UPDATED_EVENT,
   readAppeals,
@@ -37,10 +37,10 @@ export function AppealsInbox() {
   }
 
   return (
-    <section className={`${cardSurface} min-h-[16rem]`}>
-      <h2 className="text-base font-semibold text-[#0b1f3a]">{t("appeals.title")}</h2>
-      <p className="mt-1 text-sm text-slate-500">{t("appeals.lead")}</p>
-      {!rows.length ? <p className="mt-4 text-sm text-slate-400">{t("appeals.empty")}</p> : null}
+    <section className={`${cardSurface} ${moduleStripe.performance} min-h-[16rem]`}>
+      <h2 className="text-lg font-bold text-slate-900">{t("appeals.title")}</h2>
+      <p className="mt-1 text-sm text-slate-700">{t("appeals.lead")}</p>
+      {!rows.length ? <p className="mt-4 text-sm text-slate-500">{t("appeals.empty")}</p> : null}
       <ul className="mt-4 space-y-3">
         {rows.map((row) => (
           <li key={row.id} className="rounded-xl border border-slate-100 bg-slate-50/80 p-4">
@@ -62,21 +62,21 @@ export function AppealsInbox() {
                 <button
                   type="button"
                   onClick={() => decide(row.id, "onaylandi")}
-                  className="rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-medium text-white"
+                  className={btnSuccessSm}
                 >
                   {t("appeals.approve")}
                 </button>
                 <button
                   type="button"
                   onClick={() => decide(row.id, "revize")}
-                  className="rounded-lg bg-sky-700 px-2.5 py-1 text-xs font-medium text-white"
+                  className={btnPrimarySm}
                 >
                   {t("appeals.revise")}
                 </button>
                 <button
                   type="button"
                   onClick={() => decide(row.id, "reddedildi")}
-                  className="rounded-lg bg-slate-200 px-2.5 py-1 text-xs font-medium text-slate-800"
+                  className={btnDangerSm}
                 >
                   {t("appeals.reject")}
                 </button>

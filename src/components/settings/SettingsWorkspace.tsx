@@ -15,7 +15,7 @@ import { AccessControlCard } from "@/components/settings/AccessControlCard";
 import { HelpTitle } from "@/components/ui/HelpTip";
 import { LegalLinks } from "@/components/legal/LegalLinks";
 import { SelectField } from "@/components/ui/SelectField";
-import { cardSurface } from "@/components/ui/surface";
+import { btnPrimary, cardSurface, moduleStripe, pageKicker, pageLead, pageTitle } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { LOCALES, localeMeta, type Locale, type MessageKey } from "@/lib/i18n";
 
@@ -129,11 +129,11 @@ export function SettingsWorkspace() {
   return (
     <div className="flex min-h-[750px] w-full flex-col items-stretch">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("settings.kicker")}</p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
+        <p className={pageKicker}>{t("settings.kicker")}</p>
+        <h1 className={pageTitle}>
           <HelpTitle hint={t("settings.hint")}>{t("settings.title")}</HelpTitle>
         </h1>
-        <p className="mt-2 text-sm leading-7 text-slate-500">{t("settings.description")}</p>
+        <p className={pageLead}>{t("settings.description")}</p>
       </div>
 
       <div className="mt-6 min-h-[680px] grid grid-cols-1 items-start gap-6 md:grid-cols-12">
@@ -161,9 +161,9 @@ export function SettingsWorkspace() {
 
         <div className="min-h-[600px] w-full md:col-span-9">
           <TabsContent active={tab} id="brand">
-            <div className={`${cardSurface} min-h-[600px] w-full space-y-4 transition-none`}>
+            <div className={`${cardSurface} ${moduleStripe.performance} min-h-[600px] w-full space-y-4 transition-none`}>
               <div className="min-h-12">
-                {loading ? <p className="text-sm text-slate-400">{t("settings.loading")}</p> : null}
+                {loading ? <p className="text-sm text-slate-500">{t("settings.loading")}</p> : null}
                 {error ? (
                   <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
                 ) : null}
@@ -263,13 +263,13 @@ export function SettingsWorkspace() {
           </TabsContent>
 
           <TabsContent active={tab} id="billing">
-            <section className={`${cardSurface} min-h-[600px] w-full transition-none`}>
+            <section className={`${cardSurface} ${moduleStripe.performance} min-h-[600px] w-full transition-none`}>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("settings.billingKicker")}</p>
               <h2 className="mt-2 text-lg font-semibold text-slate-900">{t("settings.billingTitle")}</h2>
               <p className="mt-2 text-sm leading-6 text-slate-500">{t("settings.billingLead")}</p>
               <Link
                 href="/ayarlar/abonelik"
-                className="mt-4 inline-flex rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744]"
+                className={`mt-4 ${btnPrimary}`}
               >
                 {t("settings.billingCta")}
               </Link>
@@ -277,7 +277,7 @@ export function SettingsWorkspace() {
           </TabsContent>
 
           <TabsContent active={tab} id="prefs">
-            <section className={`${cardSurface} min-h-[600px] w-full space-y-6 transition-none`}>
+            <section className={`${cardSurface} ${moduleStripe.performance} min-h-[600px] w-full space-y-6 transition-none`}>
               <label className="block max-w-md text-sm">
                 <span className="mb-1 block font-medium text-slate-700">{t("settings.language")}</span>
                 <SelectField
@@ -303,7 +303,7 @@ export function SettingsWorkspace() {
           </TabsContent>
 
           <TabsContent active={tab} id="legal">
-            <div className={`${cardSurface} min-h-[600px] w-full space-y-6 transition-none`}>
+            <div className={`${cardSurface} ${moduleStripe.performance} min-h-[600px] w-full space-y-6 transition-none`}>
               <section>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("legal.kicker")}</p>
                 <h2 className="mt-2 text-lg font-semibold text-slate-900">{t("settings.legalTitle")}</h2>
@@ -325,7 +325,7 @@ export function SettingsWorkspace() {
                   type="button"
                   onClick={() => void loadDemo()}
                   disabled={seeding}
-                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+                  className={`mt-4 ${btnPrimary}`}
                 >
                   {seeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                   {t("settings.demoBtn")}

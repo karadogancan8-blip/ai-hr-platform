@@ -5,7 +5,7 @@ import { ArrowLeftRight, Receipt } from "lucide-react";
 import { ExpenseDesk } from "@/components/hr-admin/ExpenseDesk";
 import { ShiftSwapPanel } from "@/components/hr-admin/ShiftSwapPanel";
 import { useI18n } from "@/components/i18n/LocaleProvider";
-import { cardSurface, moduleTone, tabPaneMin } from "@/components/ui/surface";
+import { cardSurface, cardTitle, moduleStripe, moduleTone, tabPaneMin } from "@/components/ui/surface";
 
 type OpsTab = "expense" | "swap";
 
@@ -14,11 +14,14 @@ export function OzlukAutopilotBoard() {
   const [tab, setTab] = useState<OpsTab>("expense");
 
   return (
-    <section className={`${cardSurface} min-h-[640px] transition-none`}>
+    <section className={`${cardSurface} ${moduleStripe.ops} min-h-[640px] transition-none`}>
       <div className="min-h-[4.25rem]">
-        <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.ops.kicker}`}>{t("ozluk.opsKicker")}</p>
-        <h2 className="mt-1 text-lg font-semibold tracking-tight text-[#0b1f3a]">{t("ozluk.opsTitle")}</h2>
-        <p className="mt-1 text-sm leading-6 text-slate-500">{t("ozluk.opsLead")}</p>
+        <p className={`text-xs font-medium uppercase tracking-wide ${moduleTone.ops.kicker}`}>{t("ozluk.opsKicker")}</p>
+        <h2 className={cardTitle}>
+          <span>{t("ozluk.opsTitle")}</span>
+          <span className={moduleTone.ops.badge}>{t("ozluk.tab.expense")}</span>
+        </h2>
+        <p className="-mt-2 mb-4 text-sm leading-6 text-slate-700">{t("ozluk.opsLead")}</p>
       </div>
 
       <div className="mt-5 flex h-12 w-full gap-2 rounded-full border border-slate-200/90 bg-slate-50 p-1">
@@ -26,7 +29,7 @@ export function OzlukAutopilotBoard() {
           type="button"
           onClick={() => setTab("expense")}
           className={`inline-flex flex-1 items-center justify-center gap-2 rounded-full text-sm font-medium transition-none ${
-            tab === "expense" ? "bg-white text-[#0b1f3a] shadow-[0_4px_16px_rgba(15,37,64,0.08)]" : "text-slate-500"
+            tab === "expense" ? "bg-white font-semibold text-slate-900 shadow-sm" : "text-slate-500"
           }`}
         >
           <Receipt className="h-4 w-4" />
@@ -36,7 +39,7 @@ export function OzlukAutopilotBoard() {
           type="button"
           onClick={() => setTab("swap")}
           className={`inline-flex flex-1 items-center justify-center gap-2 rounded-full text-sm font-medium transition-none ${
-            tab === "swap" ? "bg-white text-[#0b1f3a] shadow-[0_4px_16px_rgba(15,37,64,0.08)]" : "text-slate-500"
+            tab === "swap" ? "bg-white font-semibold text-slate-900 shadow-sm" : "text-slate-500"
           }`}
         >
           <ArrowLeftRight className="h-4 w-4" />
@@ -45,10 +48,10 @@ export function OzlukAutopilotBoard() {
       </div>
 
       <div className={`mt-5 ${tabPaneMin}`}>
-        <div hidden={tab !== "expense"} className={`${tabPaneMin} border-l-4 border-emerald-400 pl-4`}>
+        <div hidden={tab !== "expense"} className={`${tabPaneMin} border-l-4 border-l-amber-500 pl-4`}>
           {tab === "expense" ? <ExpenseDesk /> : null}
         </div>
-        <div hidden={tab !== "swap"} className={`${tabPaneMin} border-l-4 border-emerald-200 pl-4`}>
+        <div hidden={tab !== "swap"} className={`${tabPaneMin} border-l-4 border-l-amber-500 pl-4`}>
           {tab === "swap" ? <ShiftSwapPanel /> : null}
         </div>
       </div>

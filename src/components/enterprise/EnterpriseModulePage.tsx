@@ -5,7 +5,7 @@ import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { ENTERPRISE_MODULES, type EnterpriseModuleId } from "@/lib/access-control";
 import { HelpTitle } from "@/components/ui/HelpTip";
-import { cardSurface } from "@/components/ui/surface";
+import { cardSurface, moduleStripe, pageKicker, pageLead, pageTitle } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
 
@@ -103,7 +103,7 @@ export function EnterpriseModulePage({ moduleId }: { moduleId: EnterpriseModuleI
   const descriptionKey = `enterprise.${moduleId}.description` as MessageKey;
 
   if (loading) {
-    return <p className="text-sm text-slate-400">{t("enterprise.loading")}</p>;
+    return <p className="text-sm text-slate-500">{t("enterprise.loading")}</p>;
   }
 
   if (!canView(moduleId) || !meta) {
@@ -117,31 +117,31 @@ export function EnterpriseModulePage({ moduleId }: { moduleId: EnterpriseModuleI
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("enterprise.kicker")}</p>
-        <h1 className="mt-1 flex items-center gap-2 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
-          <Icon className="h-6 w-6 text-sky-700" />
+        <p className={`${pageKicker} text-indigo-700`}>{t("enterprise.kicker")}</p>
+        <h1 className={`${pageTitle} flex items-center gap-2`}>
+          <Icon className="h-6 w-6 text-indigo-700" />
           <HelpTitle hint={t("enterprise.hint")}>{t(titleKey)}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t(descriptionKey)}</p>
+        <p className={pageLead}>{t(descriptionKey)}</p>
       </div>
 
       <section className="grid gap-4 sm:grid-cols-3">
         {copy.kpis.map((kpi) => (
           <article
             key={kpi.label}
-            className={`${cardSurface} min-h-[10rem]`}
+            className={`${cardSurface} ${moduleStripe.performance} min-h-[10rem]`}
           >
             <p className="text-sm text-slate-500">{kpi.label}</p>
-            <p className="mt-2 text-3xl font-semibold text-[#0b1f3a]">{kpi.value}</p>
-            <p className="mt-1 text-xs text-slate-400">{kpi.hint}</p>
+            <p className="mt-2 text-3xl font-bold text-slate-900">{kpi.value}</p>
+            <p className="mt-1 text-xs font-medium text-slate-500">{kpi.hint}</p>
             <AiDisclaimer className="mt-4" />
           </article>
         ))}
       </section>
 
-      <article className={`${cardSurface} min-h-[12rem]`}>
-        <h2 className="text-base font-semibold text-[#0b1f3a]">{t("enterprise.summary")}</h2>
-        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600">
+      <article className={`${cardSurface} ${moduleStripe.performance} min-h-[12rem]`}>
+        <h2 className="text-lg font-bold text-slate-900">{t("enterprise.summary")}</h2>
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
           {copy.findings.map((item) => (
             <li key={item}>{item}</li>
           ))}

@@ -7,7 +7,7 @@ import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { StoredPerformanceReview } from "@/lib/performance";
 import { readLocalJson, writeLocalJson } from "@/lib/session-store";
 import { SKILL_GAP_STORAGE_KEY, type SkillGapPlan } from "@/lib/skill-gap";
-import { cardSurface } from "@/components/ui/surface";
+import { btnPrimary, cardSurface, moduleStripe } from "@/components/ui/surface";
 
 type SkillGapPlanPanelProps = {
   review: StoredPerformanceReview | null;
@@ -59,18 +59,18 @@ export function SkillGapPlanPanel({ review }: SkillGapPlanPanelProps) {
   }
 
   return (
-    <section className={`${cardSurface} min-h-[320px] w-full transition-none`}>
+    <section className={`${cardSurface} ${moduleStripe.performance} min-h-[320px] w-full transition-none`}>
       <div className="flex min-h-[4.5rem] flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-700">{t("perf.skillGap.kicker")}</p>
-          <h2 className="mt-1 text-base font-semibold text-[#0b1f3a]">{t("perf.skillGap.title")}</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">{t("perf.skillGap.lead")}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-indigo-700">{t("perf.skillGap.kicker")}</p>
+          <h2 className="mt-1 text-lg font-bold text-slate-900">{t("perf.skillGap.title")}</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-700">{t("perf.skillGap.lead")}</p>
         </div>
         <button
           type="button"
           disabled={!review || generating}
           onClick={() => void generate()}
-          className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#123056] px-4 text-center text-sm font-medium leading-tight text-white hover:bg-[#0f2744] disabled:opacity-50"
+          className={btnPrimary}
         >
           {generating ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Sparkles className="h-4 w-4 shrink-0" />}
           <span className="max-w-[16rem] whitespace-normal sm:whitespace-nowrap">{t("perf.skillGap.generate")}</span>
@@ -78,7 +78,7 @@ export function SkillGapPlanPanel({ review }: SkillGapPlanPanelProps) {
       </div>
 
       <div className="mt-4 min-h-10">
-        {!review ? <p className="text-sm text-slate-400">{t("perf.skillGap.needReview")}</p> : null}
+        {!review ? <p className="text-sm text-slate-500">{t("perf.skillGap.needReview")}</p> : null}
         {review && review.score >= 4 && !plan ? (
           <p className="text-sm text-slate-500">{t("perf.skillGap.highScore")}</p>
         ) : null}
@@ -111,7 +111,7 @@ export function SkillGapPlanPanel({ review }: SkillGapPlanPanelProps) {
           </div>
         ) : (
           <div className="flex min-h-[220px] items-center rounded-2xl border border-dashed border-violet-100 bg-violet-50/30 px-4">
-            <p className="text-sm text-slate-400">{t("perf.skillGap.empty")}</p>
+            <p className="text-sm text-slate-500">{t("perf.skillGap.empty")}</p>
           </div>
         )}
       </div>

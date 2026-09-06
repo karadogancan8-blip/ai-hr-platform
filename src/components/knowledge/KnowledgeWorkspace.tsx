@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { BookOpen, Plus, Sparkles, X } from "lucide-react";
 import { HelpTitle } from "@/components/ui/HelpTip";
-import { cardSurface } from "@/components/ui/surface";
+import { btnPrimary, btnSecondary, cardSurface, moduleStripe, pageKicker, pageLead, pageTitle } from "@/components/ui/surface";
 import { SelectField } from "@/components/ui/SelectField";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
@@ -148,11 +148,11 @@ export function KnowledgeWorkspace() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("kb.kicker")}</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+          <p className={`${pageKicker} text-indigo-700`}>{t("kb.kicker")}</p>
+          <h1 className={pageTitle}>
             <HelpTitle hint={t("kb.hint")}>{t("kb.title")}</HelpTitle>
           </h1>
-          <p className="mt-1 text-sm text-slate-500">{t("kb.description")}</p>
+          <p className={pageLead}>{t("kb.description")}</p>
         </div>
         {editor ? (
           <div className="flex flex-wrap items-center gap-2">
@@ -170,7 +170,7 @@ export function KnowledgeWorkspace() {
             <button
               type="button"
               onClick={generateSectorPack}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744]"
+              className={btnPrimary}
             >
               <Sparkles className="h-4 w-4" />
               {t("kb.sectorPack")}
@@ -178,7 +178,7 @@ export function KnowledgeWorkspace() {
             <button
               type="button"
               onClick={() => setComposer(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50"
+              className={btnSecondary}
             >
               <Plus className="h-4 w-4" />
               {t("kb.newDoc")}
@@ -199,7 +199,7 @@ export function KnowledgeWorkspace() {
             type="button"
             onClick={() => setDepartment(id)}
             className={`rounded-full px-4 py-1.5 text-sm font-medium ${
-              department === id ? "bg-[#123056] text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+              department === id ? "bg-indigo-600 text-white" : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
             }`}
           >
             {t(`kb.dept.${id}` as MessageKey)}
@@ -232,7 +232,7 @@ export function KnowledgeWorkspace() {
               setQuestion("");
               setAnswer("");
             }}
-            className={`${cardSurface} text-start`}
+            className={`${cardSurface} ${moduleStripe.performance} text-start`}
           >
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-sky-700">
               <BookOpen className="h-3.5 w-3.5" />
@@ -248,7 +248,7 @@ export function KnowledgeWorkspace() {
           </button>
         ))}
       </div>
-      {!visible.length ? <p className="text-sm text-slate-400">{t("kb.empty")}</p> : null}
+      {!visible.length ? <p className="text-sm text-slate-500">{t("kb.empty")}</p> : null}
 
       {selected ? (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/45 p-3 backdrop-blur-[2px] sm:items-center sm:p-6">
@@ -301,7 +301,7 @@ export function KnowledgeWorkspace() {
                 <button
                   type="submit"
                   disabled={asking}
-                  className="rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+                  className={btnPrimary}
                 >
                   {asking ? t("kb.asking") : t("kb.askBtn")}
                 </button>
@@ -340,7 +340,7 @@ export function KnowledgeWorkspace() {
               placeholder={t("kb.bodyPh")}
               className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm"
             />
-            <button type="submit" className="w-full rounded-xl bg-[#123056] py-2.5 text-sm font-medium text-white">
+            <button type="submit" className={`w-full ${btnPrimary}`}>
               {t("kb.save")}
             </button>
           </form>

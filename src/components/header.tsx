@@ -26,15 +26,15 @@ export function AppHeader({ onMenu }: AppHeaderProps) {
           <IconMenu className="h-5 w-5" />
         </button>
         <div className="min-w-0">
-          <p className="truncate text-xs font-medium uppercase tracking-[0.14em] text-sky-700/70">{t("header.kicker")}</p>
-          <p className="truncate text-sm font-semibold text-slate-800">{t("header.title")}</p>
+          <p className="truncate text-xs font-medium uppercase tracking-wide text-slate-500">{t("header.kicker")}</p>
+          <p className="truncate text-sm font-bold text-slate-900">{t("header.title")}</p>
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <CommandSearchButton compact className="sm:hidden" />
         <CommandSearchButton className="hidden sm:inline-flex" />
         <LanguageSwitcher />
-        <div className="hidden overflow-hidden rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-800 lg:block">
+        <div className="hidden overflow-hidden rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-800 lg:block">
           {t("header.isolation")}
         </div>
         <div

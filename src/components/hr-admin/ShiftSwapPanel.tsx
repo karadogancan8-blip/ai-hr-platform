@@ -7,7 +7,7 @@ import { SelectField } from "@/components/ui/SelectField";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { SHIFT_SWAP_EVENT, SHIFT_SWAP_KEY, type ShiftSlot, type ShiftSwapRequest } from "@/lib/shift-swap";
 import { readLocalJson, writeLocalJson } from "@/lib/session-store";
-import { cardSurface, moduleTone } from "@/components/ui/surface";
+import { btnDangerSm, btnPrimary, btnSuccessSm, cardSurface, moduleStripe, moduleTone } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
 
 function persist(rows: ShiftSwapRequest[]) {
@@ -68,12 +68,12 @@ export function ShiftSwapPanel() {
   }
 
   return (
-    <section id="shift-swap" className={`${cardSurface} min-h-[24rem] w-full space-y-4 transition-none`}>
+    <section id="shift-swap" className={`${cardSurface} ${moduleStripe.ops} min-h-[24rem] w-full space-y-4 transition-none`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.ops.kicker}`}>{t("swap.kicker")}</p>
-          <h2 className="mt-1 text-base font-semibold text-[#0b1f3a]">{t("swap.title")}</h2>
-          <p className="mt-1 text-sm leading-6 text-slate-500">{t("swap.lead")}</p>
+          <p className={`text-xs font-medium uppercase tracking-wide ${moduleTone.ops.kicker}`}>{t("swap.kicker")}</p>
+          <h2 className="mt-1 text-lg font-bold text-slate-900">{t("swap.title")}</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-700">{t("swap.lead")}</p>
         </div>
         <span className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full ${moduleTone.ops.icon}`}>
           <ArrowLeftRight className="h-4 w-4" />
@@ -133,7 +133,7 @@ export function ShiftSwapPanel() {
           />
         </label>
         <div className="xl:col-span-5">
-          <button type="submit" className="h-10 rounded-full bg-[#123056] px-5 text-sm font-medium text-white">
+          <button type="submit" className={btnPrimary}>
             {t("swap.submit")}
           </button>
         </div>
@@ -154,7 +154,7 @@ export function ShiftSwapPanel() {
           <tbody className="divide-y divide-slate-100">
             {rows.length === 0 ? (
               <tr>
-                <td className="px-4 py-8 text-slate-400" colSpan={hrDesk ? 6 : 5}>
+                <td className="px-4 py-8 text-slate-500" colSpan={hrDesk ? 6 : 5}>
                   {t("swap.empty")}
                 </td>
               </tr>
@@ -176,14 +176,14 @@ export function ShiftSwapPanel() {
                         <button
                           type="button"
                           onClick={() => setStatus(row.id, "approved")}
-                          className="h-8 rounded-full bg-emerald-600 px-3 text-xs font-medium text-white"
+                          className={btnSuccessSm}
                         >
                           {t("swap.approve")}
                         </button>
                         <button
                           type="button"
                           onClick={() => setStatus(row.id, "rejected")}
-                          className="h-8 rounded-full bg-slate-200 px-3 text-xs font-medium"
+                          className={btnDangerSm}
                         >
                           {t("swap.reject")}
                         </button>

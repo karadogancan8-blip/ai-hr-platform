@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Award, Cake, HeartHandshake, PartyPopper, Sparkles, UserPlus } from "lucide-react";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { HelpTitle } from "@/components/ui/HelpTip";
-import { cardSurface } from "@/components/ui/surface";
+import { btnPrimary, cardSurface, moduleStripe, pageKicker, pageLead, pageTitle } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import {
   WALL_KIND_STYLES,
@@ -88,22 +88,22 @@ export function CompanyWall({ variant = "compact" }: CompanyWallProps) {
   const visible = variant === "compact" ? posts.slice(0, 4) : posts;
 
   return (
-    <section className={`${cardSurface} min-h-[22rem] w-full transition-none`}>
+    <section className={`${cardSurface} ${moduleStripe.ops} min-h-[22rem] w-full transition-none`}>
       <div className="flex min-h-[3.5rem] items-start justify-between gap-3">
         <div className="min-w-0">
           {variant === "page" ? (
             <>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-fuchsia-700">{t("wall.kicker")}</p>
-              <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+              <p className={`${pageKicker} text-amber-700`}>{t("wall.kicker")}</p>
+              <h1 className={pageTitle}>
                 <HelpTitle hint={t("wall.hint")}>{t("wall.title")}</HelpTitle>
               </h1>
             </>
           ) : (
-            <h2 className="text-base font-semibold text-[#0b1f3a]">{t("wall.title")}</h2>
+            <h2 className="text-lg font-bold text-slate-900">{t("wall.title")}</h2>
           )}
-          <p className="mt-1 text-sm leading-6 text-slate-500">{t("wall.lead")}</p>
+          <p className={pageLead}>{t("wall.lead")}</p>
         </div>
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-fuchsia-50 text-fuchsia-700">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-amber-100 text-amber-800">
           <Sparkles className="h-4 w-4" />
         </span>
       </div>
@@ -143,7 +143,7 @@ export function CompanyWall({ variant = "compact" }: CompanyWallProps) {
           <div className="md:col-span-4">
             <button
               type="submit"
-              className="inline-flex h-10 items-center rounded-full bg-[#123056] px-5 text-sm font-medium text-white"
+              className={btnPrimary}
             >
               {t("wall.publish")}
             </button>

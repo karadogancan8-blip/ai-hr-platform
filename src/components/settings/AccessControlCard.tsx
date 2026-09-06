@@ -16,7 +16,7 @@ import {
 } from "@/lib/access-control";
 import type { MessageKey } from "@/lib/i18n";
 import { SelectField } from "@/components/ui/SelectField";
-import { cardSurface } from "@/components/ui/surface";
+import { btnPrimary, cardSurface, moduleStripe } from "@/components/ui/surface";
 
 export function AccessControlCard() {
   const { t } = useI18n();
@@ -58,20 +58,20 @@ export function AccessControlCard() {
   }
 
   return (
-    <section className={`${cardSurface} flex min-h-[600px] w-full flex-col space-y-6 transition-none`}>
+    <section className={`${cardSurface} ${moduleStripe.performance} flex min-h-[600px] w-full flex-col space-y-6 transition-none`}>
       <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-[#123056]">
+        <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-indigo-700">
           <ShieldCheck className="h-5 w-5" />
         </span>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("access.kicker")}</p>
-          <h2 className="mt-1 text-lg font-semibold text-[#0b1f3a]">{t("access.title")}</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-500">{t("access.description")}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-indigo-700">{t("access.kicker")}</p>
+          <h2 className="mt-1 text-lg font-bold text-slate-900">{t("access.title")}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-700">{t("access.description")}</p>
         </div>
       </div>
 
       <div className="min-h-12">
-        {loading ? <p className="text-sm text-slate-400">{t("access.loading")}</p> : null}
+        {loading ? <p className="text-sm text-slate-500">{t("access.loading")}</p> : null}
         {error ? (
           <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
         ) : null}
@@ -140,7 +140,7 @@ export function AccessControlCard() {
                         }))
                       }
                       className={`relative h-6 w-11 rounded-full transition ${
-                        item.enabled ? "bg-[#123056]" : "bg-slate-300"
+                        item.enabled ? "bg-indigo-600" : "bg-slate-300"
                       } disabled:opacity-50`}
                     >
                       <span
@@ -184,7 +184,7 @@ export function AccessControlCard() {
         type="button"
         onClick={() => void save()}
         disabled={saving || loading}
-        className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+        className={`mt-5 ${btnPrimary}`}
       >
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
         {canManage ? t("access.save") : t("access.saveRole")}

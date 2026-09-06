@@ -16,7 +16,7 @@ import { AppealsInbox } from "@/components/hr-admin/AppealsInbox";
 import { SkillGapPlanPanel } from "@/components/performance/SkillGapPlanPanel";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
-import { cardSurface, moduleTone, panelMin } from "@/components/ui/surface";
+import { btnPrimary, cardSurface, cardTitle, moduleStripe, moduleTone, pageKicker, pageLead, pageTitle, panelMin } from "@/components/ui/surface";
 
 const SESSION_KEY = DEMO_PERFORMANCE_KEY;
 
@@ -108,11 +108,11 @@ export function PerformanceWorkspace() {
   return (
     <div className="space-y-6">
       <div>
-        <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.performance.kicker}`}>{t("perf.kicker")}</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+        <p className={`${pageKicker} ${moduleTone.performance.kicker}`}>{t("perf.kicker")}</p>
+        <h1 className={pageTitle}>
           <HelpTitle hint={t("perf.hint")}>{t("perf.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t("perf.description")}</p>
+        <p className={pageLead}>{t("perf.description")}</p>
       </div>
 
       {error ? (
@@ -122,7 +122,8 @@ export function PerformanceWorkspace() {
         <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p>
       ) : null}
 
-      <form onSubmit={generate} className={`space-y-4 ${cardSurface} ${panelMin}`}>
+      <form onSubmit={generate} className={`space-y-4 ${cardSurface} ${moduleStripe.performance} ${panelMin}`}>
+        <h2 className={cardTitle}>{t("perf.title")}</h2>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="text-sm">
             <span className="mb-1 block font-medium text-slate-700">{t("perf.employee")}</span>
@@ -157,7 +158,7 @@ export function PerformanceWorkspace() {
           <button
             type="submit"
             disabled={generating}
-            className="inline-flex min-w-0 items-center justify-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-center text-sm font-medium leading-tight text-white hover:bg-[#0f2744] disabled:opacity-50"
+            className={btnPrimary}
           >
             {generating ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Sparkles className="h-4 w-4 shrink-0" />}
             <span className="min-w-0">{t("perf.generate")}</span>
@@ -177,7 +178,7 @@ export function PerformanceWorkspace() {
 
       {latest ? (
         <section className="grid gap-4 lg:grid-cols-2">
-          <article className={`${cardSurface} min-h-[16rem]`}>
+          <article className={`${cardSurface} ${moduleStripe.performance} min-h-[16rem]`}>
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold text-[#0b1f3a]">{latest.employeeName}</h2>
@@ -221,14 +222,14 @@ export function PerformanceWorkspace() {
 
       <section>
         <h2 className="mb-3 text-base font-semibold text-[#0b1f3a]">{t("perf.saved")}</h2>
-        {loading ? <p className="text-sm text-slate-400">{t("perf.loading")}</p> : null}
+        {loading ? <p className="text-sm text-slate-500">{t("perf.loading")}</p> : null}
         <div className="grid gap-3 md:grid-cols-2">
           {reviews.map((review) => (
             <button
               type="button"
               key={review.id}
               onClick={() => setLatest(review)}
-              className={`${cardSurface} text-left`}
+              className={`${cardSurface} ${moduleStripe.performance} text-left`}
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-[#0b1f3a]">{review.employeeName}</p>

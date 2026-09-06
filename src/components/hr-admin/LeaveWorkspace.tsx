@@ -23,7 +23,7 @@ import { ProfileSelfService } from "@/components/hr-admin/ProfileSelfService";
 import { OzlukAutopilotBoard } from "@/components/hr-admin/OzlukAutopilotBoard";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
-import { cardSurface, pageKicker, pageLead, pageTitle, tableShell } from "@/components/ui/surface";
+import { btnDangerSm, btnPrimary, btnSecondary, btnSuccessSm, cardSurface, cardTitle, fieldLabel, moduleStripe, pageKicker, pageLead, pageTitle, tableShell } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
 
 const statusStyle: Record<LeaveStatus, string> = {
@@ -153,7 +153,7 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
   return (
     <div className="space-y-8">
       <div>
-        <p className={pageKicker}>{t("leave.kicker")}</p>
+        <p className={`${pageKicker} text-emerald-700`}>{t("leave.kicker")}</p>
         <h1 className={pageTitle}>
           <HelpTitle hint={t("leave.hint")}>{t("leave.title")}</HelpTitle>
         </h1>
@@ -168,11 +168,11 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
         <form
           id="leave-form"
           onSubmit={submit}
-          className={`space-y-4 ${cardSurface}`}
+          className={`space-y-4 ${cardSurface} ${moduleStripe.leave}`}
         >
-          <h2 className="text-base font-semibold text-[#0b1f3a]">{t("leave.form")}</h2>
+          <h2 className={cardTitle}>{t("leave.form")}</h2>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-600">{t("leave.employee")}</span>
+            <span className={fieldLabel}>{t("leave.employee")}</span>
             <input
               value={form.employee}
               onChange={(event) => setForm({ ...form, employee: event.target.value })}
@@ -181,7 +181,7 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-600">{t("leave.dept")}</span>
+            <span className={fieldLabel}>{t("leave.dept")}</span>
             <SelectField
               value={form.department}
               onChange={(event) => setForm({ ...form, department: event.target.value })}
@@ -192,7 +192,7 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
             </SelectField>
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-600">{t("leave.type")}</span>
+            <span className={fieldLabel}>{t("leave.type")}</span>
             <SelectField
               value={form.type}
               onChange={(event) => setForm({ ...form, type: event.target.value as LeaveType })}
@@ -206,7 +206,7 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-sm">
-              <span className="mb-1 block text-slate-600">{t("leave.start")}</span>
+              <span className={fieldLabel}>{t("leave.start")}</span>
               <input
                 type="date"
                 value={form.startDate}
@@ -215,7 +215,7 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
               />
             </label>
             <label className="block text-sm">
-              <span className="mb-1 block text-slate-600">{t("leave.end")}</span>
+              <span className={fieldLabel}>{t("leave.end")}</span>
               <input
                 type="date"
                 value={form.endDate}
@@ -225,7 +225,7 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
             </label>
           </div>
           <label className="block text-sm">
-            <span className="mb-1 block text-slate-600">{t("leave.reason")}</span>
+            <span className={fieldLabel}>{t("leave.reason")}</span>
             <textarea
               value={form.reason}
               onChange={(event) => setForm({ ...form, reason: event.target.value })}
@@ -237,18 +237,18 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
           <button
             type="submit"
             disabled={saving}
-            className="w-full rounded-xl bg-[#123056] py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+            className={`w-full ${btnPrimary}`}
           >
             {saving ? t("leave.saving") : t("leave.submit")}
           </button>
           {notice ? <p className="text-xs text-sky-800">{notice}</p> : null}
         </form>
 
-        <section className={`${tableShell}`}>
-          <div className="flex items-center justify-between gap-3 border-b border-sky-50 px-5 py-4">
-            <h2 className="text-base font-semibold text-[#0b1f3a]">{t("leave.table")}</h2>
+        <section className={`${tableShell} ${moduleStripe.leave}`}>
+          <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
+            <h2 className="text-lg font-bold text-slate-900">{t("leave.table")}</h2>
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-800">
+              <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-800">
                 {t("leave.pendingCount", { pending: pending.length, total: requests.length })}
               </span>
               <button
@@ -257,7 +257,7 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
                   setLoading(true);
                   void loadRequests();
                 }}
-                className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                className={btnSecondary}
               >
                 {t("common.refresh")}
               </button>
@@ -279,14 +279,14 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
-                    <td className="px-4 py-8 text-sm text-slate-400" colSpan={7}>
+                    <td className="px-4 py-8 text-sm text-slate-500" colSpan={7}>
                     {t("leave.loading")}
                     </td>
                   </tr>
                 ) : null}
                 {!loading && requests.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-8 text-sm text-slate-400" colSpan={7}>
+                    <td className="px-4 py-8 text-sm text-slate-500" colSpan={7}>
                     {t("leave.empty")}
                     </td>
                   </tr>
@@ -296,7 +296,7 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
                     <td className="px-4 py-4 font-medium text-slate-700">{shortId(row.id)}</td>
                     <td className="px-4 py-4">
                       <div className="font-medium text-slate-900">{row.employee}</div>
-                      <div className="mt-1 text-xs text-slate-400">{row.department}</div>
+                      <div className="mt-1 text-xs font-medium text-slate-500">{row.department}</div>
                     </td>
                     <td className="px-4 py-4">{t(`leave.type.${row.type}` as MessageKey)}</td>
                     <td className="px-4 py-4 text-xs leading-5 text-slate-600">
@@ -315,14 +315,14 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
                             <button
                               type="button"
                               onClick={() => void setStatus(row.id, "onaylandi")}
-                              className="rounded-lg bg-emerald-600 px-2 py-1 text-xs font-medium text-white"
+                              className={btnSuccessSm}
                             >
                               {t("leave.approve")}
                             </button>
                             <button
                               type="button"
                               onClick={() => void setStatus(row.id, "reddedildi")}
-                              className="rounded-lg bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700"
+                              className={btnDangerSm}
                             >
                               {t("leave.reject")}
                             </button>

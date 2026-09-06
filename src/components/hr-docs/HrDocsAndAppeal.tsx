@@ -6,7 +6,7 @@ import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
 import { submitAppeal, type AppealModule } from "@/lib/appeals";
 import { SelectField } from "@/components/ui/SelectField";
-import { cardSurface } from "@/components/ui/surface";
+import { btnPrimary, btnPrimarySm, cardSurface, moduleStripe } from "@/components/ui/surface";
 
 export type PersonnelFile = {
   id: string;
@@ -163,7 +163,7 @@ export function HrDocsAndAppeal({
               placeholder={t("appeal.detailPlaceholder")}
             />
           </label>
-          <button type="submit" className="w-full rounded-xl bg-[#123056] py-2.5 text-sm font-medium text-white hover:bg-[#0f2744]">
+          <button type="submit" className={`w-full ${btnPrimary}`}>
             {t("appeal.submit")}
           </button>
         </form>
@@ -182,7 +182,7 @@ export function HrDocsAndAppeal({
   }
 
   return (
-    <section className={`${cardSurface} space-y-3`}>
+    <section className={`${cardSurface} ${moduleStripe.leave} space-y-3`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[#0b1f3a]">{t("docs.title")}</h2>
@@ -206,10 +206,10 @@ export function HrDocsAndAppeal({
           dragging ? "border-sky-500 bg-sky-50" : "border-slate-200 bg-slate-50/70"
         }`}
       >
-        <FileUp className="mx-auto h-7 w-7 text-slate-400" />
+        <FileUp className="mx-auto h-7 w-7 text-slate-500" />
         <p className="mt-2 text-sm font-medium text-slate-800">{t("docs.drop")}</p>
         <p className="mt-1 text-xs text-slate-500">PDF, PNG, JPG, WEBP</p>
-        <label className="mt-3 inline-flex cursor-pointer rounded-xl bg-[#123056] px-3 py-2 text-xs font-medium text-white hover:bg-[#0f2744]">
+        <label className={`mt-3 inline-flex cursor-pointer ${btnPrimarySm}`}>
           {t("docs.browse")}
           <input
             type="file"
@@ -229,7 +229,7 @@ export function HrDocsAndAppeal({
               className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm"
             >
               <span className="min-w-0 truncate text-slate-700">{file.name}</span>
-              <span className="shrink-0 text-xs text-slate-400">{Math.max(1, Math.round(file.size / 1024))} KB</span>
+              <span className="shrink-0 text-xs font-medium text-slate-500">{Math.max(1, Math.round(file.size / 1024))} KB</span>
             </li>
           ))}
         </ul>

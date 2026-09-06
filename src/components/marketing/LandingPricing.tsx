@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { useI18n } from "@/components/i18n/LocaleProvider";
-import { cardSurfaceFlush } from "@/components/ui/surface";
+import { btnPrimary, btnSecondary, cardSurfaceFlush } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
 
 const CARDS: {
@@ -82,11 +82,7 @@ export function LandingPricing() {
             </ul>
             <Link
               href="/fiyatlandirma"
-              className={`mt-6 inline-flex h-11 items-center justify-center rounded-full text-sm font-semibold ${
-                plan.popular
-                  ? "bg-[#123056] text-white hover:bg-[#0f2744]"
-                  : "border border-slate-200 bg-white text-slate-800 hover:bg-slate-50"
-              }`}
+              className={`mt-6 h-11 w-full ${plan.popular ? btnPrimary : btnSecondary}`}
             >
               {t("landing.priceCta")}
             </Link>

@@ -14,7 +14,7 @@ import {
   type PulseVote,
 } from "@/lib/pulse";
 import { readLocalJson, writeLocalJson } from "@/lib/session-store";
-import { cardSurface } from "@/components/ui/surface";
+import { btnPrimary, cardSurface, moduleStripe } from "@/components/ui/surface";
 
 function persistAnnouncements(items: CompanyAnnouncement[]) {
   writeLocalJson(ANNOUNCEMENTS_KEY, items);
@@ -63,7 +63,7 @@ export function CompanyPulseCard() {
 
   return (
     <section className="grid min-h-[22rem] items-stretch gap-5 lg:grid-cols-2">
-      <article className={`flex min-h-[22rem] flex-col overflow-hidden ${cardSurface}`}>
+      <article className={`flex min-h-[22rem] flex-col overflow-hidden ${cardSurface} ${moduleStripe.performance}`}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="text-base font-semibold text-[#0b1f3a]">{t("dashboard.announce.title")}</h2>
@@ -73,7 +73,7 @@ export function CompanyPulseCard() {
             <button
               type="button"
               onClick={() => setModalOpen(true)}
-              className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl bg-[#123056] px-3 text-sm font-medium text-white hover:bg-[#0f2744]"
+              className={btnPrimary}
             >
               <Megaphone className="h-4 w-4" />
               {t("dashboard.announce.cta")}
@@ -82,7 +82,7 @@ export function CompanyPulseCard() {
         </div>
         <ul className="mt-4 min-h-[12rem] flex-1 space-y-2 overflow-y-auto">
           {announcements.length === 0 ? (
-            <li className="flex min-h-[12rem] items-center rounded-xl border border-dashed border-slate-200 px-4 text-sm text-slate-400">
+            <li className="flex min-h-[12rem] items-center rounded-xl border border-dashed border-slate-200 px-4 text-sm text-slate-500">
               {t("dashboard.announce.empty")}
             </li>
           ) : (
@@ -90,14 +90,14 @@ export function CompanyPulseCard() {
               <li key={item.id} className="rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3">
                 <p className="text-sm font-semibold text-slate-800">{item.title}</p>
                 <p className="mt-1 line-clamp-3 text-xs leading-5 text-slate-500">{item.body}</p>
-                <p className="mt-2 text-[11px] text-slate-400">{item.createdAt.slice(0, 16).replace("T", " ")}</p>
+                <p className="mt-2 text-[11px] font-medium text-slate-500">{item.createdAt.slice(0, 16).replace("T", " ")}</p>
               </li>
             ))
           )}
         </ul>
       </article>
 
-      <article className={`flex min-h-[22rem] flex-col ${cardSurface} bg-gradient-to-br from-violet-50/70 via-white to-slate-50`}>
+      <article className={`flex min-h-[22rem] flex-col ${cardSurface} ${moduleStripe.leave}`}>
         <h2 className="text-base font-semibold text-[#0b1f3a]">{t("dashboard.pulse.title")}</h2>
         <p className="mt-1 text-sm leading-6 text-slate-500">{t("dashboard.pulse.lead")}</p>
         <div className="mt-6 flex min-h-[3.5rem] items-end gap-3">
@@ -214,7 +214,7 @@ function AnnounceModal({
           >
             {t("common.cancel")}
           </button>
-          <button type="submit" className="h-10 rounded-xl bg-[#123056] px-4 text-sm font-medium text-white">
+          <button type="submit" className={btnPrimary}>
             {t("dashboard.announce.publish")}
           </button>
         </div>

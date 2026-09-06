@@ -9,7 +9,7 @@ import {
   type ProfileRequest,
 } from "@/lib/profile-requests";
 import { readLocalJson, writeLocalJson } from "@/lib/session-store";
-import { cardSurface } from "@/components/ui/surface";
+import { btnDangerSm, btnPrimary, btnSuccessSm, cardSurface, moduleStripe } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
 
 function persist(items: ProfileRequest[]) {
@@ -70,11 +70,11 @@ export function ProfileSelfService() {
   }
 
   return (
-    <section className={`${cardSurface} min-h-[28rem] w-full space-y-4 transition-none`}>
+    <section className={`${cardSurface} ${moduleStripe.leave} min-h-[28rem] w-full space-y-4 transition-none`}>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("profile.kicker")}</p>
-        <h2 className="mt-1 text-base font-semibold text-[#0b1f3a]">{t("profile.title")}</h2>
-        <p className="mt-1 text-sm leading-6 text-slate-500">{t("profile.lead")}</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-emerald-700">{t("profile.kicker")}</p>
+        <h2 className="mt-1 text-lg font-bold text-slate-900">{t("profile.title")}</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-700">{t("profile.lead")}</p>
       </div>
       <div className="min-h-10">
         {notice ? (
@@ -124,7 +124,7 @@ export function ProfileSelfService() {
           />
         </label>
         <div className="md:col-span-2">
-          <button type="submit" className="h-10 rounded-full bg-[#123056] px-5 text-sm font-medium text-white">
+          <button type="submit" className={btnPrimary}>
             {t("profile.submit")}
           </button>
         </div>
@@ -144,7 +144,7 @@ export function ProfileSelfService() {
           <tbody className="divide-y divide-slate-100">
             {items.length === 0 ? (
               <tr>
-                <td className="px-4 py-8 text-slate-400" colSpan={hrDesk ? 5 : 4}>
+                <td className="px-4 py-8 text-slate-500" colSpan={hrDesk ? 5 : 4}>
                   {t("profile.empty")}
                 </td>
               </tr>
@@ -169,14 +169,14 @@ export function ProfileSelfService() {
                           <button
                             type="button"
                             onClick={() => setStatus(row.id, "approved")}
-                            className="h-8 rounded-full bg-emerald-600 px-3 text-xs font-medium text-white"
+                            className={btnSuccessSm}
                           >
                             {t("profile.approve")}
                           </button>
                           <button
                             type="button"
                             onClick={() => setStatus(row.id, "rejected")}
-                            className="h-8 rounded-full bg-slate-200 px-3 text-xs font-medium text-slate-700"
+                            className={btnDangerSm}
                           >
                             {t("profile.reject")}
                           </button>

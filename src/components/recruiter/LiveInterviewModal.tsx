@@ -5,6 +5,7 @@ import { Loader2, Mic, Square, Video, X } from "lucide-react";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { allQuestions, type InterviewGuide } from "@/lib/interview";
 import type { StoredResume } from "@/lib/resumes";
+import { btnPrimary } from "@/components/ui/surface";
 
 type LiveInterviewModalProps = {
   open: boolean;
@@ -288,7 +289,7 @@ export function LiveInterviewModal({
                 type="button"
                 disabled={saving}
                 onClick={() => void finish()}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+                className={btnPrimary}
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 Mülakatı Tamamla ve AI Değerlendirmesi Al

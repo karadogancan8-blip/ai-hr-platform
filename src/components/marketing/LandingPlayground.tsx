@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Briefcase, ClipboardList, Loader2, Sparkles, TrendingUp } from "lucide-react";
 import { useI18n } from "@/components/i18n/LocaleProvider";
-import { cardSurfaceFlush } from "@/components/ui/surface";
+import { btnPrimary, cardSurfaceFlush } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
 
 type PlayTab = "recruit" | "leave" | "perf";
@@ -69,7 +69,7 @@ export function LandingPlayground() {
           type="button"
           onClick={run}
           disabled={running}
-          className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#123056] px-5 text-sm font-semibold text-white hover:bg-[#0f2744] disabled:opacity-60"
+          className={`mt-5 h-11 w-full ${btnPrimary}`}
         >
           {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
           {running ? t("landing.play.thinking") : t("landing.play.run")}
@@ -77,14 +77,14 @@ export function LandingPlayground() {
       </div>
 
       <div className="flex min-h-[32rem] flex-col bg-[#f8fafc] p-6 sm:p-8 lg:col-span-7">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{t("landing.play.output")}</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{t("landing.play.output")}</p>
         <div className="mt-3 min-h-[22rem] flex-1 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
           {running ? (
-            <p className="text-sm text-slate-400">{t("landing.play.thinking")}</p>
+            <p className="text-sm text-slate-500">{t("landing.play.thinking")}</p>
           ) : shown ? (
             <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700">{t(active.resultKey)}</p>
           ) : (
-            <p className="text-sm leading-7 text-slate-400">{t("landing.play.idle")}</p>
+            <p className="text-sm leading-7 text-slate-500">{t("landing.play.idle")}</p>
           )}
         </div>
       </div>

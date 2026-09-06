@@ -125,13 +125,13 @@ export function CommandBar() {
                   type="button"
                   onClick={() => go(item)}
                   className={`flex h-11 w-full items-center justify-between rounded-full px-4 text-left text-sm transition-none ${
-                    index === active ? "bg-[#123056] text-white" : "text-slate-700 hover:bg-slate-50"
+                    index === active ? "bg-indigo-600 text-white" : "text-slate-800 hover:bg-slate-50"
                   }`}
                 >
                   <span className="min-w-0 truncate font-medium">
                     {item.group === "people" ? item.keywords : t(item.titleKey)}
                   </span>
-                  <span className={`ms-3 shrink-0 text-[11px] ${index === active ? "text-sky-100" : "text-slate-400"}`}>
+                  <span className={`ms-3 shrink-0 text-[11px] font-medium ${index === active ? "text-indigo-100" : "text-slate-500"}`}>
                     {item.group === "people" ? t("cmd.group.people") : t(`cmd.group.${item.group}` as MessageKey)}
                   </span>
                 </button>

@@ -7,7 +7,7 @@ import { SelectField } from "@/components/ui/SelectField";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { ESIGN_STORAGE_KEY, ESIGN_UPDATED_EVENT, type EsignPacket, type EsignTemplate } from "@/lib/esign";
 import { readLocalJson, writeLocalJson } from "@/lib/session-store";
-import { cardSurface } from "@/components/ui/surface";
+import { btnPrimary, btnPrimarySm, cardSurface, moduleStripe } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
 
 function persist(items: EsignPacket[]) {
@@ -95,11 +95,11 @@ export function EsignDesk() {
   const active = packets.find((item) => item.id === activeId) ?? null;
 
   return (
-    <section className={`${cardSurface} min-h-[28rem] w-full space-y-4 transition-none`}>
+    <section className={`${cardSurface} ${moduleStripe.leave} min-h-[28rem] w-full space-y-4 transition-none`}>
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-700">{t("esign.kicker")}</p>
-        <h2 className="mt-1 text-base font-semibold text-[#0b1f3a]">{t("esign.title")}</h2>
-        <p className="mt-1 text-sm leading-6 text-slate-500">{t("esign.lead")}</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-emerald-700">{t("esign.kicker")}</p>
+        <h2 className="mt-1 text-lg font-bold text-slate-900">{t("esign.title")}</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-700">{t("esign.lead")}</p>
       </div>
 
       {hrDesk ? (
@@ -126,7 +126,7 @@ export function EsignDesk() {
             </SelectField>
           </label>
           <div className="flex items-end">
-            <button type="submit" className="h-10 w-full rounded-full bg-[#123056] text-sm font-medium text-white">
+            <button type="submit" className={`h-10 w-full ${btnPrimary}`}>
               {t("esign.send")}
             </button>
           </div>
@@ -146,7 +146,7 @@ export function EsignDesk() {
           <tbody className="divide-y divide-slate-100">
             {packets.length === 0 ? (
               <tr>
-                <td className="px-4 py-8 text-slate-400" colSpan={4}>
+                <td className="px-4 py-8 text-slate-500" colSpan={4}>
                   {t("esign.empty")}
                 </td>
               </tr>
@@ -169,7 +169,7 @@ export function EsignDesk() {
                       <button
                         type="button"
                         onClick={() => setActiveId(row.id)}
-                        className="inline-flex h-9 items-center gap-1 rounded-full bg-[#123056] px-3 text-xs font-medium text-white"
+                        className={btnPrimarySm}
                       >
                         <PenLine className="h-3.5 w-3.5" />
                         {t("esign.sign")}
@@ -237,7 +237,7 @@ export function EsignDesk() {
                 type="button"
                 onClick={sign}
                 disabled={!typedName.trim()}
-                className="h-10 rounded-full bg-[#123056] px-4 text-sm font-medium text-white disabled:opacity-50"
+                className={btnPrimary}
               >
                 {t("esign.confirm")}
               </button>

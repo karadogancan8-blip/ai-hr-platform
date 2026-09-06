@@ -15,7 +15,7 @@ import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { ItProvisioningList } from "@/components/onboarding/ItProvisioningList";
-import { cardSurface, cardSurfaceFlush } from "@/components/ui/surface";
+import { btnPrimary, cardSurface, cardSurfaceFlush, cardTitle, fieldLabel, moduleStripe, pageKicker, pageLead, pageTitle } from "@/components/ui/surface";
 
 const SESSION_KEY = DEMO_ONBOARDING_KEY;
 
@@ -159,11 +159,11 @@ export function OnboardingWorkspace() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("onb.kicker")}</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+        <p className={`${pageKicker} text-indigo-700`}>{t("onb.kicker")}</p>
+        <h1 className={pageTitle}>
           <HelpTitle hint={t("onb.hint")}>{t("onb.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t("onb.description")}</p>
+        <p className={pageLead}>{t("onb.description")}</p>
       </div>
 
       {error ? (
@@ -175,10 +175,10 @@ export function OnboardingWorkspace() {
 
       <form
         onSubmit={generate}
-        className={`grid gap-3 ${cardSurface} md:grid-cols-2 lg:grid-cols-4`}
+        className={`grid gap-3 ${cardSurface} ${moduleStripe.performance} md:grid-cols-2 lg:grid-cols-4`}
       >
         <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">{t("onb.name")}</span>
+          <span className={fieldLabel}>{t("onb.name")}</span>
           <input
             value={employeeName}
             onChange={(event) => setEmployeeName(event.target.value)}
@@ -187,7 +187,7 @@ export function OnboardingWorkspace() {
           />
         </label>
         <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">{t("onb.role")}</span>
+          <span className={fieldLabel}>{t("onb.role")}</span>
           <input
             value={role}
             onChange={(event) => setRole(event.target.value)}
@@ -195,7 +195,7 @@ export function OnboardingWorkspace() {
           />
         </label>
         <label className="text-sm">
-          <span className="mb-1 block font-medium text-slate-700">{t("onb.dept")}</span>
+          <span className={fieldLabel}>{t("onb.dept")}</span>
           <input
             value={department}
             onChange={(event) => setDepartment(event.target.value)}
@@ -207,7 +207,7 @@ export function OnboardingWorkspace() {
           <button
             type="submit"
             disabled={generating}
-            className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-[#123056] px-3 py-2.5 text-center text-sm font-medium leading-tight text-white hover:bg-[#0f2744] disabled:opacity-50"
+            className={`min-w-0 flex-1 ${btnPrimary}`}
           >
             {generating ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Sparkles className="h-4 w-4 shrink-0" />}
             <span className="min-w-0">{t("onb.generate")}</span>
@@ -215,7 +215,7 @@ export function OnboardingWorkspace() {
         </div>
       </form>
 
-      {loading ? <p className="text-sm text-slate-400">{t("onb.loading")}</p> : null}
+      {loading ? <p className="text-sm text-slate-500">{t("onb.loading")}</p> : null}
 
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.4fr_1fr]">
         <section className="space-y-3">
@@ -230,13 +230,15 @@ export function OnboardingWorkspace() {
                   setSelectedId(plan.id);
                   setChat([]);
                 }}
-                className={`w-full rounded-2xl border p-4 text-left shadow-sm ${
-                  active ? "border-sky-300 bg-sky-50" : "border-slate-200/70 bg-white"
+                className={`w-full rounded-2xl border p-4 text-left shadow-sm transition-all ${
+                  active
+                    ? "border-indigo-300 bg-indigo-50/60 border-l-4 border-l-indigo-500"
+                    : "border-slate-200/90 bg-white hover:shadow-md"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-sm font-semibold text-[#0b1f3a]">{plan.employeeName}</p>
+                    <p className="text-sm font-bold text-slate-900">{plan.employeeName}</p>
                     <p className="text-xs text-slate-500">
                       {plan.role} · {plan.department}
                     </p>
@@ -251,15 +253,15 @@ export function OnboardingWorkspace() {
               </button>
             );
           })}
-          {!loading && !plans.length ? <p className="text-sm text-slate-400">{t("onb.empty")}</p> : null}
+          {!loading && !plans.length ? <p className="text-sm text-slate-500">{t("onb.empty")}</p> : null}
         </section>
 
-        <section className={`${cardSurface} min-h-[28rem]`}>
+        <section className={`${cardSurface} ${moduleStripe.performance} min-h-[28rem]`}>
           {selected ? (
             <>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-base font-semibold text-[#0b1f3a]">{t("onb.checklist")}</h2>
-                <span className="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-800">
+              <div className={cardTitle}>
+                <h2>{t("onb.checklist")}</h2>
+                <span className="rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-800">
                   {t("onb.progress", { value: progress })}
                 </span>
               </div>
@@ -268,7 +270,7 @@ export function OnboardingWorkspace() {
               <div className="mt-4 space-y-4">
                 {selected.weeks.map((week) => (
                   <div key={week.week} className="rounded-xl border border-slate-100 p-3">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-sky-800">{week.title}</p>
+                    <p className="text-xs font-medium uppercase tracking-wide text-indigo-800">{week.title}</p>
                     <p className="mt-1 text-xs text-slate-500">{week.focus}</p>
                     <ul className="mt-2 space-y-2">
                       {selected.tasks
@@ -295,11 +297,11 @@ export function OnboardingWorkspace() {
               </div>
             </>
           ) : (
-            <p className="text-sm text-slate-400">{t("onb.pick")}</p>
+            <p className="text-sm text-slate-500">{t("onb.pick")}</p>
           )}
         </section>
 
-        <section className={`flex min-h-[420px] flex-col ${cardSurfaceFlush}`}>
+        <section className={`flex min-h-[420px] flex-col ${cardSurfaceFlush} ${moduleStripe.performance}`}>
           <div className="border-b border-sky-50 px-4 py-3">
             <p className="text-sm font-semibold text-[#0b1f3a]">{t("onb.chatTitle")}</p>
             <p className="text-xs text-slate-500">{t("onb.chatLead")}</p>
@@ -309,13 +311,13 @@ export function OnboardingWorkspace() {
               <div
                 key={`${item.role}-${index}`}
                 className={`rounded-xl px-3 py-2 text-sm leading-6 ${
-                  item.role === "user" ? "ml-6 bg-[#123056] text-white" : "mr-6 bg-sky-50 text-slate-700"
+                  item.role === "user" ? "ml-6 bg-indigo-600 text-white" : "mr-6 bg-indigo-50 text-slate-800"
                 }`}
               >
                 {item.content}
               </div>
             ))}
-            {chatPending ? <p className="text-xs text-slate-400">{t("onb.typing")}</p> : null}
+            {chatPending ? <p className="text-xs font-medium text-slate-500">{t("onb.typing")}</p> : null}
           </div>
           <form onSubmit={sendChat} className="flex gap-2 border-t border-sky-50 p-3">
             <input
@@ -328,7 +330,7 @@ export function OnboardingWorkspace() {
             <button
               type="submit"
               disabled={!selected || chatPending}
-              className="rounded-xl bg-[#123056] px-3 py-2 text-white disabled:opacity-50"
+              className={btnPrimary}
             >
               <IconSend className="h-4 w-4" />
             </button>

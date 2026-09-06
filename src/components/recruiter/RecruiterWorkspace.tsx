@@ -25,7 +25,7 @@ import {
   takePublicApplication,
   type PublicApplication,
 } from "@/lib/public-applications";
-import { cardSurface, moduleTone } from "@/components/ui/surface";
+import { btnPrimary, btnPrimarySm, btnSecondary, cardSurface, fieldLabel, moduleStripe, moduleTone, pageKicker, pageLead, pageTitle } from "@/components/ui/surface";
 
 function scoreTone(score: number) {
   if (score >= 90) return "from-sky-500 to-blue-700";
@@ -315,8 +315,8 @@ export function RecruiterWorkspace() {
 
   return (
     <div className="space-y-8">
-      <div className={`${cardSurface} text-sm`}>
-        <p className="text-xs font-semibold text-[#0b1f3a]">{t("recruit.applyLink")}</p>
+      <div className={`${cardSurface} ${moduleStripe.recruit} text-sm`}>
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{t("recruit.applyLink")}</p>
         <p className="mt-0.5 text-[11px] text-slate-500">{t("recruit.applyHint")}</p>
         <div className="mt-2 flex items-center gap-2">
           <code className="min-w-0 flex-1 truncate rounded-lg bg-slate-50 px-2 py-1.5 text-[11px] text-slate-700">
@@ -325,7 +325,7 @@ export function RecruiterWorkspace() {
           <button
             type="button"
             onClick={() => void copyApplyLink()}
-            className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#123056] px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-white hover:bg-[#0f2744]"
+            className={btnPrimarySm}
           >
             <Copy className="h-3.5 w-3.5" />
             {copied ? t("common.copied") : t("common.copy")}
@@ -334,15 +334,15 @@ export function RecruiterWorkspace() {
       </div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.recruit.kicker}`}>{t("recruit.kicker")}</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+          <p className={`${pageKicker} ${moduleTone.recruit.kicker}`}>{t("recruit.kicker")}</p>
+          <h1 className={pageTitle}>
           <HelpTitle hint={t("recruit.hint")}>{t("recruit.title")}</HelpTitle>
           </h1>
-          <p className="mt-2 text-sm leading-7 text-slate-500">{t("recruit.description")}</p>
+          <p className={pageLead}>{t("recruit.description")}</p>
         </div>
-        <div className={`${cardSurface} text-sm`}>
+        <div className={`${cardSurface} ${moduleStripe.recruit} text-sm`}>
           <span className="text-slate-500">{t("recruit.avg")}</span>
-          <span className="ml-2 font-semibold text-[#0b1f3a]">{average}%</span>
+          <span className="ml-2 font-bold text-slate-900">{average}%</span>
         </div>
       </div>
 
@@ -385,9 +385,9 @@ export function RecruiterWorkspace() {
           <div className={`mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-full ${moduleTone.recruit.icon}`}>
             <IconUpload className="h-6 w-6" />
           </div>
-          <p className="mt-3 text-base font-medium text-[#0b1f3a]">{t("recruit.drop")}</p>
+          <p className="mt-3 text-base font-bold text-slate-900">{t("recruit.drop")}</p>
           <p className="mt-1 text-sm text-slate-500">{t("recruit.dropHint")}</p>
-          <label className="mt-4 inline-flex cursor-pointer rounded-xl bg-[#123056] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#0f2744]">
+          <label className={`mt-4 inline-flex cursor-pointer ${btnPrimary}`}>
             {t("recruit.browse")}
             <input
               type="file"
@@ -399,9 +399,9 @@ export function RecruiterWorkspace() {
           {fileName ? <p className="mt-3 text-xs text-sky-800">{fileName}</p> : null}
         </section>
 
-        <section className={`${cardSurface} min-h-[22rem]`}>
+        <section className={`${cardSurface} ${moduleStripe.recruit} min-h-[22rem]`}>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium text-slate-700">{t("recruit.job")}</span>
+            <span className={fieldLabel}>{t("recruit.job")}</span>
             <input
               value={jobTitle}
               onChange={(event) => setJobTitle(event.target.value)}
@@ -409,7 +409,7 @@ export function RecruiterWorkspace() {
             />
           </label>
           <label className="mt-4 block text-sm">
-            <span className="mb-1 block font-medium text-slate-700">{t("recruit.cv")}</span>
+            <span className={fieldLabel}>{t("recruit.cv")}</span>
             <textarea
               value={cvText}
               onChange={(event) => setCvText(event.target.value)}
@@ -423,7 +423,7 @@ export function RecruiterWorkspace() {
             <button
               type="submit"
               disabled={analyzing}
-              className="inline-flex min-w-0 items-center justify-center gap-2 rounded-xl bg-[#123056] px-4 py-2.5 text-center text-sm font-medium leading-tight text-white hover:bg-[#0f2744] disabled:opacity-50"
+              className={btnPrimary}
             >
               {analyzing ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Sparkles className="h-4 w-4 shrink-0" />}
               {analyzing ? t("recruit.analyzing") : t("recruit.analyze")}
@@ -435,27 +435,27 @@ export function RecruiterWorkspace() {
 
       <section>
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold text-[#0b1f3a]">{t("recruit.list")}</h2>
+          <h2 className="text-lg font-bold text-slate-900">{t("recruit.list")}</h2>
           <button
             type="button"
             onClick={() => {
               setLoading(true);
               void loadResumes();
             }}
-            className="rounded-lg border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
+            className={btnSecondary}
           >
             {t("common.refresh")}
           </button>
         </div>
-        {loading ? <p className="text-sm text-slate-400">{t("recruit.loading")}</p> : null}
+        {loading ? <p className="text-sm text-slate-500">{t("recruit.loading")}</p> : null}
         {!loading && resumes.length === 0 ? (
-          <p className="text-sm text-slate-400">{t("recruit.empty")}</p>
+          <p className="text-sm text-slate-500">{t("recruit.empty")}</p>
         ) : null}
         <div className="grid min-h-[22rem] gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {resumes.map((resume) => (
             <article
               key={resume.id}
-              className={`${cardSurface} group relative flex min-h-[18rem] flex-col`}
+              className={`${cardSurface} ${moduleStripe.recruit} group relative flex min-h-[18rem] flex-col`}
             >
               <DeleteIconButton
                 label={t("common.delete")}
@@ -464,7 +464,7 @@ export function RecruiterWorkspace() {
               />
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-[#0b1f3a]">{resume.name}</h3>
+                  <h3 className="text-sm font-bold text-slate-900">{resume.name}</h3>
                   <p className="text-xs text-slate-500">{resume.role}</p>
                   <span
                     className={`mt-2 inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold ${
@@ -516,14 +516,14 @@ export function RecruiterWorkspace() {
                   </span>
                 ))}
               </div>
-              <p className="mt-4 text-xs text-slate-400">{formatWhen(resume.createdAt, localeMeta[locale].htmlLang)}</p>
+              <p className="mt-4 text-xs font-medium text-slate-500">{formatWhen(resume.createdAt, localeMeta[locale].htmlLang)}</p>
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <div className="flex min-w-0 items-center gap-1 overflow-visible sm:col-span-2">
                   <HelpTip text={t("recruit.qsHint")} side="top" align="start" sideOffset={6} />
                   <button
                     type="button"
                     onClick={() => void openQuestionGuide(resume)}
-                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full bg-violet-600 px-3 py-2 text-center text-xs font-medium leading-tight text-white hover:bg-violet-700"
+                    className={`min-w-0 flex-1 ${btnPrimarySm}`}
                   >
                     <Sparkles className="h-3.5 w-3.5 shrink-0" />
                     <span className="min-w-0">{t("recruit.qsGenerate")}</span>
@@ -545,7 +545,7 @@ export function RecruiterWorkspace() {
                   <button
                     type="button"
                     onClick={() => void openLiveInterview(resume)}
-                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#123056] px-3 py-2 text-center text-xs font-medium leading-tight text-white hover:bg-[#0f2744]"
+                    className={`min-w-0 flex-1 ${btnPrimarySm}`}
                   >
                     <Video className="h-3.5 w-3.5 shrink-0" />
                     <span className="min-w-0">{t("recruit.live")}</span>

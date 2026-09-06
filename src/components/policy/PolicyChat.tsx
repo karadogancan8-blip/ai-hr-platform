@@ -8,7 +8,7 @@ import { readSessionList } from "@/lib/session-store";
 import type { ChatMessage } from "@/lib/types";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTitle } from "@/components/ui/HelpTip";
-import { cardSurfaceFlush } from "@/components/ui/surface";
+import { btnPrimary, cardSurfaceFlush, moduleStripe, pageKicker, pageLead, pageTitle } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { localeMeta } from "@/lib/i18n";
 
@@ -92,14 +92,14 @@ export function PolicyChat() {
   return (
     <div className="flex min-h-[calc(100vh-8rem)] flex-col">
       <div className="mb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("policy.kicker")}</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+        <p className={`${pageKicker} text-indigo-700`}>{t("policy.kicker")}</p>
+        <h1 className={pageTitle}>
           <HelpTitle hint={t("policy.hint")}>{t("policy.title")}</HelpTitle>
         </h1>
-        <p className="mt-1 text-sm text-slate-500">{t("policy.description")}</p>
+        <p className={pageLead}>{t("policy.description")}</p>
       </div>
 
-      <div className={`flex min-h-[520px] flex-1 flex-col overflow-hidden ${cardSurfaceFlush}`}>
+      <div className={`flex min-h-[520px] flex-1 flex-col overflow-hidden ${cardSurfaceFlush} ${moduleStripe.performance}`}>
         <div className="border-b border-sky-50 bg-[#f7fbff] px-5 py-3 text-xs text-slate-500">
           {t("policy.source")}
         </div>
@@ -112,23 +112,23 @@ export function PolicyChat() {
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 ${
                   message.role === "user"
-                    ? "bg-[#123056] text-white"
-                    : "bg-sky-50 text-slate-800 ring-1 ring-sky-100"
+                    ? "bg-indigo-600 text-white"
+                    : "bg-indigo-50 text-slate-800 ring-1 ring-indigo-100"
                 }`}
               >
                 {message.role === "assistant" ? (
-                  <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-sky-700">
+                  <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-indigo-700">
                     PolicyAgent
                   </p>
                 ) : null}
                 <p className="whitespace-pre-wrap">{message.content}</p>
-                <p className={`mt-2 text-[10px] ${message.role === "user" ? "text-sky-200" : "text-slate-400"}`}>
+                <p className={`mt-2 text-[10px] font-medium ${message.role === "user" ? "text-indigo-100" : "text-slate-500"}`}>
                   {message.time}
                 </p>
               </div>
             </div>
           ))}
-          {pending ? <div className="text-xs text-slate-400">{t("policy.pending")}</div> : null}
+          {pending ? <div className="text-xs font-medium text-slate-500">{t("policy.pending")}</div> : null}
           <div ref={endRef} />
         </div>
         <form onSubmit={send} className="flex gap-2 border-t border-sky-50 p-3 sm:p-4">
@@ -141,7 +141,7 @@ export function PolicyChat() {
           <button
             type="submit"
             disabled={pending}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#123056] px-4 py-3 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+            className={btnPrimary}
           >
             <IconSend className="h-4 w-4" />
             {t("common.send")}
