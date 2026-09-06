@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { AI_ROUTE_MAX_DURATION, generateAiText, isAiConfigured, withAiFallback } from "@/lib/ai-config";
+import { generateAiText, isAiConfigured, withAiFallback } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { createServerSupabase } from "@/lib/supabase/server";
 
-export const maxDuration = AI_ROUTE_MAX_DURATION;
+export const maxDuration = 20;
 
 function fallback(question: string, employeeName: string, role: string) {
   const q = question.toLocaleLowerCase("tr-TR");

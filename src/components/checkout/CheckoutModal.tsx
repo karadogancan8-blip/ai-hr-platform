@@ -17,6 +17,32 @@ type CheckoutModalProps = {
 };
 
 export function CheckoutModal({ open, plan, cycle = "monthly", chargeLabel, onClose, onPaid }: CheckoutModalProps) {
+  if (!open || !plan) return null;
+  return (
+    <CheckoutDialog
+      key={`${plan.id}-${cycle}`}
+      plan={plan}
+      cycle={cycle}
+      chargeLabel={chargeLabel}
+      onClose={onClose}
+      onPaid={onPaid}
+    />
+  );
+}
+
+function CheckoutDialog({
+  plan,
+  cycle,
+  chargeLabel,
+  onClose,
+  onPaid,
+}: {
+  plan: Plan;
+  cycle: BillingCycle;
+  chargeLabel?: string;
+  onClose: () => void;
+  onPaid: (result: { planType: PlanId; entitlement: string }) => void;
+}) {
   const { t } = useI18n();
   const [name, setName] = useState("");
   const [error, setError] = useState("");
@@ -28,14 +54,6 @@ export function CheckoutModal({ open, plan, cycle = "monthly", chargeLabel, onCl
   }, []);
 
   useEffect(() => {
-    if (!open) return;
-    setName("");
-    setError("");
-    setPending(false);
-  }, [open, plan?.id]);
-
-  useEffect(() => {
-    if (!open) return;
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape" && !pending) onClose();
     }
@@ -63,9 +81,7 @@ export function CheckoutModal({ open, plan, cycle = "monthly", chargeLabel, onCl
       window.removeEventListener("message", onMessage);
       window.removeEventListener("nexus-checkout-paid", onPaidEvent);
     };
-  }, [open, pending, onClose, onPaid]);
-
-  if (!open || !plan) return null;
+  }, [pending, onClose, onPaid]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/45 p-4 backdrop-blur-[2px] sm:items-center">
@@ -109,7 +125,7 @@ export function CheckoutModal({ open, plan, cycle = "monthly", chargeLabel, onCl
         </label>
 
         <div className="mt-3">
-          <SecureCardFields planId={plan.id} cycle={cycle} holderName={name} onError={handleError} />
+          <SecureCardFields key={`${plan.id}-${cycle}`} planId={plan.id} cycle={cycle} holderName={name} onError={handleError} />
         </div>
 
         <button

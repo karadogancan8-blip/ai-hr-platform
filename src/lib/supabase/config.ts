@@ -14,11 +14,14 @@ export function isSupabaseConfigured() {
   return Boolean(supabaseUrl() && supabaseAnonKey());
 }
 
+/** Build sırasında env yoksa çökme; gerçek istekler isSupabaseConfigured ile korunur. */
+export function supabaseEnvOrPlaceholder() {
+  return {
+    url: supabaseUrl() || "https://placeholder.supabase.co",
+    key: supabaseAnonKey() || "public-anon-placeholder",
+  };
+}
+
 export function requireSupabaseEnv() {
-  if (!isSupabaseConfigured()) {
-    throw new Error(
-      "Supabase yapılandırılmamış. NEXT_PUBLIC_SUPABASE_URL ve NEXT_PUBLIC_SUPABASE_ANON_KEY değerlerini .env.local dosyasına ekleyin.",
-    );
-  }
-  return { url: supabaseUrl(), key: supabaseAnonKey() };
+  return supabaseEnvOrPlaceholder();
 }

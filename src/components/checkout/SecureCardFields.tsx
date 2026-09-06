@@ -80,9 +80,6 @@ export function SecureCardFields({
 
   useEffect(() => {
     let cancelled = false;
-    setReady(false);
-    setIntent(null);
-    setThreeDs(false);
 
     void (async () => {
       const response = await fetch("/api/billing/create-intent", {

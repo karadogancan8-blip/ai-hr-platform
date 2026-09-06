@@ -1,6 +1,7 @@
 import { getSupabase } from "./supabase";
 import { getCompanyId, resolveOptionalCompanyId, type AppSupabase } from "./tenant";
-import type { ResumeRow } from "./database.types";
+import { omitPayloadKey } from "./payload";
+import type { Database, ResumeRow } from "./database.types";
 
 export type StoredResume = {
   id: string;
@@ -67,7 +68,7 @@ export async function fetchResumes(client?: AppSupabase) {
 export async function insertResume(input: ResumeInsert, client?: AppSupabase) {
   const supabase = client ?? getSupabase();
   const companyId = await resolveOptionalCompanyId(supabase);
-  const payload: Record<string, string | number | string[] | null> = {
+  let payload: Database["public"]["Tables"]["resumes"]["Insert"] = {
     company_id: companyId,
     candidate_name: input.name,
     name: input.name,
@@ -103,15 +104,15 @@ export async function insertResume(input: ResumeInsert, client?: AppSupabase) {
 
     const column = missingColumn(error.message);
     if (column && column in payload && column !== "company_id") {
-      delete payload[column];
+      payload = omitPayloadKey(payload, column);
       continue;
     }
     if (/company_id|invalid input syntax for type uuid|foreign key|null value/i.test(error.message) && "company_id" in payload) {
-      delete payload.company_id;
+      payload = omitPayloadKey(payload, "company_id");
       continue;
     }
     if (!column || !(column in payload)) throw new Error(error.message);
-    delete payload[column];
+    payload = omitPayloadKey(payload, column);
   }
 
   throw new Error("CV analizi resumes tablosuna kaydedilemedi.");
@@ -124,8 +125,7 @@ export async function updateResumeInterview(
 ) {
   const supabase = client ?? getSupabase();
   const companyId = await getCompanyId(supabase);
-  const payload: Record<string, string | number> = {
-    interview_score: input.interviewScore,
+  let payload: Database["public"]["Tables"]["resumes"]["Update"] = {
     interview_notes: input.interviewNotes ?? "",
   };
 
@@ -147,7 +147,7 @@ export async function updateResumeInterview(
       );
     }
     if (!column || !(column in payload) || column === "interview_score") throw new Error(error.message);
-    delete payload[column];
+    payload = omitPayloadKey(payload, column);
   }
 
   throw new Error("Mülakat skoru kaydedilemedi.");

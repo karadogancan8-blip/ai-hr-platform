@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { AI_ROUTE_MAX_DURATION, generateAiText, isAiConfigured, withAiFallback } from "@/lib/ai-config";
+import { generateAiText, isAiConfigured, withAiFallback } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import type { Locale } from "@/lib/i18n";
 
-export const maxDuration = AI_ROUTE_MAX_DURATION;
+export const maxDuration = 20;
 
 const DEPT_LABEL: Record<string, string> = {
   hr: "Human Resources",

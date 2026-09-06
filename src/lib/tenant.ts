@@ -51,7 +51,9 @@ export async function ensureCompanyForUser(
     companyError = retry.error;
   }
 
-  if (companyError) throw new Error(companyError.message);
+  if (companyError || !company?.id) {
+    throw new Error(companyError?.message ?? "Şirket oluşturulamadı.");
+  }
 
   const { error: profileError } = await supabase.from("profiles").upsert({
     id: user.id,

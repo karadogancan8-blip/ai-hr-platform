@@ -21,17 +21,6 @@ export const LEGAL_DOCS: LegalDocMeta[] = [
   { id: "cookies", href: "/cerez-politikasi", titleKey: "legal.cookies", summaryKey: "legal.cookies.summary" },
 ];
 
-export const LEGAL_HREF: Record<LegalDocId, string> = {
-  privacy: "/gizlilik",
-  terms: "/kullanim-sartlari",
-  kvkk: "/kvkk",
-  cookies: "/cerez-politikasi",
-};
-
-export function legalDocByHref(pathname: string) {
-  return LEGAL_DOCS.find((doc) => doc.href === pathname) ?? null;
-}
-
 const TR: Record<LegalDocId, LegalSection[]> = {
   privacy: [
     {

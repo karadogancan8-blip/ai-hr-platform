@@ -1,12 +1,12 @@
 import { generateObject } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { AI_ROUTE_MAX_DURATION, aiCallOptions, generateAiText, isAiConfigured } from "@/lib/ai-config";
+import { aiCallOptions, generateAiText, isAiConfigured } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { isGeminiConfigured, withGeminiModel } from "@/lib/gemini";
 import { fallbackSkillGapPlan } from "@/lib/skill-gap";
 
-export const maxDuration = AI_ROUTE_MAX_DURATION;
+export const maxDuration = 20;
 
 const weekSchema = z.object({
   week: z.number().min(1).max(4),

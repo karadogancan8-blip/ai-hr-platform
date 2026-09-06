@@ -1,7 +1,8 @@
 import type { LeaveRequest, LeaveStatus, LeaveType } from "./types";
 import { getSupabase } from "./supabase";
 import { getCompanyId, type AppSupabase } from "./tenant";
-import type { LeaveRequestRow } from "./database.types";
+import { omitPayloadKey } from "./payload";
+import type { Database, LeaveRequestRow } from "./database.types";
 import { readLocalJson, writeLocalJson } from "./session-store";
 
 export const LEAVE_CACHE_KEY = "nexus-leave-requests";
@@ -70,7 +71,7 @@ export async function fetchLeaveRequests(client?: AppSupabase) {
 export async function insertLeaveRequest(input: Omit<LeaveRequest, "id">, client?: AppSupabase) {
   const supabase = client ?? getSupabase();
   const companyId = await getCompanyId(supabase);
-  const payload: Record<string, string | number> = {
+  let payload: Database["public"]["Tables"]["leave_requests"]["Insert"] = {
     company_id: companyId,
     employee: input.employee,
     employee_name: input.employee,
@@ -90,7 +91,7 @@ export async function insertLeaveRequest(input: Omit<LeaveRequest, "id">, client
 
     const column = missingColumn(error.message);
     if (!column || column === "company_id" || !(column in payload)) throw new Error(error.message);
-    delete payload[column];
+    payload = omitPayloadKey(payload, column);
   }
 
   throw new Error("İzin talebi kaydedilemedi.");

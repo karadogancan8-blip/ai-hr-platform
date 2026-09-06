@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { AI_ROUTE_MAX_DURATION, generateAiText, isAiConfigured, withAiFallback } from "@/lib/ai-config";
+import { generateAiText, isAiConfigured, withAiFallback } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { createServerSupabase } from "@/lib/supabase/server";
 
-export const maxDuration = AI_ROUTE_MAX_DURATION;
+export const maxDuration = 20;
 
 const policySystem = `Sen PolicyAgent adlı şirket içi mevzuat asistanısın. Yanıtların Türkçe, kısa ve net olsun.
 Çalışanlara İK yönetmeliği, izin, fazla mesai, uzaktan çalışma ve kıdem konularında yardımcı ol.

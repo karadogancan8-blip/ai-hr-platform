@@ -7,6 +7,8 @@ import {
   type PlanId,
   type SubscriptionStatus,
 } from "./plans";
+import { omitPayloadKey } from "./payload";
+import type { CompanyRow } from "./database.types";
 import { getCompanyId, type AppSupabase } from "./tenant";
 
 export type CompanySubscription = {
@@ -53,7 +55,7 @@ export async function updateCompanySubscription(planType: PlanId, client?: AppSu
 
 export async function activateCompanySubscription(companyId: string, planType: PlanId, client: AppSupabase) {
   const subscriptionStatus: SubscriptionStatus = planType === "free" ? "free" : "active";
-  const payload: { plan_type?: string; subscription_status?: string } = {
+  let payload: Partial<CompanyRow> = {
     plan_type: toDbPlanEntitlement(planType),
     subscription_status: toDbSubscriptionStatus(subscriptionStatus),
   };
@@ -72,7 +74,7 @@ export async function activateCompanySubscription(companyId: string, planType: P
 
     const column = missingColumn(error.message);
     if (!column || !(column in payload)) throw new Error(error.message);
-    delete payload[column];
+    payload = omitPayloadKey(payload, column);
   }
 
   throw new Error("Abonelik güncellenemedi. companies tablosuna plan_type ve subscription_status ekleyin.");

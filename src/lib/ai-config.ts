@@ -9,9 +9,6 @@ export const AI_MAX_OUTPUT_TOKENS = 1024;
 
 export const AI_MAX_RETRIES = 1;
 
-/** Vercel function süresi: 15s AI + tampon. */
-export const AI_ROUTE_MAX_DURATION = 20;
-
 const ANTHROPIC_MODEL = "claude-3-5-haiku-latest";
 
 export function publicAppUrl() {
@@ -30,9 +27,16 @@ export function isAiConfigured() {
   return isGeminiConfigured() || isAnthropicConfigured();
 }
 
+function timeoutSignal() {
+  return typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
+    ? AbortSignal.timeout(AI_TIMEOUT_MS)
+    : undefined;
+}
+
 export function aiCallOptions() {
+  const abortSignal = timeoutSignal();
   return {
-    abortSignal: AbortSignal.timeout(AI_TIMEOUT_MS),
+    ...(abortSignal ? { abortSignal } : {}),
     maxOutputTokens: AI_MAX_OUTPUT_TOKENS,
     maxRetries: AI_MAX_RETRIES,
   };
@@ -101,7 +105,7 @@ export async function anthropicGenerateText(input: AiTextInput) {
       "x-api-key": apiKey,
       "anthropic-version": "2023-06-01",
     },
-    signal: AbortSignal.timeout(AI_TIMEOUT_MS),
+    signal: timeoutSignal(),
     body: JSON.stringify({
       model: ANTHROPIC_MODEL,
       max_tokens: AI_MAX_OUTPUT_TOKENS,

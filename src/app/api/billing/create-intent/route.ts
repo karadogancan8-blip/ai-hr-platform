@@ -5,6 +5,7 @@ import {
   isStripeConfigured,
   planByCheckoutId,
   stripeFormRequest,
+  stripePublishableKey,
 } from "@/lib/billing";
 import { isPaidPlanId } from "@/lib/plans";
 import { createServerSupabase } from "@/lib/supabase/server";
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
       });
       return NextResponse.json({
         mode: "setup",
-        publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+        publishableKey: stripePublishableKey(),
         clientSecret: String(setup.client_secret ?? ""),
         amount: 0,
         entitlement,
@@ -83,7 +84,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       mode: "payment",
-      publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+      publishableKey: stripePublishableKey(),
       clientSecret: String(intent.client_secret ?? ""),
       amount,
       entitlement,

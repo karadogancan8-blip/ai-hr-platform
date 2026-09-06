@@ -1,5 +1,7 @@
 import { getSupabase } from "./supabase";
 import { getCompanyId, type AppSupabase } from "./tenant";
+import type { CompanyRow } from "./database.types";
+import { omitPayloadKey } from "./payload";
 
 export const DEFAULT_PRIMARY_COLOR = "#123056";
 export const BRANDING_UPDATED_EVENT = "nexus-branding-updated";
@@ -53,17 +55,18 @@ export async function updateCompanyBranding(
 ) {
   const supabase = client ?? getSupabase();
   const companyId = await getCompanyId(supabase);
-  const payload: Record<string, string> = {
+  const payload: Partial<CompanyRow> = {
     logo_url: input.logoUrl.trim(),
     primary_color: normalizeHexColor(input.primaryColor),
   };
   const name = input.companyName?.trim();
   if (name) payload.name = name;
 
+  let nextPayload = payload;
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const { data, error } = await supabase
       .from("companies")
-      .update(payload)
+      .update(nextPayload)
       .eq("id", companyId)
       .select("*")
       .maybeSingle();
@@ -85,8 +88,8 @@ export async function updateCompanyBranding(
         "companies tablosunda logo_url / primary_color kolonları yok. supabase/schema.sql içindeki ALTER TABLE komutlarını çalıştırın.",
       );
     }
-    if (!column || !(column in payload)) throw new Error(error.message);
-    delete payload[column];
+    if (!column || !(column in nextPayload)) throw new Error(error.message);
+    nextPayload = omitPayloadKey(nextPayload, column);
   }
 
   throw new Error("Şirket markası kaydedilemedi.");
