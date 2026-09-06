@@ -168,7 +168,7 @@ export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boole
         <form
           id="leave-form"
           onSubmit={submit}
-          className={`space-y-4 ${cardSurface} p-6`}
+          className={`space-y-4 ${cardSurface}`}
         >
           <h2 className="text-base font-semibold text-[#0b1f3a]">{t("leave.form")}</h2>
           <label className="block text-sm">

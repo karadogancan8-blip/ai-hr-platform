@@ -16,6 +16,7 @@ import { AppealsInbox } from "@/components/hr-admin/AppealsInbox";
 import { SkillGapPlanPanel } from "@/components/performance/SkillGapPlanPanel";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
+import { cardSurface, moduleTone, panelMin } from "@/components/ui/surface";
 
 const SESSION_KEY = DEMO_PERFORMANCE_KEY;
 
@@ -107,7 +108,7 @@ export function PerformanceWorkspace() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("perf.kicker")}</p>
+        <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.performance.kicker}`}>{t("perf.kicker")}</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <HelpTitle hint={t("perf.hint")}>{t("perf.title")}</HelpTitle>
         </h1>
@@ -121,7 +122,7 @@ export function PerformanceWorkspace() {
         <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p>
       ) : null}
 
-      <form onSubmit={generate} className="space-y-4 rounded-2xl border border-slate-200/70 bg-white p-5">
+      <form onSubmit={generate} className={`space-y-4 ${cardSurface} ${panelMin}`}>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="text-sm">
             <span className="mb-1 block font-medium text-slate-700">{t("perf.employee")}</span>
@@ -176,7 +177,7 @@ export function PerformanceWorkspace() {
 
       {latest ? (
         <section className="grid gap-4 lg:grid-cols-2">
-          <article className="rounded-2xl border border-slate-200/70 bg-white p-6">
+          <article className={`${cardSurface} min-h-[16rem]`}>
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold text-[#0b1f3a]">{latest.employeeName}</h2>
@@ -189,7 +190,7 @@ export function PerformanceWorkspace() {
             <p className="mt-3 text-sm leading-6 text-slate-600">{latest.summary}</p>
             <AiDisclaimer className="mt-4" />
           </article>
-          <article className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5">
+          <article className={`${cardSurface} min-h-[10rem] border-emerald-100 bg-emerald-50/50`}>
             <h3 className="text-xs font-semibold uppercase tracking-wide text-emerald-800">{t("perf.strengths")}</h3>
             <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-slate-700">
               {latest.strengths.map((item) => (
@@ -197,7 +198,7 @@ export function PerformanceWorkspace() {
               ))}
             </ul>
           </article>
-          <article className="rounded-2xl border border-amber-100 bg-amber-50/60 p-5">
+          <article className={`${cardSurface} min-h-[10rem] border-amber-100 bg-amber-50/50`}>
             <h3 className="text-xs font-semibold uppercase tracking-wide text-amber-800">{t("perf.gaps")}</h3>
             <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-slate-700">
               {latest.improvements.map((item) => (
@@ -205,8 +206,8 @@ export function PerformanceWorkspace() {
               ))}
             </ul>
           </article>
-          <article className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-5">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-indigo-800">{t("perf.goals")}</h3>
+          <article className={`${cardSurface} min-h-[10rem] border-violet-100 bg-violet-50/40`}>
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-violet-800">{t("perf.goals")}</h3>
             <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-slate-700">
               {latest.goals.map((item) => (
                 <li key={item}>{item}</li>
@@ -227,7 +228,7 @@ export function PerformanceWorkspace() {
               type="button"
               key={review.id}
               onClick={() => setLatest(review)}
-              className="rounded-2xl border border-slate-200/70 bg-white p-5 text-left hover:border-slate-300"
+              className={`${cardSurface} text-left`}
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-[#0b1f3a]">{review.employeeName}</p>

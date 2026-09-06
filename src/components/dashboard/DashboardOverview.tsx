@@ -6,17 +6,17 @@ import { dashboardStats, liveOperations, recentActivity } from "@/lib/mock-data"
 import { CompanyPulseCard } from "@/components/dashboard/CompanyPulseCard";
 import { CompanyWall } from "@/components/social/CompanyWall";
 import { HelpTitle } from "@/components/ui/HelpTip";
-import { cardSurface, pageLead, pageTitle } from "@/components/ui/surface";
+import { cardSurface, cardSurfaceFlush, pageLead, pageTitle } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
 
 const shortcuts: { href: string; labelKey: MessageKey; icon: typeof FileSearch; iconClass: string }[] = [
-  { href: "/ise-alim", labelKey: "dashboard.link.recruit", icon: FileSearch, iconClass: "bg-sky-50 text-sky-700" },
-  { href: "/izin", labelKey: "dashboard.link.leave", icon: ClipboardList, iconClass: "bg-indigo-50 text-indigo-700" },
-  { href: "/puantaj", labelKey: "dashboard.link.timesheet", icon: Clock, iconClass: "bg-amber-50 text-amber-700" },
+  { href: "/ise-alim", labelKey: "dashboard.link.recruit", icon: FileSearch, iconClass: "bg-blue-50 text-blue-700" },
+  { href: "/izin", labelKey: "dashboard.link.leave", icon: ClipboardList, iconClass: "bg-slate-100 text-slate-700" },
+  { href: "/puantaj", labelKey: "dashboard.link.timesheet", icon: Clock, iconClass: "bg-emerald-50 text-emerald-700" },
   { href: "/sosyal", labelKey: "dashboard.link.wall", icon: Sparkles, iconClass: "bg-fuchsia-50 text-fuchsia-700" },
-  { href: "/mevzuat", labelKey: "dashboard.link.policy", icon: Bot, iconClass: "bg-violet-50 text-violet-700" },
-  { href: "/performans", labelKey: "dashboard.link.performance", icon: TrendingUp, iconClass: "bg-emerald-50 text-emerald-700" },
+  { href: "/mevzuat", labelKey: "dashboard.link.policy", icon: Bot, iconClass: "bg-sky-50 text-sky-700" },
+  { href: "/performans", labelKey: "dashboard.link.performance", icon: TrendingUp, iconClass: "bg-violet-50 text-violet-700" },
 ];
 
 const feed = [
@@ -52,7 +52,7 @@ export function DashboardOverview() {
         <div className="flex min-h-[42rem] flex-col gap-5 lg:col-span-2">
           <div className="grid min-h-[13.5rem] shrink-0 grid-cols-2 gap-4">
             {dashboardStats.map((stat) => (
-              <article key={stat.id} className={`${cardSurface} p-6`}>
+              <article key={stat.id} className={cardSurface}>
                 <p className="text-sm text-slate-500">{stat.label}</p>
                 <div className="mt-3 flex items-end justify-between gap-2">
                   <p className="text-3xl font-semibold tracking-tight text-[#0b1f3a]">{stat.value}</p>
@@ -69,7 +69,7 @@ export function DashboardOverview() {
             ))}
           </div>
 
-          <article className={`flex min-h-[26rem] flex-1 flex-col overflow-hidden ${cardSurface}`}>
+          <article className={`flex min-h-[26rem] flex-1 flex-col overflow-hidden ${cardSurfaceFlush}`}>
             <div className="border-b border-sky-50 px-6 py-4">
               <h2 className="text-base font-semibold text-[#0b1f3a]">{t("dashboard.activity")}</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">{t("dashboard.liveLead")}</p>
@@ -89,7 +89,7 @@ export function DashboardOverview() {
           </article>
         </div>
 
-        <aside className={`flex min-h-[42rem] flex-col overflow-hidden ${cardSurface} bg-gradient-to-br from-indigo-50/70 via-white to-slate-50 p-6`}>
+        <aside className={`flex min-h-[42rem] flex-col overflow-hidden ${cardSurface} bg-gradient-to-br from-indigo-50/70 via-white to-slate-50`}>
           <h2 className="text-base font-semibold tracking-tight text-slate-800">{t("dashboard.quick")}</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">{t("dashboard.quickLead")}</p>
           <div className="mt-6 flex flex-1 flex-col gap-2.5">
@@ -99,12 +99,12 @@ export function DashboardOverview() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white/90 px-3.5 py-3 text-sm font-medium text-slate-800 transition-all hover:border-indigo-300 hover:bg-indigo-50/50"
+                  className="group flex items-center gap-3 overflow-hidden rounded-full border border-slate-200/80 bg-white/90 px-3.5 py-3 text-sm font-medium text-slate-800 transition-all hover:border-indigo-300 hover:bg-indigo-50/50"
                 >
-                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${item.iconClass}`}>
+                  <span className={`flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full ${item.iconClass}`}>
                     <Icon className="h-4 w-4" />
                   </span>
-                  <span>{t(item.labelKey)}</span>
+                  <span className="min-w-0 truncate">{t(item.labelKey)}</span>
                 </Link>
               );
             })}

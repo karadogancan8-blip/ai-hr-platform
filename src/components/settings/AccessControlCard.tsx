@@ -16,6 +16,7 @@ import {
 } from "@/lib/access-control";
 import type { MessageKey } from "@/lib/i18n";
 import { SelectField } from "@/components/ui/SelectField";
+import { cardSurface } from "@/components/ui/surface";
 
 export function AccessControlCard() {
   const { t } = useI18n();
@@ -57,7 +58,7 @@ export function AccessControlCard() {
   }
 
   return (
-    <section className="flex min-h-[600px] w-full flex-col space-y-6 rounded-2xl border border-slate-200/70 bg-white p-6 transition-none">
+    <section className={`${cardSurface} flex min-h-[600px] w-full flex-col space-y-6 transition-none`}>
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-[#123056]">
           <ShieldCheck className="h-5 w-5" />

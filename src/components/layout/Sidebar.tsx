@@ -164,11 +164,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               <img
                 src={branding.logoUrl}
                 alt={branding.companyName}
-                className="h-10 w-10 rounded-xl bg-white object-contain p-0.5 ring-1 ring-white/20"
+                className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-white object-contain p-0.5 ring-1 ring-white/20"
               />
             ) : (
               <span
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold tracking-tight text-white ring-1 ring-white/20"
+                className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-bold tracking-tight text-white ring-1 ring-white/20"
                 style={{ backgroundColor: branding.primaryColor }}
               >
                 {branding.companyName.slice(0, 2).toUpperCase() || "AI"}
@@ -181,7 +181,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </Link>
           <button
             type="button"
-            className="rounded-lg p-1.5 text-slate-300 hover:bg-white/10 lg:hidden"
+            className="overflow-hidden rounded-full p-1.5 text-slate-300 hover:bg-white/10 lg:hidden"
             onClick={onClose}
             aria-label="Menüyü kapat"
           >
@@ -212,18 +212,18 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
-                className={`group flex items-start gap-3 rounded-xl px-3 py-3 transition ${
+                className={`group flex items-start gap-3 overflow-hidden rounded-2xl px-3 py-3 transition ${
                   active
                     ? "bg-sky-400/15 text-white shadow-[inset_0_0_0_1px_rgba(125,211,252,0.28)]"
                     : "text-slate-300 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 <span
-                  className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                  className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full ${
                     active ? "bg-sky-400 text-[#0b1f3a]" : "bg-white/10 text-sky-200"
                   }`}
                 >
-                  <Icon className="h-[18px] w-[18px]" />
+                  <Icon className="h-[18px] w-[18px] shrink-0" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-medium leading-5">{t(item.titleKey)}</span>

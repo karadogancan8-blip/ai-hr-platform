@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { CommandSearchButton } from "@/components/ui/command-search-button";
 import { LegalLinks } from "@/components/legal/LegalLinks";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 
@@ -12,22 +13,23 @@ export function PublicChrome({ children }: { children: React.ReactNode }) {
       <header className="h-16 shrink-0 border-b border-slate-200/80 bg-white">
         <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#123056] text-sm font-semibold text-white">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#123056] text-sm font-semibold text-white">
               N
             </span>
             <span className="text-sm font-semibold tracking-tight text-slate-900">Nexus HR</span>
           </Link>
           <nav className="flex items-center gap-2 text-sm">
+            <CommandSearchButton className="hidden md:inline-flex" />
             <LanguageSwitcher />
-            <Link href="/fiyatlandirma" className="hidden rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 sm:inline">
+            <Link href="/fiyatlandirma" className="hidden overflow-hidden rounded-full px-3 py-2 text-slate-600 hover:bg-slate-100 sm:inline">
               {t("pricing.nav")}
             </Link>
-            <Link href="/login" className="rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100">
+            <Link href="/login" className="overflow-hidden rounded-full px-3 py-2 text-slate-600 hover:bg-slate-100">
               {t("pricing.login")}
             </Link>
             <Link
               href="/login?mode=register"
-              className="rounded-xl bg-[#123056] px-3.5 py-2 text-sm font-medium text-white hover:bg-[#0f2744]"
+              className="overflow-hidden rounded-full bg-[#123056] px-3.5 py-2 text-sm font-medium text-white hover:bg-[#0f2744]"
             >
               {t("pricing.trial")}
             </Link>

@@ -16,6 +16,7 @@ import {
   type PlanId,
 } from "@/lib/plans";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { cardSurfaceFlush } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { fetchCompanySubscription, updateCompanySubscription } from "@/lib/subscription";
 import { createBrowserSupabase } from "@/lib/supabase/client";
@@ -167,8 +168,8 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
           return (
             <article
               key={plan.id}
-              className={`flex h-full min-h-[36rem] flex-col rounded-2xl border bg-white px-7 py-8 ${
-                plan.popular ? "border-slate-300 bg-slate-50/60" : "border-slate-200/70"
+              className={`flex h-full min-h-[36rem] flex-col ${cardSurfaceFlush} px-7 py-8 ${
+                plan.popular ? "ring-1 ring-slate-300" : ""
               }`}
             >
               <div className="min-h-[1.5rem]">

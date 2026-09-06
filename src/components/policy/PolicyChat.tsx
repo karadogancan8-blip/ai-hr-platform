@@ -8,6 +8,7 @@ import { readSessionList } from "@/lib/session-store";
 import type { ChatMessage } from "@/lib/types";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { cardSurfaceFlush } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { localeMeta } from "@/lib/i18n";
 
@@ -98,7 +99,7 @@ export function PolicyChat() {
         <p className="mt-1 text-sm text-slate-500">{t("policy.description")}</p>
       </div>
 
-      <div className="flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white">
+      <div className={`flex min-h-[520px] flex-1 flex-col overflow-hidden ${cardSurfaceFlush}`}>
         <div className="border-b border-sky-50 bg-[#f7fbff] px-5 py-3 text-xs text-slate-500">
           {t("policy.source")}
         </div>

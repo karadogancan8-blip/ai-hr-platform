@@ -7,6 +7,7 @@ import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { StoredPerformanceReview } from "@/lib/performance";
 import { readLocalJson, writeLocalJson } from "@/lib/session-store";
 import { SKILL_GAP_STORAGE_KEY, type SkillGapPlan } from "@/lib/skill-gap";
+import { cardSurface } from "@/components/ui/surface";
 
 type SkillGapPlanPanelProps = {
   review: StoredPerformanceReview | null;
@@ -58,7 +59,7 @@ export function SkillGapPlanPanel({ review }: SkillGapPlanPanelProps) {
   }
 
   return (
-    <section className="min-h-[320px] w-full rounded-2xl border border-violet-100 bg-white p-5 transition-none">
+    <section className={`${cardSurface} min-h-[320px] w-full transition-none`}>
       <div className="flex min-h-[4.5rem] flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-violet-700">{t("perf.skillGap.kicker")}</p>

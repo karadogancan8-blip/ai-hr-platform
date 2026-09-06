@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { BookOpen, Plus, Sparkles, X } from "lucide-react";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { cardSurface } from "@/components/ui/surface";
 import { SelectField } from "@/components/ui/SelectField";
 import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
@@ -221,7 +222,7 @@ export function KnowledgeWorkspace() {
         ))}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid min-h-[22rem] gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {visible.map((doc) => (
           <button
             type="button"
@@ -231,7 +232,7 @@ export function KnowledgeWorkspace() {
               setQuestion("");
               setAnswer("");
             }}
-            className="rounded-2xl border border-slate-200 bg-white p-5 text-start hover:border-slate-300"
+            className={`${cardSurface} text-start`}
           >
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-sky-700">
               <BookOpen className="h-3.5 w-3.5" />

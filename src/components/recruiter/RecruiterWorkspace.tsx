@@ -25,6 +25,7 @@ import {
   takePublicApplication,
   type PublicApplication,
 } from "@/lib/public-applications";
+import { cardSurface, moduleTone } from "@/components/ui/surface";
 
 function scoreTone(score: number) {
   if (score >= 90) return "from-sky-500 to-blue-700";
@@ -314,7 +315,7 @@ export function RecruiterWorkspace() {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-2xl border border-slate-200/70 bg-slate-50 px-4 py-4 text-sm">
+      <div className={`${cardSurface} text-sm`}>
         <p className="text-xs font-semibold text-[#0b1f3a]">{t("recruit.applyLink")}</p>
         <p className="mt-0.5 text-[11px] text-slate-500">{t("recruit.applyHint")}</p>
         <div className="mt-2 flex items-center gap-2">
@@ -333,13 +334,13 @@ export function RecruiterWorkspace() {
       </div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("recruit.kicker")}</p>
+          <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.recruit.kicker}`}>{t("recruit.kicker")}</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
           <HelpTitle hint={t("recruit.hint")}>{t("recruit.title")}</HelpTitle>
           </h1>
           <p className="mt-2 text-sm leading-7 text-slate-500">{t("recruit.description")}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200/70 bg-white px-4 py-4 text-sm">
+        <div className={`${cardSurface} text-sm`}>
           <span className="text-slate-500">{t("recruit.avg")}</span>
           <span className="ml-2 font-semibold text-[#0b1f3a]">{average}%</span>
         </div>
@@ -375,13 +376,13 @@ export function RecruiterWorkspace() {
             setDragging(false);
             void ingestFiles(event.dataTransfer.files);
           }}
-          className={`rounded-2xl border-2 border-dashed p-8 text-center transition ${
+          className={`rounded-2xl border-2 border-dashed p-8 text-center shadow-sm transition-all ${
             dragging
-              ? "border-sky-500 bg-sky-50"
-              : "border-slate-300 bg-white"
+              ? moduleTone.recruit.dash
+              : "border-slate-300 bg-white hover:shadow-md"
           }`}
         >
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sky-50 text-sky-700">
+          <div className={`mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-full ${moduleTone.recruit.icon}`}>
             <IconUpload className="h-6 w-6" />
           </div>
           <p className="mt-3 text-base font-medium text-[#0b1f3a]">{t("recruit.drop")}</p>
@@ -398,7 +399,7 @@ export function RecruiterWorkspace() {
           {fileName ? <p className="mt-3 text-xs text-sky-800">{fileName}</p> : null}
         </section>
 
-        <section className="rounded-2xl border border-slate-200/70 bg-white p-6">
+        <section className={`${cardSurface} min-h-[22rem]`}>
           <label className="block text-sm">
             <span className="mb-1 block font-medium text-slate-700">{t("recruit.job")}</span>
             <input
@@ -450,11 +451,11 @@ export function RecruiterWorkspace() {
         {!loading && resumes.length === 0 ? (
           <p className="text-sm text-slate-400">{t("recruit.empty")}</p>
         ) : null}
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid min-h-[22rem] gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {resumes.map((resume) => (
             <article
               key={resume.id}
-              className="group relative flex flex-col rounded-2xl border border-slate-200/90 bg-white p-6 shadow-[0_10px_40px_rgba(15,37,64,0.06)]"
+              className={`${cardSurface} group relative flex min-h-[18rem] flex-col`}
             >
               <DeleteIconButton
                 label={t("common.delete")}

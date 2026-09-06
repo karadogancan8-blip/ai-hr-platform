@@ -5,7 +5,7 @@ import { ArrowLeftRight, Receipt } from "lucide-react";
 import { ExpenseDesk } from "@/components/hr-admin/ExpenseDesk";
 import { ShiftSwapPanel } from "@/components/hr-admin/ShiftSwapPanel";
 import { useI18n } from "@/components/i18n/LocaleProvider";
-import { cardSurface } from "@/components/ui/surface";
+import { cardSurface, moduleTone, tabPaneMin } from "@/components/ui/surface";
 
 type OpsTab = "expense" | "swap";
 
@@ -14,9 +14,9 @@ export function OzlukAutopilotBoard() {
   const [tab, setTab] = useState<OpsTab>("expense");
 
   return (
-    <section className={`${cardSurface} min-h-[640px] p-6 transition-none`}>
+    <section className={`${cardSurface} min-h-[640px] transition-none`}>
       <div className="min-h-[4.25rem]">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("ozluk.opsKicker")}</p>
+        <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.ops.kicker}`}>{t("ozluk.opsKicker")}</p>
         <h2 className="mt-1 text-lg font-semibold tracking-tight text-[#0b1f3a]">{t("ozluk.opsTitle")}</h2>
         <p className="mt-1 text-sm leading-6 text-slate-500">{t("ozluk.opsLead")}</p>
       </div>
@@ -44,11 +44,11 @@ export function OzlukAutopilotBoard() {
         </button>
       </div>
 
-      <div className="mt-5 min-h-[520px]">
-        <div hidden={tab !== "expense"} className="min-h-[520px] border-l-4 border-amber-300 pl-4">
+      <div className={`mt-5 ${tabPaneMin}`}>
+        <div hidden={tab !== "expense"} className={`${tabPaneMin} border-l-4 border-emerald-400 pl-4`}>
           {tab === "expense" ? <ExpenseDesk /> : null}
         </div>
-        <div hidden={tab !== "swap"} className="min-h-[520px] border-l-4 border-indigo-300 pl-4">
+        <div hidden={tab !== "swap"} className={`${tabPaneMin} border-l-4 border-emerald-200 pl-4`}>
           {tab === "swap" ? <ShiftSwapPanel /> : null}
         </div>
       </div>

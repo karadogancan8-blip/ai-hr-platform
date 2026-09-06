@@ -10,7 +10,7 @@ type SelectFieldProps = SelectHTMLAttributes<HTMLSelectElement> & {
 
 export function SelectField({ className = "", wrapperClassName = "", ...props }: SelectFieldProps) {
   return (
-    <div className={`relative isolate h-10 overflow-hidden rounded-xl ${wrapperClassName}`}>
+    <div className={`relative isolate h-10 overflow-hidden rounded-full ${wrapperClassName}`}>
       <select {...props} className={`${selectControlClass} ${className}`} />
       <ChevronDown
         aria-hidden

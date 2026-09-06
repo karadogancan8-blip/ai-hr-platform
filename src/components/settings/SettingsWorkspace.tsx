@@ -15,6 +15,7 @@ import { AccessControlCard } from "@/components/settings/AccessControlCard";
 import { HelpTitle } from "@/components/ui/HelpTip";
 import { LegalLinks } from "@/components/legal/LegalLinks";
 import { SelectField } from "@/components/ui/SelectField";
+import { cardSurface } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { LOCALES, localeMeta, type Locale, type MessageKey } from "@/lib/i18n";
 
@@ -146,7 +147,7 @@ export function SettingsWorkspace() {
                 role="tab"
                 aria-selected={selected}
                 onClick={() => setTab(item.id)}
-                className={`rounded-xl px-3 py-2.5 text-start text-sm font-medium transition-none ${
+                className={`overflow-hidden rounded-full px-3 py-2.5 text-start text-sm font-medium transition-none ${
                   selected
                     ? "bg-indigo-50 text-indigo-800 ring-1 ring-indigo-100"
                     : "text-slate-600 hover:bg-slate-50"
@@ -160,7 +161,7 @@ export function SettingsWorkspace() {
 
         <div className="min-h-[600px] w-full md:col-span-9">
           <TabsContent active={tab} id="brand">
-            <div className="min-h-[600px] w-full space-y-4 rounded-2xl border border-slate-200/70 bg-white p-6 transition-none">
+            <div className={`${cardSurface} min-h-[600px] w-full space-y-4 transition-none`}>
               <div className="min-h-12">
                 {loading ? <p className="text-sm text-slate-400">{t("settings.loading")}</p> : null}
                 {error ? (
@@ -262,7 +263,7 @@ export function SettingsWorkspace() {
           </TabsContent>
 
           <TabsContent active={tab} id="billing">
-            <section className="min-h-[600px] w-full rounded-2xl border border-slate-200/70 bg-white p-6 transition-none">
+            <section className={`${cardSurface} min-h-[600px] w-full transition-none`}>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("settings.billingKicker")}</p>
               <h2 className="mt-2 text-lg font-semibold text-slate-900">{t("settings.billingTitle")}</h2>
               <p className="mt-2 text-sm leading-6 text-slate-500">{t("settings.billingLead")}</p>
@@ -276,7 +277,7 @@ export function SettingsWorkspace() {
           </TabsContent>
 
           <TabsContent active={tab} id="prefs">
-            <section className="min-h-[600px] w-full space-y-6 rounded-2xl border border-slate-200/70 bg-white p-6 transition-none">
+            <section className={`${cardSurface} min-h-[600px] w-full space-y-6 transition-none`}>
               <label className="block max-w-md text-sm">
                 <span className="mb-1 block font-medium text-slate-700">{t("settings.language")}</span>
                 <SelectField
@@ -302,7 +303,7 @@ export function SettingsWorkspace() {
           </TabsContent>
 
           <TabsContent active={tab} id="legal">
-            <div className="min-h-[600px] w-full space-y-6 rounded-2xl border border-slate-200/70 bg-white p-6 transition-none">
+            <div className={`${cardSurface} min-h-[600px] w-full space-y-6 transition-none`}>
               <section>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("legal.kicker")}</p>
                 <h2 className="mt-2 text-lg font-semibold text-slate-900">{t("settings.legalTitle")}</h2>

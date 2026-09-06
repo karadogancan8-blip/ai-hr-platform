@@ -12,6 +12,8 @@ export type CommandItem = {
 };
 
 export const COMMAND_ITEMS: CommandItem[] = [
+  { id: "pricing", href: "/fiyatlandirma", titleKey: "pricing.nav", hintKey: "cmd.hint.pricing", group: "module", keywords: "fiyat paket pricing" },
+  { id: "login", href: "/login", titleKey: "pricing.login", hintKey: "cmd.hint.login", group: "action", keywords: "giris login" },
   { id: "dash", href: "/dashboard", titleKey: "dashboard.title", hintKey: "cmd.hint.dash", group: "module", keywords: "dashboard panel kontrol" },
   { id: "recruit", href: "/ise-alim", titleKey: "recruit.title", hintKey: "cmd.hint.recruit", group: "module", keywords: "cv ats ise alim aday" },
   { id: "leave", href: "/izin", titleKey: "leave.title", hintKey: "cmd.hint.leave", group: "module", keywords: "izin ozluk leave" },

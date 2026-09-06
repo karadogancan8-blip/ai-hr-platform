@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Award, Cake, HeartHandshake, PartyPopper, Sparkles, UserPlus } from "lucide-react";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { cardSurface } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import {
   WALL_KIND_STYLES,
@@ -87,7 +88,7 @@ export function CompanyWall({ variant = "compact" }: CompanyWallProps) {
   const visible = variant === "compact" ? posts.slice(0, 4) : posts;
 
   return (
-    <section className="min-h-[22rem] w-full rounded-2xl border border-slate-200/90 bg-white p-6 shadow-[0_10px_40px_rgba(15,37,64,0.06)] transition-none">
+    <section className={`${cardSurface} min-h-[22rem] w-full transition-none`}>
       <div className="flex min-h-[3.5rem] items-start justify-between gap-3">
         <div className="min-w-0">
           {variant === "page" ? (

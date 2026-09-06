@@ -32,7 +32,9 @@ import {
   type WorkMode,
 } from "@/lib/timesheets";
 import { ShiftSwapPanel } from "@/components/hr-admin/ShiftSwapPanel";
+import { cardSurface, moduleTone, tableShell } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
+import type { LeaveRequest } from "@/lib/types";
 
 const statusStyle: Record<TimesheetStatus, string> = {
   pending: "bg-amber-50 text-amber-800",
@@ -147,10 +149,10 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
 
   return (
     <>
-    <section id="puantaj" className="min-h-[560px] w-full space-y-4 rounded-2xl border border-slate-200/90 bg-white p-6 shadow-[0_10px_40px_rgba(15,37,64,0.06)] transition-none">
+    <section id="puantaj" className={`${cardSurface} min-h-[560px] w-full space-y-4 transition-none`}>
       {variant === "page" ? (
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("timesheet.kicker")}</p>
+          <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.ops.kicker}`}>{t("timesheet.kicker")}</p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
             <HelpTitle hint={t("timesheet.hint")}>{t("timesheet.title")}</HelpTitle>
           </h1>
@@ -261,7 +263,7 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
         </button>
       </div>
 
-      <div className="min-h-[220px] overflow-x-auto rounded-2xl border border-slate-100">
+      <div className={`min-h-[220px] ${tableShell}`}>
         <table className="min-w-[920px] w-full text-left text-sm">
           <thead className="bg-[#f7fbff] text-xs uppercase tracking-wide text-slate-500">
             <tr>

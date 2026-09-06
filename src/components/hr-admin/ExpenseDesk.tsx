@@ -7,6 +7,7 @@ import { SelectField } from "@/components/ui/SelectField";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { EXPENSE_STORAGE_KEY, EXPENSE_UPDATED_EVENT, type ExpenseCategory, type ExpenseRow } from "@/lib/expenses";
 import { readLocalJson, writeLocalJson } from "@/lib/session-store";
+import { cardSurface, moduleTone } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
 
 function persist(rows: ExpenseRow[]) {
@@ -81,14 +82,14 @@ export function ExpenseDesk() {
   }
 
   return (
-    <section id="expenses" className="min-h-[28rem] w-full space-y-4 rounded-2xl border border-slate-200/90 bg-white p-6 shadow-[0_8px_24px_rgba(15,37,64,0.05)] transition-none">
+    <section id="expenses" className={`${cardSurface} min-h-[28rem] w-full space-y-4 transition-none`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">{t("expense.kicker")}</p>
+          <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${moduleTone.ops.kicker}`}>{t("expense.kicker")}</p>
           <h2 className="mt-1 text-base font-semibold text-[#0b1f3a]">{t("expense.title")}</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">{t("expense.lead")}</p>
         </div>
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-800">
+        <span className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full ${moduleTone.ops.icon}`}>
           <Receipt className="h-4 w-4" />
         </span>
       </div>

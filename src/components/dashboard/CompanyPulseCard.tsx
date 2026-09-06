@@ -14,6 +14,7 @@ import {
   type PulseVote,
 } from "@/lib/pulse";
 import { readLocalJson, writeLocalJson } from "@/lib/session-store";
+import { cardSurface } from "@/components/ui/surface";
 
 function persistAnnouncements(items: CompanyAnnouncement[]) {
   writeLocalJson(ANNOUNCEMENTS_KEY, items);
@@ -62,7 +63,7 @@ export function CompanyPulseCard() {
 
   return (
     <section className="grid min-h-[22rem] items-stretch gap-5 lg:grid-cols-2">
-      <article className="flex min-h-[22rem] flex-col overflow-hidden rounded-2xl border border-sky-100 bg-white p-5">
+      <article className={`flex min-h-[22rem] flex-col overflow-hidden ${cardSurface}`}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="text-base font-semibold text-[#0b1f3a]">{t("dashboard.announce.title")}</h2>
@@ -96,7 +97,7 @@ export function CompanyPulseCard() {
         </ul>
       </article>
 
-      <article className="flex min-h-[22rem] flex-col rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50/70 via-white to-slate-50 p-5">
+      <article className={`flex min-h-[22rem] flex-col ${cardSurface} bg-gradient-to-br from-violet-50/70 via-white to-slate-50`}>
         <h2 className="text-base font-semibold text-[#0b1f3a]">{t("dashboard.pulse.title")}</h2>
         <p className="mt-1 text-sm leading-6 text-slate-500">{t("dashboard.pulse.lead")}</p>
         <div className="mt-6 flex min-h-[3.5rem] items-end gap-3">

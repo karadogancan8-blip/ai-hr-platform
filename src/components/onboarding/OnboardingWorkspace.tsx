@@ -15,6 +15,7 @@ import { AiDisclaimer } from "@/components/ai-disclaimer";
 import { HelpTip, HelpTitle } from "@/components/ui/HelpTip";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { ItProvisioningList } from "@/components/onboarding/ItProvisioningList";
+import { cardSurface, cardSurfaceFlush } from "@/components/ui/surface";
 
 const SESSION_KEY = DEMO_ONBOARDING_KEY;
 
@@ -174,7 +175,7 @@ export function OnboardingWorkspace() {
 
       <form
         onSubmit={generate}
-        className="grid gap-3 rounded-2xl border border-slate-200/70 bg-white p-5 md:grid-cols-4"
+        className={`grid gap-3 ${cardSurface} md:grid-cols-2 lg:grid-cols-4`}
       >
         <label className="text-sm">
           <span className="mb-1 block font-medium text-slate-700">{t("onb.name")}</span>
@@ -253,7 +254,7 @@ export function OnboardingWorkspace() {
           {!loading && !plans.length ? <p className="text-sm text-slate-400">{t("onb.empty")}</p> : null}
         </section>
 
-        <section className="rounded-2xl border border-slate-200/70 bg-white p-5">
+        <section className={`${cardSurface} min-h-[28rem]`}>
           {selected ? (
             <>
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -298,7 +299,7 @@ export function OnboardingWorkspace() {
           )}
         </section>
 
-        <section className="flex min-h-[420px] flex-col rounded-2xl border border-slate-200/70 bg-white">
+        <section className={`flex min-h-[420px] flex-col ${cardSurfaceFlush}`}>
           <div className="border-b border-sky-50 px-4 py-3">
             <p className="text-sm font-semibold text-[#0b1f3a]">{t("onb.chatTitle")}</p>
             <p className="text-xs text-slate-500">{t("onb.chatLead")}</p>

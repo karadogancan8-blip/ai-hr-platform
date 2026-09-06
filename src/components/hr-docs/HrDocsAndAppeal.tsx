@@ -6,6 +6,7 @@ import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
 import { submitAppeal, type AppealModule } from "@/lib/appeals";
 import { SelectField } from "@/components/ui/SelectField";
+import { cardSurface } from "@/components/ui/surface";
 
 export type PersonnelFile = {
   id: string;
@@ -181,7 +182,7 @@ export function HrDocsAndAppeal({
   }
 
   return (
-    <section className="space-y-3 rounded-2xl border border-slate-200/70 bg-white p-5">
+    <section className={`${cardSurface} space-y-3`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[#0b1f3a]">{t("docs.title")}</h2>
