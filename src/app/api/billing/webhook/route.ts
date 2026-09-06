@@ -1,57 +1,38 @@
 import { NextResponse } from "next/server";
-import { isPaidPlanId, type PlanId } from "@/lib/plans";
-import { stripeWebhookSecret } from "@/lib/billing";
-import { verifyStripeSignature } from "@/lib/stripe-webhook";
+import { entitlementLabel } from "@/lib/billing";
+import { readLocalCheckoutToken } from "@/lib/local-payment";
 import { createServiceSupabase } from "@/lib/supabase/admin";
 import { activateCompanySubscription } from "@/lib/subscription";
 
 export const maxDuration = 20;
 
-function planFromMetadata(metadata?: Record<string, string>): PlanId | null {
-  const raw = metadata?.plan_id ?? metadata?.entitlement ?? "";
-  const lower = raw.toLowerCase();
-  if (lower === "pro" || raw === "PRO") return "pro";
-  if (lower === "enterprise" || raw === "ENTERPRISE") return "enterprise";
-  if (lower === "starter" || raw === "STARTER") return "starter";
-  return isPaidPlanId(lower) ? lower : null;
-}
-
+/** Yerel İyzico / PayTR bildirim uç noktası. Geçersiz token uygulama hatası üretmez. */
 export async function POST(request: Request) {
-  const secret = stripeWebhookSecret();
   const raw = await request.text();
-  const signature = request.headers.get("stripe-signature");
-
-  if (!secret || !verifyStripeSignature(raw, signature, secret)) {
-    return NextResponse.json({ error: "Webhook imzası geçersiz." }, { status: 400 });
-  }
-
-  let event: { type?: string; data?: { object?: Record<string, unknown> } };
+  let token = "";
   try {
-    event = JSON.parse(raw) as typeof event;
+    const json = JSON.parse(raw) as { token?: string; merchant_oid?: string };
+    token = json.token || json.merchant_oid || "";
   } catch {
-    return NextResponse.json({ error: "Geçersiz JSON." }, { status: 400 });
+    const params = new URLSearchParams(raw);
+    token = params.get("token") || params.get("merchant_oid") || "";
   }
 
-  const type = event.type ?? "";
-  if (type !== "payment_intent.succeeded" && type !== "setup_intent.succeeded") {
-    return NextResponse.json({ received: true });
-  }
-
-  const object = event.data?.object ?? {};
-  const metadata = (object.metadata ?? {}) as Record<string, string>;
-  const companyId = metadata.company_id;
-  const planId = planFromMetadata(metadata);
-
-  if (!companyId || !planId) {
-    return NextResponse.json({ received: true, skipped: true });
+  const session = readLocalCheckoutToken(token);
+  if (!session) {
+    return NextResponse.json({ received: true, skipped: true, provider: "iyzico" });
   }
 
   const admin = createServiceSupabase();
   if (!admin) {
-    console.error("[billing/webhook] SUPABASE_SERVICE_ROLE_KEY eksik");
-    return NextResponse.json({ error: "Servis anahtarı yok." }, { status: 500 });
+    return NextResponse.json({ received: true, skipped: true, reason: "no-admin" });
   }
 
-  await activateCompanySubscription(companyId, planId, admin);
-  return NextResponse.json({ received: true, subscriptionStatus: "ACTIVE", plan: planId.toUpperCase() });
+  await activateCompanySubscription(session.companyId, session.planId, admin);
+  return NextResponse.json({
+    received: true,
+    provider: "iyzico",
+    subscriptionStatus: "ACTIVE",
+    plan: entitlementLabel(session.planId),
+  });
 }

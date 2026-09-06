@@ -55,7 +55,7 @@ const TR: Record<LegalDocId, LegalSection[]> = {
     {
       heading: "5. Saklama, paylaşım ve haklar",
       paragraphs: [
-        "Veriler, sözleşme süresi ve ilgili mevzuatın (ör. iş hukuku, vergi) zorunlu kıldığı süre boyunca saklanır. Alt işlemciler: barındırma (Supabase), yapay zekâ çıkarımı (model sağlayıcıları) ve isteğe bağlı ödeme (Stripe). Aktarım, sözleşme maddeleri ve kiracı sınırlarıyla kısıtlanır.",
+        "Veriler, sözleşme süresi ve ilgili mevzuatın (ör. iş hukuku, vergi) zorunlu kıldığı süre boyunca saklanır. Alt işlemciler: barındırma (Supabase), yapay zekâ çıkarımı (model sağlayıcıları) ve yerel ödeme simülasyonu (İyzico / PayTR). Aktarım, sözleşme maddeleri ve kiracı sınırlarıyla kısıtlanır.",
         "Erişim, düzeltme, silme, aktarılabilirlik ve itiraz talepleri önce müşteri şirketin İK / KVKK birimine yöneltilmelidir. Nexus HR, veri işleyen olarak talimat üzerine destek sağlar. İletişim: privacy@nexus-hr.example.",
       ],
     },
@@ -132,7 +132,7 @@ const TR: Record<LegalDocId, LegalSection[]> = {
       paragraphs: [
         "Zorunlu çerezler: Supabase kimlik doğrulama oturumu, CSRF / güvenlik ve yük dengeleme. Bunlar olmadan panele giriş ve kiracı izolasyonu çalışmaz.",
         "İşlevsel depolama: arayüz dil tercihi (nexus-locale) ve bazı modül taslakları tarayıcıda tutulabilir. Bu veriler reklam profillemesi için kullanılmaz.",
-        "Ödeme: Stripe veya benzeri sağlayıcı, 3D Secure doğrulaması için kendi çerezlerini ve iframe’lerini kullanabilir. Kart verisi Nexus HR çerezlerine yazılmaz.",
+        "Ödeme: İyzico / PayTR simülasyonu kart alanını tarayıcıda tutar. Kart verisi Nexus HR çerezlerine yazılmaz.",
       ],
     },
     {
@@ -179,7 +179,7 @@ const EN: Record<LegalDocId, LegalSection[]> = {
     {
       heading: "5. Retention, sharing and rights",
       paragraphs: [
-        "Data is kept for the contract term and any period required by law (for example labour or tax rules). Sub-processors include hosting (Supabase), AI inference (model providers) and optional payments (Stripe). Transfers are limited by contract and tenant boundaries.",
+        "Data is kept for the contract term and any period required by law (for example labour or tax rules). Sub-processors include hosting (Supabase), AI inference (model providers) and the local Iyzico / PayTR payment simulation. Transfers are limited by contract and tenant boundaries.",
         "Access, correction, erasure, portability and objection requests should first go to the customer’s HR / privacy team. Nexus HR assists as processor on instruction. Contact: privacy@nexus-hr.example.",
       ],
     },
@@ -256,7 +256,7 @@ const EN: Record<LegalDocId, LegalSection[]> = {
       paragraphs: [
         "Strictly necessary: Supabase authentication session, CSRF / security and load balancing. The product cannot log you in or isolate tenants without them.",
         "Functional storage: UI language (nexus-locale) and some module drafts may be kept in the browser. They are not used for advertising profiles.",
-        "Payments: Stripe or a similar provider may set its own cookies and iframes for 3D Secure. Card data is not written into Nexus HR cookies.",
+        "Payments: the Iyzico / PayTR simulation keeps card fields in the browser. Card data is not written into Nexus HR cookies.",
       ],
     },
     {
