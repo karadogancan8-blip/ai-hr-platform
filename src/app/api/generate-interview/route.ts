@@ -1,13 +1,11 @@
-import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { AI_ROUTE_MAX_DURATION, generateAiText, isAiConfigured } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
-import { isGeminiConfigured } from "@/lib/gemini";
 import type { InterviewGuide } from "@/lib/interview";
 import { createServerSupabase } from "@/lib/supabase/server";
 
-export const maxDuration = 60;
+export const maxDuration = AI_ROUTE_MAX_DURATION;
 
 const questionSchema = z.object({
   question: z.string().min(1),
@@ -181,8 +179,8 @@ export async function POST(request: Request) {
     summary = body.summary?.trim() ?? "";
     const fallback = fallbackGuide(jobTitle, candidateName, summary);
 
-    if (!isGeminiConfigured()) {
-      console.error("[generate-interview] GOOGLE_GENERATIVE_AI_API_KEY tanımlı değil");
+    if (!isAiConfigured()) {
+      console.error("[generate-interview] AI API anahtarı tanımlı değil");
       return NextResponse.json({ guide: fallback, fallback: true });
     }
 
@@ -215,15 +213,9 @@ technicalQuestions 5, cultureQuestions 3 öğe olsun.`;
 
     let text = "";
     try {
-      const result = await generateText({
-        model: google("gemini-1.5-flash"),
-        system,
-        prompt,
-        maxRetries: 2,
-      });
-      text = result.text ?? "";
+      text = await generateAiText({ system, prompt });
     } catch (error) {
-      console.error("[generate-interview] Gemini API hatası:", error);
+      console.error("[generate-interview] AI API hatası:", error);
       return NextResponse.json({ guide: fallback, fallback: true });
     }
 

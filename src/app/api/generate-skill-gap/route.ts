@@ -1,11 +1,12 @@
-import { generateObject, generateText } from "ai";
+import { generateObject } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { AI_ROUTE_MAX_DURATION, aiCallOptions, generateAiText, isAiConfigured } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { isGeminiConfigured, withGeminiModel } from "@/lib/gemini";
 import { fallbackSkillGapPlan } from "@/lib/skill-gap";
 
-export const maxDuration = 60;
+export const maxDuration = AI_ROUTE_MAX_DURATION;
 
 const weekSchema = z.object({
   week: z.number().min(1).max(4),
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
     locale: outputLocale,
   });
 
-  if (!isGeminiConfigured()) {
+  if (!isAiConfigured()) {
     return NextResponse.json({ plan: fallback, fallback: true });
   }
 
@@ -73,13 +74,16 @@ JSON:
 Each week must have 3 concrete workplace actions. No generic slogans.`;
 
   try {
+    if (!isGeminiConfigured()) {
+      throw new Error("Gemini atlandı");
+    }
     const { object } = await withGeminiModel((model) =>
       generateObject({
         model,
         schema,
         system,
         prompt,
-        maxRetries: 1,
+        ...aiCallOptions(),
       }),
     );
     return NextResponse.json({
@@ -102,14 +106,10 @@ Each week must have 3 concrete workplace actions. No generic slogans.`;
   } catch (first) {
     console.error("[generate-skill-gap] generateObject:", first);
     try {
-      const { text } = await withGeminiModel((model) =>
-        generateText({
-          model,
-          system: `${system} Return a JSON object only.`,
-          prompt,
-          maxRetries: 1,
-        }),
-      );
+      const text = await generateAiText({
+        system: `${system} Return a JSON object only.`,
+        prompt,
+      });
       const cleaned = (text ?? "").replace(/```json|```/g, "").trim();
       const start = cleaned.indexOf("{");
       const end = cleaned.lastIndexOf("}");

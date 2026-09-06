@@ -1,10 +1,9 @@
-import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
 import { NextResponse } from "next/server";
+import { AI_ROUTE_MAX_DURATION, generateAiText, isAiConfigured, withAiFallback } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { createServerSupabase } from "@/lib/supabase/server";
 
-export const maxDuration = 60;
+export const maxDuration = AI_ROUTE_MAX_DURATION;
 
 const policySystem = `Sen PolicyAgent adlı şirket içi mevzuat asistanısın. Yanıtların Türkçe, kısa ve net olsun.
 Çalışanlara İK yönetmeliği, izin, fazla mesai, uzaktan çalışma ve kıdem konularında yardımcı ol.
@@ -20,9 +19,6 @@ type ChatTurn = {
   content?: string;
 };
 
-function hasApiKey() {
-  return Boolean(process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() || process.env.GOOGLE_API_KEY?.trim());
-}
 
 function fallbackReply(question: string) {
   const q = question.toLocaleLowerCase("tr-TR");
@@ -117,8 +113,8 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!hasApiKey()) {
-      console.error("[chat] GOOGLE_GENERATIVE_AI_API_KEY tanımlı değil");
+    if (!isAiConfigured()) {
+      console.error("[chat] AI API anahtarı tanımlı değil");
       return ok(fallbackReply(lastUser), true);
     }
 
@@ -134,23 +130,15 @@ export async function POST(request: Request) {
       messages.push({ role: "user", content: lastUser });
     }
 
-    try {
-      const { text } = await generateText({
-        model: google("gemini-1.5-flash"),
-        system: `${policySystem}\n${replyInLocaleInstruction(parseRequestLocale(body.locale))}`,
-        messages,
-        maxRetries: 2,
-      });
-      const reply = text?.trim();
-      if (!reply) {
-        console.error("[chat] Gemini boş yanıt döndü");
-        return ok(fallbackReply(lastUser), true);
-      }
-      return ok(reply, false);
-    } catch (error) {
-      console.error("[chat] Gemini API / kota hatası:", error);
-      return ok(fallbackReply(lastUser), true);
-    }
+    const result = await withAiFallback(
+      () =>
+        generateAiText({
+          system: `${policySystem}\n${replyInLocaleInstruction(parseRequestLocale(body.locale))}`,
+          messages,
+        }),
+      () => fallbackReply(lastUser),
+    );
+    return ok(result.data, result.fallback);
   } catch (error) {
     console.error("[chat] beklenmeyen hata:", error);
     return ok(fallbackReply(lastUser || "genel mevzuat"), true);

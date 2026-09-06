@@ -1,9 +1,7 @@
-import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { AI_ROUTE_MAX_DURATION, generateAiText, isAiConfigured } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
-import { isGeminiConfigured } from "@/lib/gemini";
 import {
   fallbackOnboardingPlan,
   insertOnboardingPlan,
@@ -14,7 +12,7 @@ import {
 } from "@/lib/onboarding";
 import { createServerSupabase } from "@/lib/supabase/server";
 
-export const maxDuration = 60;
+export const maxDuration = AI_ROUTE_MAX_DURATION;
 
 const schema = z.object({
   summary: z.string(),
@@ -87,15 +85,14 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!isGeminiConfigured()) {
+    if (!isAiConfigured()) {
       console.error("[generate-onboarding] API anahtarı yok");
       return persist(fallback, true);
     }
 
     let text = "";
     try {
-      const result = await generateText({
-        model: google("gemini-1.5-flash"),
+      text = await generateAiText({
         system: `Sen OnboardingAgent adlı İK oryantasyon koçusun. Yalnızca JSON döndür. Markdown kullanma. JSON string değerlerini seçilen dilde yaz. ${replyInLocaleInstruction(outputLocale)}`,
         prompt: `Çalışan: ${employeeName}
 Pozisyon: ${role}
@@ -108,11 +105,9 @@ Departman: ${department}
   "tasks": [{ "week": 1, "day": 1, "title": "..." }]
 }
 4 hafta ve en az 10 görev üret. Görevler gün 1–30 aralığında olsun.`,
-        maxRetries: 2,
       });
-      text = result.text ?? "";
     } catch (error) {
-      console.error("[generate-onboarding] Gemini hatası:", error);
+      console.error("[generate-onboarding] AI hatası:", error);
       return persist(fallback, true);
     }
 

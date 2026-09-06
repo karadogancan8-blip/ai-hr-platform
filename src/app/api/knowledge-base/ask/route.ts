@@ -1,10 +1,9 @@
-import { generateText } from "ai";
 import { NextResponse } from "next/server";
+import { AI_ROUTE_MAX_DURATION, generateAiText, isAiConfigured, withAiFallback } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
-import { isGeminiConfigured, withGeminiModel } from "@/lib/gemini";
 import type { Locale } from "@/lib/i18n";
 
-export const maxDuration = 30;
+export const maxDuration = AI_ROUTE_MAX_DURATION;
 
 const DEPT_LABEL: Record<string, string> = {
   hr: "Human Resources",
@@ -59,21 +58,17 @@ export async function POST(request: Request) {
     return jsonReply(fallbackAnswer("—", title, document, locale), true);
   }
 
-  if (!isGeminiConfigured() || !document) {
+  if (!isAiConfigured() || !document) {
     return jsonReply(fallbackAnswer(question, title, document, locale), true);
   }
 
-  try {
-    const { text } = await withGeminiModel((model) =>
-      generateText({
-        model,
+  const result = await withAiFallback(
+    () =>
+      generateAiText({
         system: `You are the Nexus HR knowledge-base assistant. Answer only from the provided document. If the document does not contain the answer, say so and recommend HR confirmation. Be concise and professional. Audience department: ${department}. ${replyInLocaleInstruction(locale)}`,
         prompt: `Document title: ${title}\n\n${document.slice(0, 8000)}\n\nQuestion: ${question}`,
-        maxRetries: 1,
       }),
-    );
-    return jsonReply(text.trim() || fallbackAnswer(question, title, document, locale));
-  } catch {
-    return jsonReply(fallbackAnswer(question, title, document, locale), true);
-  }
+    () => fallbackAnswer(question, title, document, locale),
+  );
+  return jsonReply(result.data, result.fallback);
 }

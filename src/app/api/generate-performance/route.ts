@@ -1,13 +1,11 @@
-import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { AI_ROUTE_MAX_DURATION, generateAiText, isAiConfigured } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
-import { isGeminiConfigured } from "@/lib/gemini";
 import { fallbackPerformanceReview, insertPerformanceReview, toLocalPerformanceReview } from "@/lib/performance";
 import { createServerSupabase } from "@/lib/supabase/server";
 
-export const maxDuration = 60;
+export const maxDuration = AI_ROUTE_MAX_DURATION;
 
 const schema = z.object({
   summary: z.string(),
@@ -62,15 +60,14 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!isGeminiConfigured()) {
+    if (!isAiConfigured()) {
       console.error("[generate-performance] API anahtarı yok");
       return persist(fallback, true);
     }
 
     let text = "";
     try {
-      const result = await generateText({
-        model: google("gemini-1.5-flash"),
+      text = await generateAiText({
         system: `Sen PerformanceAgent adlı İK performans koçusun. Adil ve somut yaz. Yalnızca JSON döndür. JSON string değerlerini seçilen dilde yaz. ${replyInLocaleInstruction(outputLocale)}`,
         prompt: `Çalışan: ${employeeName}
 Dönem: ${period}
@@ -85,11 +82,9 @@ JSON:
   "score": 3
 }
 score 1-5 tam sayı. goals gelecek çeyrek için 3 madde olsun.`,
-        maxRetries: 2,
       });
-      text = result.text ?? "";
     } catch (error) {
-      console.error("[generate-performance] Gemini hatası:", error);
+      console.error("[generate-performance] AI hatası:", error);
       return persist(fallback, true);
     }
 

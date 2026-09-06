@@ -1,11 +1,9 @@
-import { google } from "@ai-sdk/google";
-import { generateText } from "ai";
 import { NextResponse } from "next/server";
+import { AI_ROUTE_MAX_DURATION, generateAiText, isAiConfigured, withAiFallback } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
-import { isGeminiConfigured } from "@/lib/gemini";
 import { createServerSupabase } from "@/lib/supabase/server";
 
-export const maxDuration = 60;
+export const maxDuration = AI_ROUTE_MAX_DURATION;
 
 function fallback(question: string, employeeName: string, role: string) {
   const q = question.toLocaleLowerCase("tr-TR");
@@ -64,27 +62,20 @@ export async function POST(request: Request) {
       });
     }
 
-    if (!isGeminiConfigured()) {
+    if (!isAiConfigured()) {
       console.error("[onboarding-chat] API anahtarı yok");
       return NextResponse.json({ reply: fallback(question, employeeName, role), fallback: true });
     }
 
-    try {
-      const { text } = await generateText({
-        model: google("gemini-1.5-flash"),
-        system: `Sen OnboardingAgent adlı oryantasyon asistanısın. Kısa ve uygulanabilir cevap ver. Uydurma iç politika numarası yazma. ${replyInLocaleInstruction(outputLocale)}`,
-        prompt: `Çalışan: ${employeeName}\nPozisyon: ${role}\nDepartman: ${department}\nSoru: ${question}`,
-        maxRetries: 2,
-      });
-      const reply = text?.trim();
-      if (!reply) {
-        return NextResponse.json({ reply: fallback(question, employeeName, role), fallback: true });
-      }
-      return NextResponse.json({ reply, fallback: false });
-    } catch (error) {
-      console.error("[onboarding-chat] Gemini hatası:", error);
-      return NextResponse.json({ reply: fallback(question, employeeName, role), fallback: true });
-    }
+    const result = await withAiFallback(
+      () =>
+        generateAiText({
+          system: `Sen OnboardingAgent adlı oryantasyon asistanısın. Kısa ve uygulanabilir cevap ver. Uydurma iç politika numarası yazma. ${replyInLocaleInstruction(outputLocale)}`,
+          prompt: `Çalışan: ${employeeName}\nPozisyon: ${role}\nDepartman: ${department}\nSoru: ${question}`,
+        }),
+      () => fallback(question, employeeName, role),
+    );
+    return NextResponse.json({ reply: result.data, fallback: result.fallback });
   } catch (error) {
     console.error("[onboarding-chat] beklenmeyen hata:", error);
     return NextResponse.json({ reply: fallback(question || "genel", employeeName, role), fallback: true });

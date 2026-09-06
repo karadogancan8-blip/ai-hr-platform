@@ -7,6 +7,7 @@ const RETRYABLE =
 
 export function geminiApiKey() {
   return (
+    process.env.GEMINI_API_KEY?.trim() ||
     process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() ||
     process.env.GOOGLE_API_KEY?.trim() ||
     ""
@@ -25,7 +26,7 @@ function googleClient() {
   const apiKey = geminiApiKey();
   if (!apiKey) {
     throw new Error(
-      "GOOGLE_GENERATIVE_AI_API_KEY tanımlı değil. Ücretsiz Gemini anahtarını Google AI Studio’dan alıp .env.local dosyasına ekleyin.",
+      "GEMINI_API_KEY tanımlı değil. Ücretsiz Gemini anahtarını Google AI Studio’dan alıp canlı ortam değişkenlerine ekleyin.",
     );
   }
   return createGoogleGenerativeAI({ apiKey });
@@ -65,12 +66,19 @@ export function toClientError(error: unknown, fallback: string) {
   return fallback;
 }
 
+function isAbortError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const name = "name" in error ? String(error.name) : "";
+  const message = error instanceof Error ? error.message : String(error);
+  return name === "AbortError" || name === "TimeoutError" || /aborted|zaman aşımı/i.test(message);
+}
+
 export async function withGeminiModel<T>(run: (model: ReturnType<typeof googleProvider>) => Promise<T>) {
   try {
     return await run(gemini());
   } catch (first) {
     const message = first instanceof Error ? first.message : String(first);
-    if (!RETRYABLE.test(message)) {
+    if (isAbortError(first) || !RETRYABLE.test(message)) {
       throw new Error(publicGeminiError(first));
     }
     try {

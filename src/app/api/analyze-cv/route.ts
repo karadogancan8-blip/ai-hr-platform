@@ -1,15 +1,14 @@
-import { generateObject, generateText } from "ai";
+import { generateObject } from "ai";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { AI_ROUTE_MAX_DURATION, AI_TIMEOUT_MS, aiCallOptions, generateAiText, isAiConfigured } from "@/lib/ai-config";
 import { parseRequestLocale, replyInLocaleInstruction } from "@/lib/ai-locale";
 import { isGeminiConfigured, toClientError, withGeminiModel } from "@/lib/gemini";
 import { sanitizeCvText } from "@/lib/cv-text";
 import { insertResume, type StoredResume } from "@/lib/resumes";
 import { createServerSupabase } from "@/lib/supabase/server";
 
-export const maxDuration = 60;
-
-const GEMINI_TIMEOUT_MS = 22_000;
+export const maxDuration = AI_ROUTE_MAX_DURATION;
 
 const cvAnalysisSchema = z.object({
   name: z.string().describe("Adayın adı soyadı; yoksa CV'den makul bir etiket"),
@@ -157,6 +156,9 @@ async function analyzeCv(
   const system = `${base} ${replyInLocaleInstruction(locale)} Put JSON string values in that language.`;
 
   try {
+    if (!isGeminiConfigured()) {
+      throw new Error("Gemini atlandı");
+    }
     const { object } = await withTimeout(
       withGeminiModel((model) =>
         generateObject({
@@ -164,28 +166,22 @@ async function analyzeCv(
           schema: cvAnalysisSchema,
           system,
           prompt,
-          maxRetries: 1,
-          abortSignal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
+          ...aiCallOptions(),
         }),
       ),
-      GEMINI_TIMEOUT_MS,
+      AI_TIMEOUT_MS,
     );
-    return { object };
+    return { object, fallback: false };
   } catch (first) {
     try {
-      const { text } = await withTimeout(
-        withGeminiModel((model) =>
-          generateText({
-            model,
-            system: `${system} Yalnızca JSON nesnesi döndür.`,
-            prompt,
-            maxRetries: 1,
-            abortSignal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
-          }),
-        ),
-        GEMINI_TIMEOUT_MS,
+      const text = await withTimeout(
+        generateAiText({
+          system: `${system} Yalnızca JSON nesnesi döndür.`,
+          prompt,
+        }),
+        AI_TIMEOUT_MS,
       );
-      return { object: parseJsonObject(text) };
+      return { object: parseJsonObject(text), fallback: false };
     } catch (second) {
       console.error("[analyze-cv] gemini", first, second);
       return {
@@ -226,12 +222,12 @@ export async function POST(request: Request) {
     }
 
     let object: CvAnalysis;
-    let geminiFallback = !isGeminiConfigured();
+    let geminiFallback = !isAiConfigured();
     let warning = "";
 
     if (geminiFallback) {
       object = fallbackCvAnalysis(jobTitle, cvText);
-      warning = "Gemini API anahtarı tanımlı değil; kural tabanlı ön analiz üretildi.";
+      warning = "Yapay zeka API anahtarı tanımlı değil; kural tabanlı ön analiz üretildi.";
     } else {
       const result = await analyzeCv(jobTitle, jobDescription, cvText, parseRequestLocale(body.locale));
       object = result.object;

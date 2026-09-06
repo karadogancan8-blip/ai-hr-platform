@@ -41,7 +41,7 @@ function LoginScreen() {
         if (!companyName.trim()) {
           throw new Error("Şirket adı zorunludur.");
         }
-        const origin = window.location.origin;
+        const origin = (process.env.NEXT_PUBLIC_APP_URL || window.location.origin).replace(/\/$/, "");
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: email.trim(),
           password,
