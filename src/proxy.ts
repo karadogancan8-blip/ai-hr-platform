@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "@/lib/supabase/config";
 
-const PUBLIC_PREFIXES = ["/login", "/auth", "/apply", "/gizlilik", "/kvkk", "/kullanim-sartlari"];
+const PUBLIC_PREFIXES = ["/login", "/auth", "/apply", "/gizlilik", "/kvkk", "/kullanim-sartlari", "/cerez-politikasi"];
 const PUBLIC_API = ["/api/parse-pdf"];
 
 function isPublicPath(pathname: string) {

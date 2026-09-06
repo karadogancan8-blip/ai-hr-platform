@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { CommandSearchButton } from "@/components/ui/command-search-button";
-import { LegalLinks } from "@/components/legal/LegalLinks";
+import { SiteFooter } from "@/components/footer";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 
 export function PublicChrome({ children }: { children: React.ReactNode }) {
@@ -37,12 +37,7 @@ export function PublicChrome({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-10 sm:px-6">{children}</main>
-      <footer className="shrink-0 border-t border-slate-200/80 bg-white px-4 py-5 sm:px-6">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-slate-400">{t("landing.footer")}</p>
-          <LegalLinks />
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

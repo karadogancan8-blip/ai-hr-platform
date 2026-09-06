@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useParams } from "next/navigation";
-import { LegalLinks } from "@/components/legal/LegalLinks";
+import { SiteFooter } from "@/components/footer";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { sanitizeCvText } from "@/lib/cv-text";
@@ -129,11 +129,7 @@ export default function PublicApplyPage() {
           {notice ? <p className="text-sm text-emerald-800">{notice}</p> : null}
         </form>
       </main>
-      <footer className="border-t border-sky-100 bg-white px-4 py-5">
-        <div className="mx-auto flex max-w-2xl justify-end">
-          <LegalLinks />
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -17,7 +17,7 @@ import { DemoRequestModal } from "@/components/marketing/DemoRequestModal";
 import { LandingPlayground } from "@/components/marketing/LandingPlayground";
 import { LandingPricing } from "@/components/marketing/LandingPricing";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { LegalLinks } from "@/components/legal/LegalLinks";
+import { SiteFooter } from "@/components/footer";
 import { CommandSearchButton } from "@/components/ui/command-search-button";
 import { cardSurface } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
@@ -174,17 +174,7 @@ export function LandingPage() {
 
       <LandingPricing />
 
-      <footer className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-10 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <p>
-          © {new Date().getFullYear()} Nexus HR · {t("landing.footer")}
-        </p>
-        <div className="flex flex-wrap items-center gap-4">
-          <LegalLinks />
-          <Link href="/fiyatlandirma" className="font-medium text-sky-800 hover:underline">
-            {t("landing.plans")}
-          </Link>
-        </div>
-      </footer>
+      <SiteFooter showPlans />
 
       <DemoRequestModal open={demoOpen} onClose={() => setDemoOpen(false)} />
     </div>

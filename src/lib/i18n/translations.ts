@@ -684,9 +684,24 @@ const tr = {
   "appeals.status.reddedildi": "Reddedildi",
   "appeals.updated": "İtiraz kararı kaydedildi.",
   "legal.privacy": "Gizlilik Politikası",
-  "legal.kvkk": "KVKK / GDPR",
+  "legal.privacy.summary":
+    "Nexus HR, müşteri şirket kiracısında İK verisini işler; yapay zekâ yalnızca talep edilen analiz için kullanılır ve veriler Supabase üzerinde kiracı izolasyonuyla korunur.",
+  "legal.kvkk": "KVKK / GDPR Aydınlatma Metni",
+  "legal.kvkk.summary":
+    "Veri sorumlusu işveren şirkettir. Nexus HR veri işleyen olarak barındırma, RLS tabanlı güvenlik ve talimat üzerine model çıkarımı sağlar.",
   "legal.terms": "Kullanım Şartları",
+  "legal.terms.summary":
+    "Hesap açan şirket ve yetkili kullanıcıları bağlar. Yapay zekâ çıktıları karar destektir; nihai İK kararı ve mevzuat uyumu müşteriye aittir.",
+  "legal.cookies": "Çerez Politikası",
+  "legal.cookies.summary":
+    "Oturum, güvenlik ve dil tercihi için zorunlu çerezler kullanılır. Kart verisi çerezlere yazılmaz; ödeme sağlayıcısı 3D Secure için kendi iframe’ini kullanabilir.",
   "legal.kicker": "Yasal",
+  "legal.updated": "Son güncelleme: 6 Eylül 2026",
+  "legal.contact": "Gizlilik talepleri: privacy@nexus-hr.example",
+  "legal.registerConsent":
+    "Gizlilik Politikası, Kullanım Şartları, KVKK / GDPR Aydınlatma Metni ve Çerez Politikasını okudum, anladım ve kabul ediyorum.",
+  "legal.registerRequired": "Kayıt için yasal metinleri kabul etmeniz gerekir.",
+  "legal.open": "Metni aç",
   "apply.title": "Açık pozisyon başvurusu",
   "apply.lead": "Özgeçmişinizi yükleyin veya metin olarak yapıştırın. Başvurunuz İK havuzuna iletilir.",
   "apply.name": "Ad soyad",
@@ -1384,9 +1399,24 @@ export const dictionaries: Record<TranslationLocale, Record<MessageKey, string>>
     "appeals.status.reddedildi": "Rejected",
     "appeals.updated": "The appeal decision was saved.",
     "legal.privacy": "Privacy Policy",
-    "legal.kvkk": "KVKK / GDPR",
-    "legal.terms": "Terms of Use",
+    "legal.privacy.summary":
+      "Nexus HR processes HR data in the customer tenant. AI is used only for the requested analysis, and data is protected on Supabase with tenant isolation.",
+    "legal.kvkk": "KVKK / GDPR Privacy Notice",
+    "legal.kvkk.summary":
+      "The employer company is the controller. Nexus HR is the processor for hosting, RLS-based security and model inference on instruction.",
+    "legal.terms": "Terms of Service",
+    "legal.terms.summary":
+      "These terms bind the company that opens an account and its authorised users. AI output is decision support; final HR decisions and legal compliance remain the customer’s.",
+    "legal.cookies": "Cookie Policy",
+    "legal.cookies.summary":
+      "Strictly necessary cookies support session, security and language. Card data is not stored in cookies; the payment provider may use its own 3D Secure iframe.",
     "legal.kicker": "Legal",
+    "legal.updated": "Last updated: 6 September 2026",
+    "legal.contact": "Privacy requests: privacy@nexus-hr.example",
+    "legal.registerConsent":
+      "I have read, understood and accept the Privacy Policy, Terms of Service, KVKK / GDPR notice and Cookie Policy.",
+    "legal.registerRequired": "You must accept the legal documents to register.",
+    "legal.open": "Open document",
     "apply.title": "Job application",
     "apply.lead": "Upload your CV or paste the text. Your application is sent to the HR pool.",
     "apply.name": "Full name",

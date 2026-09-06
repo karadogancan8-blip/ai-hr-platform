@@ -5,11 +5,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { ensureCompanyForUser } from "@/lib/tenant";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { LegalLinks } from "@/components/legal/LegalLinks";
+import { LegalModal } from "@/components/legal/LegalModal";
+import { SiteFooter } from "@/components/footer";
+import { useI18n } from "@/components/i18n/LocaleProvider";
+import type { LegalDocId } from "@/lib/legal-docs";
 
 type Mode = "login" | "register";
 
 function LoginScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/dashboard";
@@ -21,6 +27,8 @@ function LoginScreen() {
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [acceptedLegal, setAcceptedLegal] = useState(false);
+  const [legalDoc, setLegalDoc] = useState<LegalDocId | null>(null);
 
   const configured = useMemo(() => isSupabaseConfigured(), []);
 
@@ -40,6 +48,9 @@ function LoginScreen() {
       if (mode === "register") {
         if (!companyName.trim()) {
           throw new Error("Şirket adı zorunludur.");
+        }
+        if (!acceptedLegal) {
+          throw new Error(t("legal.registerRequired"));
         }
         const origin = (process.env.NEXT_PUBLIC_APP_URL || window.location.origin).replace(/\/$/, "");
         const { data, error: signUpError } = await supabase.auth.signUp({
@@ -81,7 +92,7 @@ function LoginScreen() {
   }
 
   return (
-    <div className="relative min-h-full overflow-hidden bg-[#eef4fb]">
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-[#eef4fb]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_circle_at_10%_-10%,rgba(56,189,248,0.28),transparent_55%),radial-gradient(700px_circle_at_90%_10%,rgba(15,48,86,0.16),transparent_50%)]" />
       <div className="relative mx-auto flex min-h-screen max-w-6xl items-center px-4 py-10">
         <div className="grid w-full gap-10 lg:grid-cols-[1.1fr_minmax(0,440px)]">
@@ -102,6 +113,9 @@ function LoginScreen() {
           </section>
 
           <section className="rounded-3xl border border-sky-100 bg-white p-6 shadow-[0_20px_60px_rgba(15,55,95,0.12)] sm:p-8">
+            <div className="mb-4 flex justify-end">
+              <LanguageSwitcher />
+            </div>
             <div className="mb-6 flex rounded-2xl bg-sky-50 p-1">
               {(["login", "register"] as const).map((item) => (
                 <button
@@ -167,27 +181,45 @@ function LoginScreen() {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   minLength={6}
-                  className="w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-[#f8fbff] px-3 py-2.5 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
                   placeholder="En az 6 karakter"
                   required
                 />
               </label>
+              {mode === "register" ? (
+                <div className="min-h-[4.5rem] rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-3">
+                  <label className="flex items-start gap-2.5 text-sm leading-6 text-slate-600">
+                    <input
+                      type="checkbox"
+                      checked={acceptedLegal}
+                      onChange={(event) => setAcceptedLegal(event.target.checked)}
+                      className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300"
+                      required
+                    />
+                    <span>{t("legal.registerConsent")}</span>
+                  </label>
+                </div>
+              ) : (
+                <div className="min-h-[4.5rem]" aria-hidden />
+              )}
               <button
                 type="submit"
-                disabled={pending || !configured}
-                className="w-full rounded-xl bg-[#123056] py-3 text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
+                disabled={pending || !configured || (mode === "register" && !acceptedLegal)}
+                className="h-11 w-full rounded-xl bg-[#123056] text-sm font-medium text-white hover:bg-[#0f2744] disabled:opacity-50"
               >
                 {pending ? "Lütfen bekleyin…" : mode === "login" ? "Giriş Yap" : "Kayıt Ol"}
               </button>
             </form>
             {error ? <p className="mt-4 text-sm text-rose-700">{error}</p> : null}
             {notice ? <p className="mt-4 text-sm text-sky-800">{notice}</p> : null}
-            <div className="mt-6">
-              <LegalLinks />
+            <div className="mt-6 min-h-[2.5rem]">
+              <LegalLinks onOpen={setLegalDoc} />
             </div>
           </section>
         </div>
       </div>
+      <SiteFooter onOpenLegal={setLegalDoc} />
+      <LegalModal docId={legalDoc} onClose={() => setLegalDoc(null)} />
     </div>
   );
 }

@@ -2,22 +2,33 @@
 
 import Link from "next/link";
 import { useI18n } from "@/components/i18n/LocaleProvider";
+import { LEGAL_DOCS, type LegalDocId } from "@/lib/legal-docs";
 
-const LINKS = [
-  { href: "/gizlilik", key: "legal.privacy" as const },
-  { href: "/kvkk", key: "legal.kvkk" as const },
-  { href: "/kullanim-sartlari", key: "legal.terms" as const },
-];
+type LegalLinksProps = {
+  className?: string;
+  onOpen?: (id: LegalDocId) => void;
+};
 
-export function LegalLinks({ className = "" }: { className?: string }) {
+export function LegalLinks({ className = "", onOpen }: LegalLinksProps) {
   const { t } = useI18n();
   return (
-    <nav className={`flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 ${className}`}>
-      {LINKS.map((item) => (
-        <Link key={item.href} href={item.href} className="hover:text-sky-800 hover:underline">
-          {t(item.key)}
-        </Link>
-      ))}
+    <nav aria-label={t("legal.kicker")} className={`flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500 ${className}`}>
+      {LEGAL_DOCS.map((item) =>
+        onOpen ? (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onOpen(item.id)}
+            className="min-h-5 text-left hover:text-sky-800 hover:underline"
+          >
+            {t(item.titleKey)}
+          </button>
+        ) : (
+          <Link key={item.id} href={item.href} className="min-h-5 hover:text-sky-800 hover:underline">
+            {t(item.titleKey)}
+          </Link>
+        ),
+      )}
     </nav>
   );
 }
