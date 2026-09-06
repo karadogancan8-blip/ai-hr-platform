@@ -20,9 +20,10 @@ import { AppealsInbox } from "@/components/hr-admin/AppealsInbox";
 import { TimesheetTable } from "@/components/hr-admin/TimesheetTable";
 import { EsignDesk } from "@/components/hr-admin/EsignDesk";
 import { ProfileSelfService } from "@/components/hr-admin/ProfileSelfService";
-import { ExpenseDesk } from "@/components/hr-admin/ExpenseDesk";
+import { OzlukAutopilotBoard } from "@/components/hr-admin/OzlukAutopilotBoard";
 import { useAccessControl } from "@/components/access/AccessControlProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
+import { cardSurface, pageKicker, pageLead, pageTitle, tableShell } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
 
 const statusStyle: Record<LeaveStatus, string> = {
@@ -42,7 +43,7 @@ function shortId(id: string) {
   return id.replace(/-/g, "").slice(0, 8).toUpperCase();
 }
 
-export function LeaveWorkspace() {
+export function LeaveWorkspace({ showAutopilot = true }: { showAutopilot?: boolean }) {
   const { t } = useI18n();
   const { role } = useAccessControl();
   const hrDesk = role === "company_admin" || role === "hr_manager";
@@ -152,11 +153,11 @@ export function LeaveWorkspace() {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("leave.kicker")}</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+        <p className={pageKicker}>{t("leave.kicker")}</p>
+        <h1 className={pageTitle}>
           <HelpTitle hint={t("leave.hint")}>{t("leave.title")}</HelpTitle>
         </h1>
-        <p className="mt-2 text-sm leading-7 text-slate-500">{t("leave.description")}</p>
+        <p className={pageLead}>{t("leave.description")}</p>
       </div>
 
       {error ? (
@@ -167,7 +168,7 @@ export function LeaveWorkspace() {
         <form
           id="leave-form"
           onSubmit={submit}
-          className="space-y-4 rounded-2xl border border-slate-200/70 bg-white p-6"
+          className={`space-y-4 ${cardSurface} p-6`}
         >
           <h2 className="text-base font-semibold text-[#0b1f3a]">{t("leave.form")}</h2>
           <label className="block text-sm">
@@ -243,7 +244,7 @@ export function LeaveWorkspace() {
           {notice ? <p className="text-xs text-sky-800">{notice}</p> : null}
         </form>
 
-        <section className="overflow-hidden rounded-2xl border border-slate-200/70 bg-white">
+        <section className={`${tableShell}`}>
           <div className="flex items-center justify-between gap-3 border-b border-sky-50 px-5 py-4">
             <h2 className="text-base font-semibold text-[#0b1f3a]">{t("leave.table")}</h2>
             <div className="flex items-center gap-2">
@@ -340,7 +341,7 @@ export function LeaveWorkspace() {
 
       <TimesheetTable variant="embed" leaves={requests} />
 
-      <ExpenseDesk />
+      {showAutopilot ? <OzlukAutopilotBoard /> : null}
       <EsignDesk />
       <ProfileSelfService />
 

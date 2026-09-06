@@ -67,7 +67,7 @@ export function ShiftSwapPanel() {
   }
 
   return (
-    <section id="shift-swap" className="min-h-[24rem] w-full space-y-4 rounded-3xl border border-slate-200/70 bg-white p-5 transition-none">
+    <section id="shift-swap" className="min-h-[24rem] w-full space-y-4 rounded-2xl border border-slate-200/90 bg-white p-6 shadow-[0_8px_24px_rgba(15,37,64,0.05)] transition-none">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-700">{t("swap.kicker")}</p>

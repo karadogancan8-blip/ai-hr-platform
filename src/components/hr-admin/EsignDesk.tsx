@@ -94,7 +94,7 @@ export function EsignDesk() {
   const active = packets.find((item) => item.id === activeId) ?? null;
 
   return (
-    <section className="min-h-[28rem] w-full space-y-4 rounded-3xl border border-slate-200/70 bg-white p-5 transition-none">
+    <section className="min-h-[28rem] w-full space-y-4 rounded-2xl border border-slate-200/90 bg-white p-6 shadow-[0_10px_40px_rgba(15,37,64,0.06)] transition-none">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-700">{t("esign.kicker")}</p>
         <h2 className="mt-1 text-base font-semibold text-[#0b1f3a]">{t("esign.title")}</h2>

@@ -147,7 +147,7 @@ export function TimesheetTable({ variant = "embed", leaves: leavesFromParent }: 
 
   return (
     <>
-    <section id="puantaj" className="min-h-[560px] w-full space-y-4 rounded-2xl border border-slate-200/70 bg-white p-5 transition-none">
+    <section id="puantaj" className="min-h-[560px] w-full space-y-4 rounded-2xl border border-slate-200/90 bg-white p-6 shadow-[0_10px_40px_rgba(15,37,64,0.06)] transition-none">
       {variant === "page" ? (
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{t("timesheet.kicker")}</p>

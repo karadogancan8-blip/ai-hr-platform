@@ -6,6 +6,7 @@ import { dashboardStats, liveOperations, recentActivity } from "@/lib/mock-data"
 import { CompanyPulseCard } from "@/components/dashboard/CompanyPulseCard";
 import { CompanyWall } from "@/components/social/CompanyWall";
 import { HelpTitle } from "@/components/ui/HelpTip";
+import { cardSurface, pageLead, pageTitle } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import type { MessageKey } from "@/lib/i18n";
 
@@ -41,17 +42,17 @@ export function DashboardOverview() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-[#0b1f3a]">
+        <h1 className={pageTitle}>
           <HelpTitle hint={t("dashboard.hint")}>{t("dashboard.title")}</HelpTitle>
         </h1>
-        <p className="mt-2 text-sm leading-7 text-slate-500">{t("dashboard.description")}</p>
+        <p className={pageLead}>{t("dashboard.description")}</p>
       </div>
 
       <section className="grid min-h-[42rem] items-stretch gap-5 lg:grid-cols-3">
         <div className="flex min-h-[42rem] flex-col gap-5 lg:col-span-2">
           <div className="grid min-h-[13.5rem] shrink-0 grid-cols-2 gap-4">
             {dashboardStats.map((stat) => (
-              <article key={stat.id} className="rounded-2xl border border-sky-100 bg-white p-5">
+              <article key={stat.id} className={`${cardSurface} p-6`}>
                 <p className="text-sm text-slate-500">{stat.label}</p>
                 <div className="mt-3 flex items-end justify-between gap-2">
                   <p className="text-3xl font-semibold tracking-tight text-[#0b1f3a]">{stat.value}</p>
@@ -68,7 +69,7 @@ export function DashboardOverview() {
             ))}
           </div>
 
-          <article className="flex min-h-[26rem] flex-1 flex-col overflow-hidden rounded-2xl border border-sky-100 bg-white">
+          <article className={`flex min-h-[26rem] flex-1 flex-col overflow-hidden ${cardSurface}`}>
             <div className="border-b border-sky-50 px-6 py-4">
               <h2 className="text-base font-semibold text-[#0b1f3a]">{t("dashboard.activity")}</h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">{t("dashboard.liveLead")}</p>
@@ -88,7 +89,7 @@ export function DashboardOverview() {
           </article>
         </div>
 
-        <aside className="flex min-h-[42rem] flex-col overflow-hidden rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-indigo-50/70 via-white to-slate-50 p-6 shadow-sm transition-shadow hover:shadow-md">
+        <aside className={`flex min-h-[42rem] flex-col overflow-hidden ${cardSurface} bg-gradient-to-br from-indigo-50/70 via-white to-slate-50 p-6`}>
           <h2 className="text-base font-semibold tracking-tight text-slate-800">{t("dashboard.quick")}</h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">{t("dashboard.quickLead")}</p>
           <div className="mt-6 flex flex-1 flex-col gap-2.5">

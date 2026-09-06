@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import { useCompanyBranding } from "@/components/branding/BrandingProvider";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { COMMAND_OPEN_EVENT } from "@/lib/command-bar";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 type AppHeaderProps = {
   onMenu: () => void;
@@ -15,7 +16,7 @@ export function AppHeader({ onMenu }: AppHeaderProps) {
   const { t } = useI18n();
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-sky-100/80 bg-white/80 px-4 backdrop-blur-md sm:px-6">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 px-5 shadow-[0_4px_18px_rgba(15,37,64,0.04)] backdrop-blur-md sm:px-8">
       <div className="flex items-center gap-3">
         <button
           type="button"

@@ -87,7 +87,7 @@ export function CompanyWall({ variant = "compact" }: CompanyWallProps) {
   const visible = variant === "compact" ? posts.slice(0, 4) : posts;
 
   return (
-    <section className="min-h-[22rem] w-full rounded-3xl border border-slate-200/70 bg-white p-5 transition-none">
+    <section className="min-h-[22rem] w-full rounded-2xl border border-slate-200/90 bg-white p-6 shadow-[0_10px_40px_rgba(15,37,64,0.06)] transition-none">
       <div className="flex min-h-[3.5rem] items-start justify-between gap-3">
         <div className="min-w-0">
           {variant === "page" ? (

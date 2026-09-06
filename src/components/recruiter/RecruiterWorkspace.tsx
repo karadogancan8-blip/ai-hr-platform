@@ -454,7 +454,7 @@ export function RecruiterWorkspace() {
           {resumes.map((resume) => (
             <article
               key={resume.id}
-              className="group relative flex flex-col rounded-2xl border border-slate-200/70 bg-white p-5"
+              className="group relative flex flex-col rounded-2xl border border-slate-200/90 bg-white p-6 shadow-[0_10px_40px_rgba(15,37,64,0.06)]"
             >
               <DeleteIconButton
                 label={t("common.delete")}
