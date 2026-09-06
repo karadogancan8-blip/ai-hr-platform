@@ -1,7 +1,10 @@
 export const PLAN_MULTILINGUAL_FEATURE = "Türkçe ve İngilizce dil desteği (TR, EN)";
 
-export type PlanId = "free" | "pro" | "enterprise";
+export type PlanId = "free" | "starter" | "pro" | "enterprise";
+export type PaidPlanId = "starter" | "pro" | "enterprise";
 export type SubscriptionStatus = "free" | "active";
+export type DbPlanEntitlement = "FREE" | "STARTER" | "PRO" | "ENTERPRISE";
+export type DbSubscriptionStatus = "FREE" | "ACTIVE";
 export type BillingCycle = "monthly" | "yearly";
 
 export type Plan = {
@@ -17,7 +20,7 @@ export type Plan = {
 
 export const plans: Plan[] = [
   {
-    id: "free",
+    id: "starter",
     name: "KOBİ",
     seatLabel: "1–50 çalışan",
     monthlyPrice: 2950,
@@ -73,10 +76,26 @@ export const plans: Plan[] = [
 ];
 
 export const planBadgeLabel: Record<PlanId, string> = {
-  free: "KOBİ",
+  free: "Deneme",
+  starter: "KOBİ",
   pro: "Pro",
   enterprise: "Enterprise",
 };
+
+export function isPaidPlanId(value: string | null | undefined): value is PaidPlanId {
+  return value === "starter" || value === "pro" || value === "enterprise";
+}
+
+export function toDbPlanEntitlement(planType: PlanId): DbPlanEntitlement {
+  if (planType === "pro") return "PRO";
+  if (planType === "enterprise") return "ENTERPRISE";
+  if (planType === "starter") return "STARTER";
+  return "FREE";
+}
+
+export function toDbSubscriptionStatus(status: SubscriptionStatus): DbSubscriptionStatus {
+  return status === "active" ? "ACTIVE" : "FREE";
+}
 
 export function formatTry(amount: number) {
   return `₺${amount.toLocaleString("tr-TR")}`;
@@ -104,8 +123,17 @@ export function planMonthlyEquivalent(plan: Plan, cycle: BillingCycle) {
 }
 
 export function asPlanId(value?: string | null): PlanId {
-  if (value === "pro" || value === "enterprise" || value === "free") return value;
-  if (value === "baslangic" || value === "ucretsiz" || value === "kobi") return "free";
-  if (value === "kurumsal") return "pro";
+  const raw = (value ?? "").trim();
+  const upper = raw.toUpperCase();
+  if (upper === "PRO") return "pro";
+  if (upper === "ENTERPRISE" || raw === "kurumsal") return "enterprise";
+  if (upper === "STARTER" || raw === "kobi" || raw === "baslangic") return "starter";
+  if (upper === "FREE" || raw === "ucretsiz") return "free";
+  return "free";
+}
+
+export function asSubscriptionStatus(value?: string | null): SubscriptionStatus {
+  const upper = (value ?? "").trim().toUpperCase();
+  if (upper === "ACTIVE") return "active";
   return "free";
 }

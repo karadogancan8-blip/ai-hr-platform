@@ -1,13 +1,18 @@
 "use client";
 
-import Link from "next/link";
+import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
+import { CheckoutModal } from "@/components/checkout/CheckoutModal";
 import { useI18n } from "@/components/i18n/LocaleProvider";
 import { btnPrimary, btnSecondary, cardSurfaceFlush } from "@/components/ui/surface";
 import type { MessageKey } from "@/lib/i18n";
+import { isPaidPlanId, planChargeLabel, plans, type PaidPlanId, type Plan } from "@/lib/plans";
+import { createBrowserSupabase } from "@/lib/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase";
 
 const CARDS: {
-  id: string;
+  id: PaidPlanId;
   nameKey: MessageKey;
   seatsKey: MessageKey;
   priceKey: MessageKey;
@@ -16,7 +21,7 @@ const CARDS: {
   popular?: boolean;
 }[] = [
   {
-    id: "kobi",
+    id: "starter",
     nameKey: "landing.plan.kobi.name",
     seatsKey: "landing.plan.kobi.seats",
     priceKey: "landing.plan.kobi.price",
@@ -33,7 +38,7 @@ const CARDS: {
     popular: true,
   },
   {
-    id: "ent",
+    id: "enterprise",
     nameKey: "landing.plan.ent.name",
     seatsKey: "landing.plan.ent.seats",
     priceKey: "landing.plan.ent.price",
@@ -44,12 +49,40 @@ const CARDS: {
 
 export function LandingPricing() {
   const { t } = useI18n();
+  const router = useRouter();
+  const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
+  const [notice, setNotice] = useState("");
+
+  const handleSubscribe = useCallback(
+    async (planId: string) => {
+      if (!isPaidPlanId(planId)) return;
+      const plan = plans.find((item) => item.id === planId) ?? null;
+      if (!plan) return;
+
+      if (!isSupabaseConfigured()) {
+        router.push(`/login?next=${encodeURIComponent(`/fiyatlandirma?subscribe=${planId}`)}`);
+        return;
+      }
+
+      const supabase = createBrowserSupabase();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        router.push(`/login?next=${encodeURIComponent(`/fiyatlandirma?subscribe=${planId}`)}`);
+        return;
+      }
+      setCheckoutPlan(plan);
+    },
+    [router],
+  );
 
   return (
     <section id="pricing" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("landing.priceKicker")}</p>
       <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#0b1f3a] sm:text-3xl">{t("landing.priceTitle")}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">{t("landing.priceLead")}</p>
+      <p className="mt-3 min-h-[1.25rem] text-sm text-emerald-700">{notice}</p>
 
       <div className="mt-8 grid min-h-[28rem] items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {CARDS.map((plan) => (
@@ -80,15 +113,28 @@ export function LandingPricing() {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/fiyatlandirma"
+            <button
+              type="button"
+              onClick={() => void handleSubscribe(plan.id)}
               className={`mt-6 h-11 w-full ${plan.popular ? btnPrimary : btnSecondary}`}
             >
-              {t("landing.priceCta")}
-            </Link>
+              {plan.id === "starter" ? t("pricing.start") : t("pricing.subscribe")}
+            </button>
           </article>
         ))}
       </div>
+
+      <CheckoutModal
+        open={Boolean(checkoutPlan)}
+        plan={checkoutPlan}
+        cycle="monthly"
+        chargeLabel={checkoutPlan ? planChargeLabel(checkoutPlan, "monthly") : undefined}
+        onClose={() => setCheckoutPlan(null)}
+        onPaid={({ entitlement }) => {
+          setCheckoutPlan(null);
+          setNotice(`${t("checkout.success")} (${entitlement})`);
+        }}
+      />
     </section>
   );
 }

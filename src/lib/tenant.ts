@@ -41,7 +41,7 @@ export async function ensureCompanyForUser(
 
   let { data: company, error: companyError } = await supabase
     .from("companies")
-    .insert({ name, plan_type: "free", subscription_status: "free" })
+    .insert({ name, plan_type: "FREE", subscription_status: "FREE" })
     .select("id")
     .single();
 

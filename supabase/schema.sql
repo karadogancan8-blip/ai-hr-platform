@@ -45,8 +45,8 @@ create table if not exists public.resumes (
 alter table public.leave_requests add column if not exists company_id uuid references public.companies (id) on delete cascade;
 alter table public.resumes add column if not exists company_id uuid references public.companies (id) on delete cascade;
 
-alter table public.companies add column if not exists plan_type text not null default 'free';
-alter table public.companies add column if not exists subscription_status text not null default 'free';
+alter table public.companies add column if not exists plan_type text not null default 'FREE';
+alter table public.companies add column if not exists subscription_status text not null default 'FREE';
 alter table public.companies add column if not exists logo_url text;
 alter table public.companies add column if not exists primary_color text default '#123056';
 alter table public.companies add column if not exists access_control jsonb not null default '{}'::jsonb;
@@ -84,8 +84,8 @@ begin
     company_name := 'Yeni Şirket';
   end if;
 
-  insert into public.companies (name, plan_type, subscription_status)
-  values (company_name, 'free', 'free')
+    insert into public.companies (name, plan_type, subscription_status)
+  values (company_name, 'FREE', 'FREE')
   returning id into new_company_id;
 
   insert into public.profiles (id, company_id, email, role)

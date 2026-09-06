@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Check } from "lucide-react";
 import { CheckoutModal } from "@/components/checkout/CheckoutModal";
 import { DemoRequestModal } from "@/components/marketing/DemoRequestModal";
 import { EnterpriseQuoteModal } from "@/components/billing/EnterpriseQuoteModal";
 import {
   PLAN_MULTILINGUAL_FEATURE,
+  isPaidPlanId,
   planChargeLabel,
   planMonthlyEquivalent,
   plans,
@@ -18,7 +20,7 @@ import {
 import { HelpTitle } from "@/components/ui/HelpTip";
 import { cardSurfaceFlush } from "@/components/ui/surface";
 import { useI18n } from "@/components/i18n/LocaleProvider";
-import { fetchCompanySubscription, updateCompanySubscription } from "@/lib/subscription";
+import { fetchCompanySubscription } from "@/lib/subscription";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
@@ -39,6 +41,8 @@ function FeatureRow({ text, emphasis }: { text: string; emphasis?: boolean }) {
 
 export function PricingWorkspace({ variant = "public" }: { variant?: "public" | "account" }) {
   const { t } = useI18n();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const account = variant === "account";
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
   const [currentPlan, setCurrentPlan] = useState<PlanId>("free");
@@ -49,10 +53,38 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
   const [quoteOpen, setQuoteOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(account);
+  const [loading, setLoading] = useState(true);
+  const subscribeConsumed = useRef(false);
+
+  const handleSubscribe = useCallback(
+    async (planId: string) => {
+      setNotice("");
+      setError("");
+      if (!isPaidPlanId(planId)) return;
+      const plan = plans.find((item) => item.id === planId);
+      if (!plan) return;
+
+      if (!isSupabaseConfigured()) {
+        router.push(`/login?next=${encodeURIComponent(`/fiyatlandirma?subscribe=${planId}`)}`);
+        return;
+      }
+
+      const supabase = createBrowserSupabase();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        const next = account ? "/ayarlar/abonelik" : "/fiyatlandirma";
+        router.push(`/login?next=${encodeURIComponent(`${next}?subscribe=${planId}`)}`);
+        return;
+      }
+      setCheckoutPlan(plan);
+    },
+    [account, router],
+  );
 
   async function loadPlan() {
-    if (variant === "public" || !isSupabaseConfigured()) {
+    if (!isSupabaseConfigured()) {
       setAuthed(false);
       setLoading(false);
       return;
@@ -71,7 +103,7 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
       setCurrentPlan(sub.planType);
       setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Paket bilgisi yüklenemedi.");
+      setError(err instanceof Error ? err.message : t("checkout.error"));
     } finally {
       setLoading(false);
     }
@@ -81,22 +113,12 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
     void loadPlan();
   }, [variant]);
 
-  async function applyPlan(plan: Plan) {
-    const updated = await updateCompanySubscription(plan.id);
-    setCurrentPlan(updated.planType);
-    setNotice(`${plan.name} paketi şirketiniz için tanımlandı.`);
-    window.dispatchEvent(new CustomEvent("nexus-plan-updated", { detail: updated.planType }));
-  }
-
-  async function startPlan(plan: Plan) {
-    setNotice("");
-    setError("");
-    if (plan.monthlyPrice == null) {
-      setQuoteOpen(true);
-      return;
-    }
-    setCheckoutPlan(plan);
-  }
+  useEffect(() => {
+    const requested = searchParams.get("subscribe");
+    if (!requested || loading || subscribeConsumed.current) return;
+    subscribeConsumed.current = true;
+    void handleSubscribe(requested);
+  }, [searchParams, loading, handleSubscribe]);
 
   function requestDemo(plan?: Plan) {
     setDemoPlan(plan ?? null);
@@ -120,11 +142,11 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
           </p>
         </div>
 
-        <div className="inline-flex items-center self-start rounded-xl border border-slate-200 bg-white p-0.5">
+        <div className="inline-flex h-11 items-center self-start rounded-xl border border-slate-200 bg-white p-0.5">
           <button
             type="button"
             onClick={() => setCycle("monthly")}
-            className={`rounded-lg px-3.5 py-1.5 text-sm font-medium ${
+            className={`h-9 rounded-lg px-3.5 text-sm font-medium ${
               cycle === "monthly" ? "bg-[#123056] text-white" : "text-slate-600 hover:bg-slate-50"
             }`}
           >
@@ -133,7 +155,7 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
           <button
             type="button"
             onClick={() => setCycle("yearly")}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-sm font-medium ${
+            className={`inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-sm font-medium ${
               cycle === "yearly" ? "bg-[#123056] text-white" : "text-slate-600 hover:bg-slate-50"
             }`}
           >
@@ -149,17 +171,13 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
         </div>
       </div>
 
-      {loading ? (
-        <p className="min-h-[1.5rem] text-sm text-slate-400">Paket durumu yükleniyor…</p>
-      ) : (
-        <p className="min-h-[1.5rem]" aria-hidden />
-      )}
-      {error ? (
-        <p className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>
-      ) : null}
-      {notice ? (
-        <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p>
-      ) : null}
+      <p className="min-h-[1.5rem] text-sm text-slate-400">{loading ? t("common.loading") : "\u00a0"}</p>
+      <p className={`min-h-[3rem] ${error ? "rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800" : ""}`}>
+        {error || "\u00a0"}
+      </p>
+      <p className={`min-h-[3rem] ${notice ? "rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" : ""}`}>
+        {notice || "\u00a0"}
+      </p>
 
       <div className="grid min-h-[640px] items-stretch gap-5 lg:grid-cols-3">
         {plans.map((plan) => {
@@ -188,21 +206,23 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
 
               <h2 className="mt-4 text-[17px] font-semibold tracking-tight text-slate-900">{plan.name}</h2>
               <p className="mt-0.5 text-xs text-slate-500">{plan.seatLabel}</p>
-              <p className="mt-3 text-sm leading-6 text-slate-500">{plan.description}</p>
+              <p className="mt-3 min-h-[3rem] text-sm leading-6 text-slate-500">{plan.description}</p>
 
-              <p className="mt-6 flex flex-wrap items-baseline gap-x-1.5">
+              <p className="mt-6 flex min-h-[2.5rem] flex-wrap items-baseline gap-x-1.5">
                 <span className="text-[28px] font-semibold tracking-tight text-slate-900">
-                  {plan.monthlyPrice == null ? "Özel teklif" : planChargeLabel(plan, cycle).split(" / ")[0]}
+                  {plan.monthlyPrice == null ? t("pricing.offer") : planChargeLabel(plan, cycle).split(" / ")[0]}
                 </span>
                 {plan.monthlyPrice != null ? (
                   <span className="text-sm text-slate-400">{cycle === "yearly" ? "/ yıl" : "/ ay"}</span>
                 ) : null}
               </p>
-              <p className="mt-1 text-xs leading-5 text-slate-400">{planMonthlyEquivalent(plan, cycle)}</p>
+              <p className="mt-1 min-h-[2.5rem] text-xs leading-5 text-slate-400">{planMonthlyEquivalent(plan, cycle)}</p>
 
               {current && plan.popular ? (
-                <p className="mt-2 text-[11px] font-medium text-slate-500">{t("pricing.current")}</p>
-              ) : null}
+                <p className="mt-2 min-h-[1rem] text-[11px] font-medium text-slate-500">{t("pricing.current")}</p>
+              ) : (
+                <p className="mt-2 min-h-[1rem]" aria-hidden />
+              )}
 
               <ul className="mt-6 flex-1 space-y-2.5">
                 {highlights.map((feature) => (
@@ -221,43 +241,26 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
               </ul>
 
               <div className="mt-7 grid gap-2">
-                {authed || plan.monthlyPrice == null ? (
-                  <button
-                    type="button"
-                    onClick={() => void startPlan(plan)}
-                    disabled={current && plan.monthlyPrice != null}
-                    className={`w-full rounded-xl py-2.5 text-sm font-medium ${
-                      current && plan.monthlyPrice != null
-                        ? "cursor-default bg-slate-100 text-slate-500"
-                        : plan.popular
-                          ? "bg-[#123056] text-white hover:bg-[#0f2744]"
-                          : "bg-slate-50 text-slate-800 hover:bg-slate-100"
-                    }`}
-                  >
-                    {current && plan.monthlyPrice != null
-                      ? t("pricing.active")
-                      : plan.monthlyPrice == null
-                        ? t("pricing.offer")
-                        : t("pricing.start")}
-                  </button>
-                ) : (
-                  <Link
-                    href="/login?next=/ayarlar/abonelik"
-                    className={`block w-full rounded-xl py-2.5 text-center text-sm font-medium ${
-                      plan.popular
-                        ? "bg-[#123056] text-white hover:bg-[#0f2744]"
-                        : "bg-slate-50 text-slate-800 hover:bg-slate-100"
-                    }`}
-                  >
-                    {t("pricing.start")}
-                  </Link>
-                )}
                 <button
                   type="button"
-                  onClick={() => requestDemo(plan)}
-                  className="w-full rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                  onClick={() => void handleSubscribe(plan.id)}
+                  disabled={current}
+                  className={`h-11 w-full rounded-xl text-sm font-medium ${
+                    current
+                      ? "cursor-default bg-slate-100 text-slate-500"
+                      : plan.popular
+                        ? "bg-[#123056] text-white hover:bg-[#0f2744]"
+                        : "bg-slate-50 text-slate-800 hover:bg-slate-100"
+                  }`}
                 >
-                  {t("pricing.demo")}
+                  {current ? t("pricing.active") : plan.id === "starter" ? t("pricing.start") : t("pricing.subscribe")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => (plan.id === "enterprise" ? setQuoteOpen(true) : requestDemo(plan))}
+                  className="h-11 w-full rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                >
+                  {plan.id === "enterprise" ? t("pricing.offer") : t("pricing.demo")}
                 </button>
               </div>
             </article>
@@ -268,12 +271,14 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
       <CheckoutModal
         open={Boolean(checkoutPlan)}
         plan={checkoutPlan}
+        cycle={cycle}
         chargeLabel={checkoutPlan ? planChargeLabel(checkoutPlan, cycle) : undefined}
         onClose={() => setCheckoutPlan(null)}
-        onConfirm={async () => {
-          if (!checkoutPlan) return;
-          await applyPlan(checkoutPlan);
+        onPaid={({ planType, entitlement }) => {
+          setCurrentPlan(planType);
           setCheckoutPlan(null);
+          setNotice(`${t("checkout.success")} (${entitlement})`);
+          window.dispatchEvent(new CustomEvent("nexus-plan-updated", { detail: planType }));
         }}
       />
 
@@ -286,6 +291,14 @@ export function PricingWorkspace({ variant = "public" }: { variant?: "public" | 
         }}
       />
       <EnterpriseQuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} />
+
+      {!account ? (
+        <p className="text-center text-sm text-slate-400">
+          <Link href="/login" className="font-medium text-slate-600 hover:text-slate-900">
+            {t("pricing.login")}
+          </Link>
+        </p>
+      ) : null}
     </div>
   );
 }

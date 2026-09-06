@@ -1,5 +1,12 @@
 import { getSupabase } from "./supabase";
-import { asPlanId, type PlanId, type SubscriptionStatus } from "./plans";
+import {
+  asPlanId,
+  asSubscriptionStatus,
+  toDbPlanEntitlement,
+  toDbSubscriptionStatus,
+  type PlanId,
+  type SubscriptionStatus,
+} from "./plans";
 import { getCompanyId, type AppSupabase } from "./tenant";
 
 export type CompanySubscription = {
@@ -27,33 +34,39 @@ export async function fetchCompanySubscription(client?: AppSupabase): Promise<Co
     subscription_status?: string | null;
   } | null;
 
+  const planType = asPlanId(row?.plan_type);
+  const status = asSubscriptionStatus(row?.subscription_status);
+
   return {
     companyId,
     companyName: row?.name ?? "Şirket",
-    planType: asPlanId(row?.plan_type),
-    subscriptionStatus: row?.subscription_status === "active" ? "active" : "free",
+    planType,
+    subscriptionStatus: status,
   };
 }
 
 export async function updateCompanySubscription(planType: PlanId, client?: AppSupabase) {
   const supabase = client ?? getSupabase();
   const companyId = await getCompanyId(supabase);
+  return activateCompanySubscription(companyId, planType, supabase);
+}
+
+export async function activateCompanySubscription(companyId: string, planType: PlanId, client: AppSupabase) {
   const subscriptionStatus: SubscriptionStatus = planType === "free" ? "free" : "active";
-  const payload: Record<string, string> = {
-    plan_type: planType,
-    subscription_status: subscriptionStatus,
+  const payload: { plan_type?: string; subscription_status?: string } = {
+    plan_type: toDbPlanEntitlement(planType),
+    subscription_status: toDbSubscriptionStatus(subscriptionStatus),
   };
 
   for (let attempt = 0; attempt < 4; attempt += 1) {
-    const { data, error } = await supabase.from("companies").update(payload).eq("id", companyId).select("*").maybeSingle();
+    const { data, error } = await client.from("companies").update(payload).eq("id", companyId).select("*").maybeSingle();
     if (!error) {
-      const row = data as { name?: string; plan_type?: string | null; subscription_status?: string | null } | null;
+      const row = data as { id?: string; name?: string; plan_type?: string | null; subscription_status?: string | null } | null;
       return {
         companyId,
         companyName: row?.name ?? "Şirket",
         planType: asPlanId(row?.plan_type ?? planType),
-        subscriptionStatus:
-          row?.subscription_status === "active" || planType !== "free" ? ("active" as const) : ("free" as const),
+        subscriptionStatus: asSubscriptionStatus(row?.subscription_status) === "active" || planType !== "free" ? ("active" as const) : ("free" as const),
       };
     }
 
